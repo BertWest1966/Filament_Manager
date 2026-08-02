@@ -4,7 +4,7 @@ const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','PA / Nylon','PC','PV
 let state=loadState(),stockMode='spools',editFilamentId=null,editSpoolId=null,editRefillId=null,currentDetailId=null,previousView='dashboard',receiveOrderId=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-function fresh(){return{appVersion:'5.8',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS),settings:{spoolPrefix:'S',refillPrefix:'R',digits:4,defaultBrand:'Bambu Lab',defaultSupplier:'Bambu Lab'}}}
+function fresh(){return{appVersion:'5.9',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS),settings:{spoolPrefix:'S',refillPrefix:'R',digits:4,defaultBrand:'Bambu Lab',defaultSupplier:'Bambu Lab'}}}
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
 function pushUnique(a,v){v=String(v||'').trim();if(v&&!a.some(x=>x.toLowerCase()===v.toLowerCase()))a.push(v)}
 function migrate(raw){
@@ -31,7 +31,7 @@ function migrate(raw){
     };
   });
   d.settings={...d.settings,...(raw.settings||{})};
-  d.appVersion='5.8';
+  d.appVersion='5.9';
   return d;
 }
 function loadState(){try{return migrate(JSON.parse(localStorage.getItem(KEY)||'null'))}catch{return fresh()}}
@@ -59,9 +59,14 @@ function refreshLists(){fCategory.innerHTML=state.libraries.categories.sort().ma
 function refreshTypeOptions(){typeOptions.innerHTML=(state.libraries.types[fCategory.value]||[]).sort().map(x=>`<option value="${esc(x)}">`).join('')}
 fCategory.addEventListener('change',refreshTypeOptions);
 function fillFilaments(el,selected=''){el.innerHTML=state.catalog.slice().sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl')).map(f=>`<option value="${f.id}" ${f.id===selected?'selected':''}>${esc(label(f))}</option>`).join('')}
-function openFilament(id=null){editFilamentId=id;refreshLists();const f=filament(id);filamentTitle.textContent=f?'Filament wijzigen':'Nieuw filament';fCategory.value=f?.category||state.libraries.categories[0];refreshTypeOptions();fBrand.value=f?.brand||localStorage.getItem('lastBrand')||state.settings.defaultBrand||'Bambu Lab';fType.value=f?.type||'';fColor.value=f?.color||'';fMinimum.value=f?.min??1;fTarget.value=f?.target??2;fSupplier.value=f?.supplier||localStorage.getItem('lastSupplier')||state.settings.defaultSupplier||'Bambu Lab';fSupplierRef.value=f?.supplierRef||'';filamentDialog.showModal()}
+function openFilament(id=null){editFilamentId=id;refreshLists();const f=filament(id);filamentTitle.textContent=f?'Filament wijzigen':'Nieuw filament';fCategory.value=f?.category||state.libraries.categories[0];refreshTypeOptions();fBrand.value=f?.brand||localStorage.getItem('lastBrand')||state.settings.defaultBrand||'Bambu Lab';fType.value=f?.type||'';fColor.value=f?.color||'';{
+  const allowed=[0,0.25,0.5,0.75,1];
+  const current=Number(f?.min??1);
+  const nearest=allowed.reduce((best,v)=>Math.abs(v-current)<Math.abs(best-current)?v:best,allowed[0]);
+  fMinimum.value=String(nearest);
+}fTarget.value=f?.target??2;fSupplier.value=f?.supplier||localStorage.getItem('lastSupplier')||state.settings.defaultSupplier||'Bambu Lab';fSupplierRef.value=f?.supplierRef||'';filamentDialog.showModal()}
 newFilamentBtn.onclick=()=>openFilament();
-filamentForm.onsubmit=e=>{e.preventDefault();const o={id:editFilamentId||uid(),category:fCategory.value.trim(),brand:fBrand.value.trim(),type:fType.value.trim(),color:fColor.value.trim(),min:Number(fMinimum.value),target:Number(fTarget.value),supplier:fSupplier.value.trim(),supplierRef:fSupplierRef.value.trim()};if(!o.category||!o.brand||!o.type||!o.color){alert('Vul categorie, merk, type en kleur in.');return}pushUnique(state.libraries.categories,o.category);pushUnique(state.libraries.brands,o.brand);pushUnique(state.libraries.colors,o.color);pushUnique(state.libraries.suppliers,o.supplier);if(!state.libraries.types[o.category])state.libraries.types[o.category]=[];pushUnique(state.libraries.types[o.category],o.type);state.catalog=editFilamentId?state.catalog.map(f=>f.id===editFilamentId?o:f):[...state.catalog,o];addLog(editFilamentId?'filament_updated':'filament_created',`${o.category} ${o.type} ${o.color} ${editFilamentId?'gewijzigd':'aangemaakt'}`,o.id);filamentDialog.close();save()}
+filamentForm.onsubmit=e=>{e.preventDefault();const o={id:editFilamentId||uid(),category:fCategory.value.trim(),brand:fBrand.value.trim(),type:fType.value.trim(),color:fColor.value.trim(),min:[0,0.25,0.5,0.75,1].includes(Number(fMinimum.value))?Number(fMinimum.value):0,target:Number(fTarget.value),supplier:fSupplier.value.trim(),supplierRef:fSupplierRef.value.trim()};if(!o.category||!o.brand||!o.type||!o.color){alert('Vul categorie, merk, type en kleur in.');return}pushUnique(state.libraries.categories,o.category);pushUnique(state.libraries.brands,o.brand);pushUnique(state.libraries.colors,o.color);pushUnique(state.libraries.suppliers,o.supplier);if(!state.libraries.types[o.category])state.libraries.types[o.category]=[];pushUnique(state.libraries.types[o.category],o.type);state.catalog=editFilamentId?state.catalog.map(f=>f.id===editFilamentId?o:f):[...state.catalog,o];addLog(editFilamentId?'filament_updated':'filament_created',`${o.category} ${o.type} ${o.color} ${editFilamentId?'gewijzigd':'aangemaakt'}`,o.id);filamentDialog.close();save()}
 function openSpool(id=null,preset=null){if(!state.catalog.length)return alert('Maak eerst een filament aan.');editSpoolId=id;const s=state.spools.find(x=>x.id===id);spoolTitle.textContent=s?'Spoel wijzigen':'Nieuwe spoel';sNumber.value=s?.number||nextNumber(state.settings.spoolPrefix||'S',state.spools);fillFilaments(sFilament,s?.filamentId||preset||state.catalog[0].id);sLevel.value=String(s?.level??100);sStatus.value=s?.status||'active';spoolDialog.showModal()}
 newSpoolBtn.onclick=()=>openSpool();
 spoolForm.onsubmit=e=>{e.preventDefault();const o={id:editSpoolId||uid(),number:sNumber.value.trim().toUpperCase(),filamentId:sFilament.value,level:Number(sLevel.value),status:sStatus.value};state.spools=editSpoolId?state.spools.map(s=>s.id===editSpoolId?o:s):[...state.spools,o];addLog('spool_update',`Spoel ${o.number} ${editSpoolId?'gewijzigd':'aangemaakt'} naar ${o.level}%`,o.filamentId,o.number);spoolDialog.close();save()}

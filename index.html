@@ -9,14 +9,14 @@
 <meta name="apple-mobile-web-app-title" content="Filament">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
-<title>Filament Manager v5.8.1 Mobile</title>
+<title>Filament Manager v5.9 Mobile</title>
 <link rel="stylesheet" href="assets/app.css">
 </head>
 <body>
 <header class="app-header">
   <div>
     <h1>Filament Manager</h1>
-    <div class="version">Versie 5.8.1 · Mobile First</div>
+    <div class="version">Versie 5.9 · Mobile First</div>
   </div>
   <button id="installAppBtn" class="install-button hidden">Installeer</button>
 </header>
@@ -218,7 +218,15 @@
 <label>Merk<input id="fBrand" list="brandOptions" required><datalist id="brandOptions"></datalist></label>
 <label>Type<input id="fType" list="typeOptions" required><datalist id="typeOptions"></datalist></label>
 <label>Kleur<input id="fColor" list="colorOptions" required><datalist id="colorOptions"></datalist></label>
-<label>Minimumvoorraad<input id="fMinimum" type="number" min="0" step="0.25" value="1" required></label>
+<label>Minimumvoorraad
+<select id="fMinimum" required>
+  <option value="0">0% — geen minimum</option>
+  <option value="0.25">25% — kwart rol</option>
+  <option value="0.5">50% — halve rol</option>
+  <option value="0.75">75% — driekwart rol</option>
+  <option value="1">100% — volle rol</option>
+</select>
+</label>
 <label>Gewenste voorraad<input id="fTarget" type="number" min="0" step="1" value="2" required></label>
 <label>Leverancier<input id="fSupplier" list="supplierOptions"><datalist id="supplierOptions"></datalist></label>
 <label>Leveranciersreferentie<input id="fSupplierRef"></label>
