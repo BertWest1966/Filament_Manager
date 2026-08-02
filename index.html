@@ -9,14 +9,14 @@
 <meta name="apple-mobile-web-app-title" content="Filament">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
-<title>Filament Manager v6.1 Mobile</title>
+<title>Filament Manager v6.2 Mobile</title>
 <link rel="stylesheet" href="assets/app.css">
 </head>
 <body>
 <header class="app-header">
   <div>
     <h1>Filament Manager</h1>
-    <div class="version">Versie 6.1 · Dashboard</div>
+    <div class="version">Versie 6.2 · Scanner</div>
   </div>
   <button id="installAppBtn" class="install-button hidden">Installeer</button>
 </header>
@@ -55,6 +55,11 @@
     <button id="newRefillBtn">Nieuwe refill</button>
     <button id="printAllLabelsBtn">Print geselecteerde stickers</button>
     <input id="stockSearch" placeholder="Zoek categorie, type, kleur of nummer">
+    <select id="stockSort">
+      <option value="filament">Categorie → type → kleur</option>
+      <option value="number-asc">Spoelnummer oplopend</option>
+      <option value="number-desc">Spoelnummer aflopend</option>
+    </select>
   </div>
   <div class="segmented">
     <button data-stock-mode="spools" class="active">Spoelen</button>
@@ -92,7 +97,7 @@
   <div class="panel">
     <h2>QR-code scannen</h2>
     <div id="scannerStatus" class="note">Gebruik de camera wanneer de app als PWA via HTTPS geopend is. Handmatige invoer blijft beschikbaar.</div>
-    <video id="scannerVideo" playsinline muted class="scanner-video hidden"></video>
+    <div id="qrReader" class="qr-reader hidden"></div>
     <div class="toolbar">
       <button class="primary" id="startScannerBtn">Start camera</button>
       <button id="stopScannerBtn">Stop camera</button>
@@ -418,6 +423,7 @@
   </div>
 </dialog>
 
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

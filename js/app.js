@@ -1,10 +1,10 @@
 
 const KEY='filament_manager_v5_3';
 const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','PA / Nylon','PC','PVA','Andere'],brands:['Bambu Lab'],colors:['Zwart','Wit'],suppliers:['Bambu Lab'],types:{'PLA':['Basic','Matte','Silk','CF','Glow'],'PETG':['Basic','HF','CF'],'TPU':['95A','85A'],'ABS':['Basic'],'ASA':['Basic'],'PA / Nylon':['Basic','CF'],'PC':['Basic'],'PVA':['Basic'],'Andere':[]}};
-let state=loadState(),stockMode='spools',editFilamentId=null,editSpoolId=null,editRefillId=null,currentDetailId=null,previousView='dashboard',receiveOrderId=null;
+let state=loadState(),stockMode='spools',stockSortMode='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,currentDetailId=null,previousView='dashboard',receiveOrderId=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-function fresh(){return{appVersion:'6.1',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS),settings:{spoolPrefix:'S',refillPrefix:'R',digits:4,defaultBrand:'Bambu Lab',defaultSupplier:'Bambu Lab'}}}
+function fresh(){return{appVersion:'6.2',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS),settings:{spoolPrefix:'S',refillPrefix:'R',digits:4,defaultBrand:'Bambu Lab',defaultSupplier:'Bambu Lab'}}}
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
 function pushUnique(a,v){v=String(v||'').trim();if(v&&!a.some(x=>x.toLowerCase()===v.toLowerCase()))a.push(v)}
 function migrate(raw){
@@ -31,7 +31,7 @@ function migrate(raw){
     };
   });
   d.settings={...d.settings,...(raw.settings||{})};
-  d.appVersion='6.1';
+  d.appVersion='6.2';
   return d;
 }
 function loadState(){try{return migrate(JSON.parse(localStorage.getItem(KEY)||'null'))}catch{return fresh()}}
@@ -383,44 +383,91 @@ function openScannedCode(value){
   const code=parseScannedValue(value);
   const found=findCode(code);
   if(!found){alert('Code niet gevonden.');return}
-  if(found.kind==='spool'){setView('voorraad');stockMode='spools';renderStock();openSpool(found.item.id)}
-  else{setView('voorraad');stockMode='refills';renderStock();openRefill(found.item.id)}
+
+  if(found.kind==='spool'&&found.item.status==='active'&&Number(found.item.level)===0&&!quickFillSpool.value){
+    quickFillSpool.value=found.item.number;
+    scannerStatus.textContent=`Lege spoel ${found.item.number} gekozen. Scan nu een refill.`;
+    return;
+  }
+
+  if(found.kind==='refill'&&quickFillSpool.value&&!quickFillRefill.value){
+    quickFillRefill.value=found.item.number;
+    scannerStatus.textContent=`Refill ${found.item.number} gekozen. Tik op Koppelen.`;
+    return;
+  }
+
+  if(found.kind==='spool'){
+    setView('voorraad');
+    stockMode='spools';
+    renderStock();
+    openSpool(found.item.id);
+  }else{
+    setView('voorraad');
+    stockMode='refills';
+    renderStock();
+    openRefill(found.item.id);
+  }
 }
 manualScanBtn.onclick=()=>openScannedCode(manualScanCode.value);
 
-let scannerStream=null;
-let scannerTimer=null;
-startScannerBtn.onclick=async()=>{
-  if(!('BarcodeDetector' in window)){
-    scannerStatus.textContent='Deze browser ondersteunt de ingebouwde QR-scanner niet. Gebruik handmatige invoer.';
+let html5QrCode=null;
+let scannerRunning=false;
+
+async function startScanner(){
+  if(typeof Html5Qrcode==='undefined'){
+    scannerStatus.textContent='De QR-scanner kon niet geladen worden. Controleer je internetverbinding en vernieuw de app.';
     return;
   }
+
+  if(scannerRunning)return;
+
   try{
-    scannerStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-    scannerVideo.srcObject=scannerStream;
-    scannerVideo.classList.remove('hidden');
-    await scannerVideo.play();
-    scannerStatus.textContent='Camera actief. Richt de QR-code binnen het beeld.';
-    const detector=new BarcodeDetector({formats:['qr_code']});
-    scannerTimer=setInterval(async()=>{
-      try{
-        const codes=await detector.detect(scannerVideo);
-        if(codes.length){
-          stopScanner();
-          openScannedCode(codes[0].rawValue);
-        }
-      }catch{}
-    },500);
+    qrReader.classList.remove('hidden');
+    html5QrCode=new Html5Qrcode('qrReader');
+
+    const config={
+      fps:10,
+      qrbox:(width,height)=>{
+        const size=Math.floor(Math.min(width,height)*0.72);
+        return {width:size,height:size};
+      },
+      aspectRatio:1.0
+    };
+
+    scannerStatus.textContent='Camera wordt geopend...';
+
+    await html5QrCode.start(
+      {facingMode:'environment'},
+      config,
+      decodedText=>{
+        stopScanner().finally(()=>openScannedCode(decodedText));
+      },
+      ()=>{}
+    );
+
+    scannerRunning=true;
+    scannerStatus.textContent='Camera actief. Richt de QR-code binnen het kader.';
   }catch(err){
-    scannerStatus.textContent='Camera kon niet worden geopend. HTTPS en cameratoegang zijn nodig.';
+    scannerRunning=false;
+    qrReader.classList.add('hidden');
+    scannerStatus.textContent='Camera kon niet worden geopend. Controleer cameratoegang in Safari en open de app via HTTPS.';
   }
-};
-function stopScanner(){
-  if(scannerTimer){clearInterval(scannerTimer);scannerTimer=null}
-  if(scannerStream){scannerStream.getTracks().forEach(t=>t.stop());scannerStream=null}
-  scannerVideo.classList.add('hidden');
+}
+
+async function stopScanner(){
+  if(html5QrCode){
+    try{
+      if(scannerRunning)await html5QrCode.stop();
+      await html5QrCode.clear();
+    }catch{}
+  }
+  html5QrCode=null;
+  scannerRunning=false;
+  qrReader.classList.add('hidden');
   scannerStatus.textContent='Scanner gestopt.';
 }
+
+startScannerBtn.onclick=startScanner;
 stopScannerBtn.onclick=stopScanner;
 
 quickFillBtn.onclick=()=>{
@@ -476,7 +523,27 @@ printAllLabelsBtn.onclick=()=>{
   win.document.close();
 };
 
-function renderStock(){document.querySelectorAll('[data-stock-mode]').forEach(b=>b.classList.toggle('active',b.dataset.stockMode===stockMode));const q=stockSearch.value.toLowerCase();const items=(stockMode==='spools'?state.spools:state.refills).filter(x=>{const f=filament(x.filamentId);return !q||`${f?.category} ${f?.type} ${f?.color} ${x.number}`.toLowerCase().includes(q)}).sort(sortByFilament);stockList.innerHTML=items.map(x=>{const f=filament(x.filamentId);return `<div class="item-row"><div class="item-main"><strong>${esc(f?.category)} · ${esc(f?.type)} · ${esc(f?.color)}</strong><div class="item-meta">${esc(x.number)} · ${stockMode==='spools'?(x.status==='inactive'?'Buiten gebruik':Number(x.level)===0?'Leeg':x.level+'%'):'Refill'}</div></div><div class="item-actions"><input class="stock-select label-select" type="checkbox" data-kind="${stockMode==='spools'?'spoel':'refill'}" data-id="${x.id}"><button onclick="${stockMode==='spools'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button><button onclick="openQr('${stockMode==='spools'?'spoel':'refill'}','${x.id}')">QR</button>${stockMode==='spools'&&x.status==='active'&&Number(x.level)===0?`<button onclick="openFill('${x.id}')">Vullen</button>`:''}</div></div>`}).join('')||'<div class="empty">Geen gegevens.</div>'}
+
+function sortStockItems(items){
+  const copy=items.slice();
+
+  if(stockSortMode==='number-asc'){
+    return copy.sort((a,b)=>String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true}));
+  }
+
+  if(stockSortMode==='number-desc'){
+    return copy.sort((a,b)=>String(b.number||'').localeCompare(String(a.number||''),'nl',{numeric:true}));
+  }
+
+  return copy.sort(sortByFilament);
+}
+
+stockSort.onchange=()=>{
+  stockSortMode=stockSort.value;
+  renderStock();
+};
+
+function renderStock(){document.querySelectorAll('[data-stock-mode]').forEach(b=>b.classList.toggle('active',b.dataset.stockMode===stockMode));const q=stockSearch.value.toLowerCase();const items=sortStockItems((stockMode==='spools'?state.spools:state.refills).filter(x=>{const f=filament(x.filamentId);return !q||`${f?.category} ${f?.type} ${f?.color} ${x.number}`.toLowerCase().includes(q)}));stockList.innerHTML=items.map(x=>{const f=filament(x.filamentId);return `<div class="item-row"><div class="item-main"><strong>${esc(f?.category)} · ${esc(f?.type)} · ${esc(f?.color)}</strong><div class="item-meta">${esc(x.number)} · ${stockMode==='spools'?(x.status==='inactive'?'Buiten gebruik':Number(x.level)===0?'Leeg':x.level+'%'):'Refill'}</div></div><div class="item-actions"><input class="stock-select label-select" type="checkbox" data-kind="${stockMode==='spools'?'spoel':'refill'}" data-id="${x.id}"><button onclick="${stockMode==='spools'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button><button onclick="openQr('${stockMode==='spools'?'spoel':'refill'}','${x.id}')">QR</button>${stockMode==='spools'&&x.status==='active'&&Number(x.level)===0?`<button onclick="openFill('${x.id}')">Vullen</button>`:''}</div></div>`}).join('')||'<div class="empty">Geen gegevens.</div>'}
 document.querySelectorAll('[data-stock-mode]').forEach(b=>b.onclick=()=>{stockMode=b.dataset.stockMode;renderStock()});stockSearch.oninput=renderStock;
 function renderOrderList(){const q=orderListSearch.value.toLowerCase(),rows=state.catalog.map(f=>({f,available:totalStock(f.id),incoming:openOrdered(f.id),needed:toOrder(f)})).filter(x=>x.needed>0&&(!q||`${x.f.category} ${x.f.type} ${x.f.color}`.toLowerCase().includes(q))).sort((a,b)=>a.f.category.localeCompare(b.f.category,'nl')||a.f.type.localeCompare(b.f.type,'nl')||a.f.color.localeCompare(b.f.color,'nl'));orderList.innerHTML=rows.length?`<table class="order-table"><thead><tr><th></th><th>Categorie</th><th>Type</th><th>Kleur</th><th>Op spoel</th><th>Refill</th><th>In bestelling</th><th>Nog bestellen</th></tr></thead><tbody>${rows.map(x=>`<tr><td><input class="order-select" type="checkbox" data-id="${x.f.id}" data-qty="${x.needed}"></td><td>${esc(x.f.category)}</td><td>${esc(x.f.type)}</td><td>${esc(x.f.color)}</td><td>${Math.round(spoolStock(x.f.id)*100)}%</td><td>${refillCount(x.f.id)}</td><td>${x.incoming}</td><td><strong>${x.needed}</strong></td></tr>`).join('')}</tbody></table>`:'<div class="empty">Niets te bestellen.</div>'}
 orderListSearch.oninput=renderOrderList;

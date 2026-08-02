@@ -1,24 +1,25 @@
-FILAMENT MANAGER v6.1 — DASHBOARD
+FILAMENT MANAGER v6.2 — SCANNER
 
-Nieuw dashboard:
-Categorie
-  Type
-    Kleur | Spoelnummer | Hoeveelheid | Refills
+Nieuw:
+- Voorraad kan worden gesorteerd op:
+  categorie → type → kleur
+  spoelnummer oplopend
+  spoelnummer aflopend
+- QR-scanner vervangen door html5-qrcode.
+- Scanner werkt in Safari/iPhone via HTTPS.
+- Achtercamera wordt automatisch gekozen.
+- Scanworkflow:
+  1. scan een lege spoel;
+  2. scan een refill;
+  3. tik op Koppelen.
 
-Voorbeeld:
-PLA
-  Basic
-    Red | S0013 | 75% | 2
+Belangrijk:
+- De scannerbibliotheek wordt online geladen.
+- De app moet via HTTPS op GitHub Pages geopend worden.
+- Geef Safari toestemming voor de camera.
 
-Werking:
-- Tik op kleur: open filamentdetail.
-- Tik op spoelnummer: wijzig spoel.
-- Tik op hoeveelheid: kies direct 0%, 25%, 50%, 75% of 100%.
-- Bij meerdere actieve spoelen van dezelfde kleur verschijnt elke spoel op een aparte regel.
-- Als geen actieve spoel bestaat, staat er een streepje.
-
-Upload naar GitHub:
-1. Vervang alle bestanden.
+Upload:
+1. Vervang alle bestanden in GitHub.
 2. Commit changes.
-3. Open de site eerst in Safari en vernieuw.
-4. Sluit daarna de geïnstalleerde app en open opnieuw.
+3. Open de website eerst in Safari en vernieuw.
+4. Sluit daarna de geïnstalleerde webapp volledig en open opnieuw.
