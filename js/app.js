@@ -1,10 +1,10 @@
 
 const KEY='filament_manager_v5_3';
-const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','PA / Nylon','PC','PVA','Andere'],brands:['Bambu Lab'],colors:['Zwart','Wit'],suppliers:['Bambu Lab'],types:{'PLA':['Basic','Matte','Silk','CF','Glow'],'PETG':['Basic','HF','CF'],'TPU':['95A','85A'],'ABS':['Basic'],'ASA':['Basic'],'PA / Nylon':['Basic','CF'],'PC':['Basic'],'PVA':['Basic'],'Andere':[]}};
+const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','PA / Nylon','PC','PVA','Andere'],brands:['Bambu Lab'],colors:[],suppliers:['Bambu Lab'],types:{'PLA':['Basic','Matte','Silk','CF','Glow'],'PETG':['Basic','HF','CF'],'TPU':['95A','85A'],'ABS':['Basic'],'ASA':['Basic'],'PA / Nylon':['Basic','CF'],'PC':['Basic'],'PVA':['Basic'],'Andere':[]}};
 let state=loadState(),stockMode='spools',stockSortMode='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,currentDetailId=null,previousView='dashboard',receiveOrderId=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-function fresh(){return{appVersion:'6.3.2',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS),settings:{spoolPrefix:'S',refillPrefix:'R',digits:4,defaultBrand:'Bambu Lab',defaultSupplier:'Bambu Lab'}}}
+function fresh(){return{appVersion:'6.3.3',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS),settings:{spoolPrefix:'S',refillPrefix:'R',digits:4,defaultBrand:'Bambu Lab',defaultSupplier:'Bambu Lab'}}}
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
 function pushUnique(a,v){v=String(v||'').trim();if(v&&!a.some(x=>x.toLowerCase()===v.toLowerCase()))a.push(v)}
 function migrate(raw){
@@ -31,7 +31,7 @@ function migrate(raw){
     };
   });
   d.settings={...d.settings,...(raw.settings||{})};
-  d.appVersion='6.3.2';
+  d.appVersion='6.3.3';
   return d;
 }
 function loadState(){try{return migrate(JSON.parse(localStorage.getItem(KEY)||'null'))}catch{return fresh()}}
@@ -696,7 +696,7 @@ function setBackupStatus(message,type=''){
 function downloadBackup(){
   const backup={
     ...state,
-    appVersion:'6.3.2',
+    appVersion:'6.3.3',
     exportedAt:new Date().toISOString(),
     backupFormat:'filament-manager-json-v1'
   };
@@ -779,45 +779,78 @@ setTimeout(()=>{
 },300);
 
 
+
+
+
+
+
+
+function removeDefaultColors(){
+  const blocked=new Set(['white','black','wit','zwart']);
+  if(!state.libraries)state.libraries={...structuredClone(DEFAULTS)};
+  if(!Array.isArray(state.libraries.colors))state.libraries.colors=[];
+
+  state.libraries.colors=state.libraries.colors.filter(
+    color=>!blocked.has(String(color||'').trim().toLowerCase())
+  );
+}
+
 function resetFilamentDraft(){
   editFilamentId=null;
-  if(window.fCategory)fCategory.value='';
-  if(window.fType)fType.value='';
-  if(window.fColor)fColor.value='';
-  if(window.fBrand)fBrand.value='';
-  if(window.fSupplier)fSupplier.value='';
-  if(window.fSupplierRef)fSupplierRef.value='';
-  if(window.pickCategoryText)pickCategoryText.textContent='Kies categorie';
-  if(window.pickTypeText)pickTypeText.textContent='Kies type';
-  if(window.pickColorText)pickColorText.textContent='Kies kleur';
-  if(window.pickBrandText)pickBrandText.textContent='Kies merk';
-  if(window.pickSupplierText)pickSupplierText.textContent='Kies leverancier';
-}
 
-if(window.cancelFilamentBtn){
-  cancelFilamentBtn.onclick=()=>{
-    resetFilamentDraft();
-    if(window.pickerDialog?.open)pickerDialog.close();
-    if(window.newPickerValueDialog?.open)newPickerValueDialog.close();
-    if(window.filamentDialog?.open)filamentDialog.close();
+  const fields=['fCategory','fType','fColor','fBrand','fSupplier','fSupplierRef'];
+  fields.forEach(id=>{
+    const field=document.getElementById(id);
+    if(field)field.value='';
+  });
+
+  const labels={
+    pickCategoryText:'Kies categorie',
+    pickTypeText:'Kies type',
+    pickColorText:'Kies kleur',
+    pickBrandText:'Kies merk',
+    pickSupplierText:'Kies leverancier'
   };
+
+  Object.entries(labels).forEach(([id,text])=>{
+    const element=document.getElementById(id);
+    if(element)element.textContent=text;
+  });
 }
 
-filamentDialog.addEventListener('cancel',event=>{
-  event.preventDefault();
-  resetFilamentDraft();
-  filamentDialog.close();
+function closeDialogSafely(dialog){
+  if(dialog && dialog.open){
+    try{dialog.close()}catch{}
+  }
+}
+
+document.addEventListener('click',event=>{
+  const directButton=event.target.closest('[data-close-dialog]');
+  if(directButton){
+    event.preventDefault();
+    if(directButton.dataset.closeDialog==='filamentDialog')resetFilamentDraft();
+    closeDialogSafely(document.getElementById(directButton.dataset.closeDialog));
+    return;
+  }
+
+  const currentButton=event.target.closest('[data-close-current-dialog]');
+  if(currentButton){
+    event.preventDefault();
+    const dialog=currentButton.closest('dialog');
+    if(dialog?.id==='filamentDialog')resetFilamentDraft();
+    closeDialogSafely(dialog);
+  }
 });
 
+const filamentDialogElement=document.getElementById('filamentDialog');
+if(filamentDialogElement){
+  filamentDialogElement.addEventListener('cancel',event=>{
+    event.preventDefault();
+    resetFilamentDraft();
+    closeDialogSafely(filamentDialogElement);
+  });
+}
 
-(function(){
-  try{
-    if(state?.libraries?.colors){
-      const defaults=['White','Black','Wit','Zwart'];
-      state.libraries.colors=state.libraries.colors.filter(
-        c=>!defaults.includes(String(c)) || state.catalog.some(f=>String(f.color)===String(c))
-      );
-      save();
-    }
-  }catch(e){}
-})();
+removeDefaultColors();
+localStorage.setItem(KEY,JSON.stringify(state));
+renderAll();

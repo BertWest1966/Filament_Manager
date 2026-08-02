@@ -9,14 +9,14 @@
 <meta name="apple-mobile-web-app-title" content="Filament">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
-<title>Filament Manager v6.3.2 Mobile</title>
+<title>Filament Manager v6.3.3 Mobile</title>
 <link rel="stylesheet" href="assets/app.css">
 </head>
 <body>
 <header class="app-header">
   <div>
     <h1>Filament Manager</h1>
-    <div class="version">Versie 6.3.2 · Leverancierskleuren</div>
+    <div class="version">Versie 6.3.3 · Herstel</div>
   </div>
   <button id="installAppBtn" class="install-button hidden">Installeer</button>
 </header>
@@ -311,7 +311,7 @@
 </div>
 
 <div class="dialog-actions">
-  <button type="button" id="cancelFilamentBtn">Annuleren</button>
+  <button type="button" id="cancelFilamentBtn" data-close-dialog="filamentDialog">Annuleren</button>
   <button type="submit" class="primary">Opslaan</button>
 </div>
 </form>
@@ -334,7 +334,7 @@
     <h2 id="newPickerValueTitle">Nieuwe waarde</h2>
     <label>Naam<input id="newPickerValueInput" required></label>
     <div class="dialog-actions">
-      <button value="cancel">Annuleren</button>
+      <button type="button" data-close-current-dialog>Annuleren</button>
       <button type="submit" class="primary">Toevoegen</button>
     </div>
   </form>
@@ -359,7 +359,7 @@
 </div>
 <label>Status<select id="sStatus"><option value="active">Actief</option><option value="inactive">Buiten gebruik</option></select></label>
 </div>
-<div class="dialog-actions"><button value="cancel">Annuleren</button><button type="submit" class="primary">Opslaan</button></div>
+<div class="dialog-actions"><button type="button" data-close-current-dialog>Annuleren</button><button type="submit" class="primary">Opslaan</button></div>
 </form>
 </dialog>
 
@@ -370,7 +370,7 @@
 <label>Nummer<input id="rNumber" required></label>
 <label>Filament<select id="rFilament" required></select></label>
 </div>
-<div class="dialog-actions"><button value="cancel">Annuleren</button><button type="submit" class="primary">Opslaan</button></div>
+<div class="dialog-actions"><button type="button" data-close-current-dialog>Annuleren</button><button type="submit" class="primary">Opslaan</button></div>
 </form>
 </dialog>
 
@@ -381,7 +381,7 @@
 <label>Lege spoel<select id="fillSpool"></select></label>
 <label>Refill<select id="fillRefill"></select></label>
 </div>
-<div class="dialog-actions"><button value="cancel">Annuleren</button><button type="submit" class="primary">Koppelen</button></div>
+<div class="dialog-actions"><button type="button" data-close-current-dialog>Annuleren</button><button type="submit" class="primary">Koppelen</button></div>
 </form>
 </dialog>
 
@@ -397,7 +397,7 @@
 <h3>Bestelregels</h3>
 <div id="orderLines"></div>
 <div class="toolbar"><button type="button" id="addOrderLineBtn">Regel toevoegen</button></div>
-<div class="dialog-actions"><button value="cancel">Annuleren</button><button type="submit" class="primary">Bestelling opslaan</button></div>
+<div class="dialog-actions"><button type="button" data-close-current-dialog>Annuleren</button><button type="submit" class="primary">Bestelling opslaan</button></div>
 </form>
 </dialog>
 
@@ -406,7 +406,7 @@
 <h2>Levering ontvangen</h2>
 <div id="receiveHeader" class="panel"></div>
 <div id="receiveLines"></div>
-<div class="dialog-actions"><button value="cancel">Annuleren</button><button type="submit" class="primary">Ontvangst verwerken</button></div>
+<div class="dialog-actions"><button type="button" data-close-current-dialog>Annuleren</button><button type="submit" class="primary">Ontvangst verwerken</button></div>
 </form>
 </dialog>
 
