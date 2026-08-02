@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Filament">
-  <title>Filament Manager v7.2.3</title>
+  <title>Filament Manager v7.4</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=7.2.3">
+  <link rel="stylesheet" href="assets/app.css?v=7.4">
 </head>
 <body>
 <div class="app-shell">
@@ -18,7 +18,7 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 7.2.3 · QR</span>
+      <span>Versie 7.4 · QR</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active">Dashboard</button>
@@ -37,7 +37,7 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 7.2.3 · QR</span>
+        <span>Versie 7.4 · QR</span>
       </div>
     </header>
 
@@ -111,16 +111,28 @@
       <section id="scannen" class="view">
         <div class="panel">
           <h2>QR scannen</h2>
-          <p class="note">Camera volgt later. Handmatig invoeren werkt nu al.</p>
+          <p id="scannerStatus" class="note">Tik op Start camera en geef toestemming voor cameragebruik.</p>
+
+          <div id="qrReader" class="qr-reader hidden"></div>
+
+          <div class="toolbar">
+            <button class="primary" id="startScannerBtn">Start camera</button>
+            <button id="stopScannerBtn">Stop camera</button>
+          </div>
+
           <div class="form-grid">
-            <label>Code<input id="manualScanCode" placeholder="S0001 of R0001"></label>
+            <label>Code handmatig invoeren
+              <input id="manualScanCode" placeholder="S0001 of R0001">
+            </label>
           </div>
           <div class="dialog-actions">
             <button class="primary" id="manualScanBtn">Open code</button>
           </div>
         </div>
+
         <div class="panel">
           <h2>Spoel vullen</h2>
+          <p class="note">Scan eerst een lege spoel en daarna een refill.</p>
           <div class="form-grid">
             <label>Lege spoel<input id="quickFillSpool" placeholder="S0001"></label>
             <label>Refill<input id="quickFillRefill" placeholder="R0001"></label>
@@ -314,6 +326,7 @@
   </div>
 </dialog>
 
-<script src="js/app.js?v=7.2.3"></script>
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="js/app.js?v=7.4"></script>
 </body>
 </html>

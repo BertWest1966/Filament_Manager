@@ -76,3 +76,118 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 .diagnostic-panel summary{cursor:pointer;font-weight:700}
 .diagnostic-panel pre{white-space:pre-wrap;word-break:break-word;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:10px;max-height:320px;overflow:auto;font-size:12px}
 .diagnostic-panel button{margin-top:8px}
+
+.qr-reader{
+  width:100%;
+  max-width:520px;
+  margin:12px auto;
+  border-radius:12px;
+  overflow:hidden;
+  background:#111;
+}
+.qr-reader video{width:100%!important}
+.qr-reader button,.qr-reader select{min-height:44px;font-size:16px}
+
+/* v7.4 compact dashboard */
+#dashboard .summary-grid{
+  gap:6px;
+  margin-bottom:8px;
+}
+#dashboard .summary-card{
+  padding:8px 10px;
+  border-radius:9px;
+}
+#dashboard .summary-card span{
+  font-size:11px;
+}
+#dashboard .summary-card strong{
+  font-size:22px;
+  line-height:1;
+}
+
+#dashboard .panel{
+  padding:9px 10px;
+}
+#dashboard .panel-head{
+  margin-bottom:4px;
+}
+#dashboard .panel-head h2{
+  font-size:18px;
+  margin:0;
+}
+#dashboard .panel-head input{
+  min-height:38px;
+  padding:7px 9px;
+  font-size:14px;
+}
+
+#dashboard .category-title{
+  font-size:16px;
+  line-height:1.1;
+  padding-bottom:3px;
+  margin-top:10px;
+}
+#dashboard .type-title{
+  font-size:13px;
+  line-height:1.1;
+  margin:7px 0 2px;
+}
+
+#dashboard .dashboard-table{
+  table-layout:fixed;
+}
+#dashboard .dashboard-table th,
+#dashboard .dashboard-table td{
+  padding:4px 3px;
+  font-size:12px;
+  line-height:1.15;
+  height:31px;
+}
+#dashboard .dashboard-table th{
+  font-size:10px;
+  font-weight:700;
+  white-space:nowrap;
+}
+#dashboard .dashboard-table th:first-child,
+#dashboard .dashboard-table td:first-child{
+  width:auto;
+}
+#dashboard .dashboard-table th:nth-child(2),
+#dashboard .dashboard-table td:nth-child(2){
+  width:66px;
+}
+#dashboard .dashboard-table th:nth-child(3),
+#dashboard .dashboard-table td:nth-child(3){
+  width:68px;
+}
+#dashboard .dashboard-table th:nth-child(4),
+#dashboard .dashboard-table td:nth-child(4){
+  width:42px;
+}
+
+#dashboard .dashboard-table button,
+#dashboard .level-btn{
+  min-height:26px;
+  height:26px;
+  padding:2px 5px;
+  border-radius:6px;
+  font-size:11px;
+  line-height:1;
+}
+#dashboard .dashboard-table td:first-child{
+  cursor:pointer;
+}
+#dashboard .dashboard-table tr:active{
+  background:#f3f4f6;
+}
+
+@media(min-width:900px){
+  #dashboard .dashboard-table th,
+  #dashboard .dashboard-table td{
+    font-size:13px;
+    height:30px;
+  }
+  #dashboard .dashboard-table th{
+    font-size:11px;
+  }
+}

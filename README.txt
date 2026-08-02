@@ -1,19 +1,17 @@
-FILAMENT MANAGER v7.2.3 — IMPORTDIAGNOSE
+FILAMENT MANAGER v7.4 — COMPACT DASHBOARD
 
-Deze versie voegt een diagnosevenster toe bij Back-up terugzetten.
+Deze eerste versie wijzigt alleen het dashboard.
 
-De diagnose toont:
-- bestandsnaam;
-- bestandsgrootte;
-- bestandstype;
-- aantal ingelezen tekens;
-- eerste 100 tekens;
-- laatste 100 tekens;
-- of het bestand met { begint;
-- of het bestand met } eindigt;
-- resultaat van JSON.parse;
-- resultaat van structuurcontrole;
-- aantallen filamenten, spoelen, refills, bestellingen en logregels;
-- eventuele exacte foutmelding.
+Aangepast:
+- kleinere samenvattingskaarten;
+- kleinere categorie- en typetitels;
+- compactere tabelregels;
+- kleinere knoppen voor spoelnummer en percentage;
+- meer filamentregels tegelijk zichtbaar;
+- gewone tekst, geen gekleurde blokjes.
 
-Er is ook een knop 'Diagnose kopiëren'.
+Bestaande functies uit v7.3 blijven behouden:
+- QR-stickers;
+- groter spoelnummer op sticker;
+- camerascanner;
+- back-up en importdiagnose.
