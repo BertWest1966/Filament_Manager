@@ -1,4 +1,4 @@
-const CACHE='filament-manager-v6-0';
+const CACHE='filament-manager-v6-1';
 const APP_SHELL=[
   './',
   './index.html',

@@ -9,14 +9,14 @@
 <meta name="apple-mobile-web-app-title" content="Filament">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
-<title>Filament Manager v6.0 Mobile</title>
+<title>Filament Manager v6.1 Mobile</title>
 <link rel="stylesheet" href="assets/app.css">
 </head>
 <body>
 <header class="app-header">
   <div>
     <h1>Filament Manager</h1>
-    <div class="version">Versie 6.0 · Tap First</div>
+    <div class="version">Versie 6.1 · Dashboard</div>
   </div>
   <button id="installAppBtn" class="install-button hidden">Installeer</button>
 </header>
@@ -209,6 +209,23 @@
   <button data-view="bestellijst"><span>☷</span>Bestellijst</button>
   <button data-view="meer"><span>•••</span>Meer</button>
 </nav>
+
+
+<dialog id="dashboardLevelDialog">
+  <div class="dialog-card">
+    <h2 id="dashboardLevelTitle">Hoeveelheid aanpassen</h2>
+    <div class="tap-choice-grid" id="dashboardLevelChoices">
+      <button type="button" data-value="0">0%</button>
+      <button type="button" data-value="25">25%</button>
+      <button type="button" data-value="50">50%</button>
+      <button type="button" data-value="75">75%</button>
+      <button type="button" data-value="100">100%</button>
+    </div>
+    <div class="dialog-actions">
+      <button type="button" onclick="dashboardLevelDialog.close()">Annuleren</button>
+    </div>
+  </div>
+</dialog>
 
 <dialog id="filamentDialog">
 <form method="dialog" id="filamentForm" class="dialog-card">

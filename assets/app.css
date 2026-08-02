@@ -140,3 +140,16 @@ button,.file-button,input,select{min-height:var(--tap);font-size:16px}
   .tap-form{grid-template-columns:repeat(2,minmax(0,1fr))}
   .tap-field:last-child{grid-column:1/-1}
 }
+
+.dashboard-stock-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.dashboard-stock-table th,.dashboard-stock-table td{padding:8px 4px;border-bottom:1px solid #ececec;font-size:14px}
+.dashboard-stock-table th{color:var(--muted);font-weight:700;text-align:left}
+.dashboard-stock-table th:nth-child(2),.dashboard-stock-table td:nth-child(2){width:82px}
+.dashboard-stock-table th:nth-child(3),.dashboard-stock-table td:nth-child(3){width:76px;text-align:center}
+.dashboard-stock-table th:nth-child(4),.dashboard-stock-table td:nth-child(4){width:58px;text-align:right}
+.level-button{min-height:38px;padding:6px 9px;font-weight:800;border-radius:8px;background:#fff}
+.level-100,.level-75{color:#166534}
+.level-50,.level-25{color:#92400e}
+.level-0{color:#b91c1c}
+.spool-link{border:none;background:none;padding:4px 0;min-height:auto;font-weight:800;text-decoration:underline}
+.no-spool{color:var(--muted)}

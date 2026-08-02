@@ -1,25 +1,24 @@
-FILAMENT MANAGER v6.0 MOBILE — TAP FIRST
+FILAMENT MANAGER v6.1 — DASHBOARD
 
-Nieuw:
-- Nieuw filament volledig via grote tikbare keuzes.
-- Geen kleine pull-downmenu's voor:
-  categorie
-  type
-  kleur
-  merk
-  leverancier
-- Zoekscherm per keuze.
-- Nieuwe waarden kunnen rechtstreeks vanuit het keuzescherm worden toegevoegd.
-- Minimumvoorraad via 0%, 25%, 50%, 75% en 100%.
-- Spoelinhoud via dezelfde vijf grote knoppen.
-- Gewenste voorraad via een korte lijst met hele rollen.
+Nieuw dashboard:
+Categorie
+  Type
+    Kleur | Spoelnummer | Hoeveelheid | Refills
+
+Voorbeeld:
+PLA
+  Basic
+    Red | S0013 | 75% | 2
+
+Werking:
+- Tik op kleur: open filamentdetail.
+- Tik op spoelnummer: wijzig spoel.
+- Tik op hoeveelheid: kies direct 0%, 25%, 50%, 75% of 100%.
+- Bij meerdere actieve spoelen van dezelfde kleur verschijnt elke spoel op een aparte regel.
+- Als geen actieve spoel bestaat, staat er een streepje.
 
 Upload naar GitHub:
-1. Upload en vervang ALLE bestanden.
+1. Vervang alle bestanden.
 2. Commit changes.
-3. Wacht enkele minuten.
-4. Open de site eerst in Safari en vernieuw.
-5. Sluit daarna de geïnstalleerde webapp volledig en open opnieuw.
-
-Versie bovenaan:
-Versie 6.0 · Tap First
+3. Open de site eerst in Safari en vernieuw.
+4. Sluit daarna de geïnstalleerde app en open opnieuw.

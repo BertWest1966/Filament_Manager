@@ -4,7 +4,7 @@ const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','PA / Nylon','PC','PV
 let state=loadState(),stockMode='spools',editFilamentId=null,editSpoolId=null,editRefillId=null,currentDetailId=null,previousView='dashboard',receiveOrderId=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-function fresh(){return{appVersion:'6.0',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS),settings:{spoolPrefix:'S',refillPrefix:'R',digits:4,defaultBrand:'Bambu Lab',defaultSupplier:'Bambu Lab'}}}
+function fresh(){return{appVersion:'6.1',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS),settings:{spoolPrefix:'S',refillPrefix:'R',digits:4,defaultBrand:'Bambu Lab',defaultSupplier:'Bambu Lab'}}}
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
 function pushUnique(a,v){v=String(v||'').trim();if(v&&!a.some(x=>x.toLowerCase()===v.toLowerCase()))a.push(v)}
 function migrate(raw){
@@ -31,7 +31,7 @@ function migrate(raw){
     };
   });
   d.settings={...d.settings,...(raw.settings||{})};
-  d.appVersion='6.0';
+  d.appVersion='6.1';
   return d;
 }
 function loadState(){try{return migrate(JSON.parse(localStorage.getItem(KEY)||'null'))}catch{return fresh()}}
@@ -231,7 +231,113 @@ receiveForm.onsubmit=e=>{e.preventDefault();const o=state.orders.find(x=>x.id===
 createOrderFromListBtn.onclick=()=>{const selected=[...document.querySelectorAll('.order-select:checked')].map(c=>({filamentId:c.dataset.id,quantity:Number(c.dataset.qty),supplier:filament(c.dataset.id)?.supplier||''}));if(!selected.length)return alert('Selecteer minstens één regel.');openOrder(selected)}
 function stockStatus(f){const total=totalStock(f.id);if(total<Number(f.min))return 'red';if(total<Number(f.target))return 'orange';return 'green'}
 function statusDot(f){return `<span class="status-dot status-${stockStatus(f)}"></span>`}
-function renderDashboard(){sumSpools.textContent=state.spools.filter(s=>s.status==='active').length;sumRefills.textContent=state.refills.length;sumEmpty.textContent=state.spools.filter(s=>s.status==='active'&&Number(s.level)===0).length;sumLow.textContent=state.catalog.filter(f=>totalStock(f.id)<Number(f.min)).length;const q=dashboardSearch.value.toLowerCase(),g={};for(const f of state.catalog){if(q&&!`${f.category} ${f.type} ${f.color}`.toLowerCase().includes(q))continue;(g[f.category]??={})[f.type]??=[];g[f.category][f.type].push({id:f.id,color:f.color,spool:spoolStock(f.id),refill:refillCount(f.id),status:stockStatus(f)})}dashboardList.innerHTML=Object.keys(g).sort().map(c=>`<div class="category-title">${esc(c)}</div>${Object.keys(g[c]).sort().map(t=>`<div class="type-title">${esc(t)}</div><table class="compact-table"><thead><tr><th>Kleur</th><th>Op spoel</th><th>Refill</th></tr></thead><tbody>${g[c][t].sort((a,b)=>a.color.localeCompare(b.color,'nl')).map(r=>`<tr class="clickable" onclick="openDetail('${r.id}')"><td><span class="status-dot status-${r.status}"></span>${esc(r.color)}</td><td>${Math.round(r.spool*100)}%</td><td>${r.refill}</td></tr>`).join('')}</tbody></table>`).join('')}`).join('')||'<div class="empty">Nog geen filamenten.</div>'}
+
+let dashboardSpoolId=null;
+
+function openDashboardLevel(spoolId){
+  const spool=state.spools.find(s=>s.id===spoolId);
+  if(!spool)return;
+  dashboardSpoolId=spoolId;
+  dashboardLevelTitle.textContent=`Hoeveelheid op ${spool.number}`;
+  setTapChoice(dashboardLevelChoices,String(spool.level));
+  dashboardLevelDialog.showModal();
+}
+
+dashboardLevelChoices.querySelectorAll('button').forEach(btn=>{
+  btn.onclick=()=>{
+    const spool=state.spools.find(s=>s.id===dashboardSpoolId);
+    if(!spool)return;
+    const oldLevel=Number(spool.level||0);
+    spool.level=Number(btn.dataset.value);
+    addLog(
+      'spool_update',
+      `Spoel ${spool.number} aangepast van ${oldLevel}% naar ${spool.level}%`,
+      spool.filamentId,
+      spool.number
+    );
+    dashboardLevelDialog.close();
+    save();
+  };
+});
+
+function dashboardRowsForFilament(f){
+  const active=state.spools
+    .filter(s=>s.status==='active'&&s.filamentId===f.id)
+    .sort((a,b)=>String(a.number).localeCompare(String(b.number),'nl',{numeric:true}));
+
+  if(!active.length){
+    return [{
+      filamentId:f.id,
+      color:f.color,
+      spool:null,
+      refill:refillCount(f.id)
+    }];
+  }
+
+  return active.map((spool,index)=>({
+    filamentId:f.id,
+    color:f.color,
+    spool,
+    refill:index===0?refillCount(f.id):''
+  }));
+}
+
+function renderDashboard(){
+  sumSpools.textContent=state.spools.filter(s=>s.status==='active').length;
+  sumRefills.textContent=state.refills.length;
+  sumEmpty.textContent=state.spools.filter(s=>s.status==='active'&&Number(s.level)===0).length;
+  sumLow.textContent=state.catalog.filter(f=>totalStock(f.id)<Number(f.min)).length;
+
+  const q=dashboardSearch.value.trim().toLowerCase();
+  const grouped={};
+
+  state.catalog
+    .slice()
+    .sort((a,b)=>
+      a.category.localeCompare(b.category,'nl') ||
+      a.type.localeCompare(b.type,'nl') ||
+      a.color.localeCompare(b.color,'nl')
+    )
+    .forEach(f=>{
+      if(q&&!`${f.category} ${f.type} ${f.color}`.toLowerCase().includes(q))return;
+      grouped[f.category]??={};
+      grouped[f.category][f.type]??=[];
+      grouped[f.category][f.type].push(...dashboardRowsForFilament(f));
+    });
+
+  dashboardList.innerHTML=Object.keys(grouped).sort((a,b)=>a.localeCompare(b,'nl')).map(category=>`
+    <div class="category-title">${esc(category)}</div>
+    ${Object.keys(grouped[category]).sort((a,b)=>a.localeCompare(b,'nl')).map(type=>`
+      <div class="type-title">${esc(type)}</div>
+      <table class="dashboard-stock-table">
+        <thead>
+          <tr>
+            <th>Kleur</th>
+            <th>Spoel</th>
+            <th>Hoeveelheid</th>
+            <th>Refill</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${grouped[category][type].map(row=>`
+            <tr>
+              <td class="clickable" onclick="openDetail('${row.filamentId}')">${esc(row.color)}</td>
+              <td>
+                ${row.spool
+                  ? `<button class="spool-link" onclick="openSpool('${row.spool.id}')">${esc(row.spool.number)}</button>`
+                  : `<span class="no-spool">—</span>`}
+              </td>
+              <td>
+                ${row.spool
+                  ? `<button class="level-button level-${row.spool.level}" onclick="openDashboardLevel('${row.spool.id}')">${row.spool.level}%</button>`
+                  : `<span class="no-spool">—</span>`}
+              </td>
+              <td>${row.refill}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`).join('')}
+  `).join('')||'<div class="empty">Nog geen filamenten.</div>';
+}
 dashboardSearch.oninput=renderDashboard;
 function renderCatalog(){const q=catalogSearch.value.toLowerCase(),items=state.catalog.filter(f=>!q||label(f).toLowerCase().includes(q)).sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));catalogList.innerHTML=items.map(f=>`<div class="item-row"><div class="item-main"><strong>${esc(f.category)} · ${esc(f.type)} · ${esc(f.color)}</strong><div class="item-meta">${esc(f.brand)} · min. ${f.min} · gewenst ${f.target}</div></div><div class="item-actions"><button onclick="openDetail('${f.id}')">Open</button><button onclick="openFilament('${f.id}')">Wijzig</button></div></div>`).join('')||'<div class="empty">Nog geen filamenten.</div>'}
 catalogSearch.oninput=renderCatalog;
