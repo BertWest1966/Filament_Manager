@@ -172,41 +172,83 @@ restoreBackupInput.onchange=async event=>{
   event.target.value='';
   if(!file)return;
 
+  const lines=[];
+  const add=line=>{
+    lines.push(line);
+    if(window.backupDiagnosis)backupDiagnosis.textContent=lines.join('\n');
+  };
+
+  add(`Bestandsnaam: ${file.name}`);
+  add(`Bestandsgrootte: ${file.size} bytes`);
+  add(`Bestandstype: ${file.type||'(onbekend)'}`);
+  add(`Laatst gewijzigd: ${file.lastModified?new Date(file.lastModified).toLocaleString('nl-BE'):'onbekend'}`);
+
+  let text='';
+  try{
+    text=await file.text();
+    add(`Tekens ingelezen: ${text.length}`);
+    add(`Begint met: ${JSON.stringify(text.slice(0,100))}`);
+    add(`Eindigt met: ${JSON.stringify(text.slice(-100))}`);
+    add(`Begint met "{": ${text.trimStart().startsWith('{')?'ja':'nee'}`);
+    add(`Eindigt met "}": ${text.trimEnd().endsWith('}')?'ja':'nee'}`);
+  }catch(error){
+    add(`Fout bij lezen: ${error.name}: ${error.message}`);
+    backupStatus.textContent='Bestand kon niet volledig worden gelezen.';
+    alert(`Bestand lezen mislukt:\n${error.message}`);
+    return;
+  }
+
   let parsed;
   try{
-    const text=await file.text();
     parsed=JSON.parse(text);
+    add('JSON.parse: geslaagd');
   }catch(error){
-    alert(`Het bestand is geen geldige JSON: ${error.message}`);
-    backupStatus.textContent='Back-up kon niet worden gelezen.';
+    add('JSON.parse: MISLUKT');
+    add(`Parserfout: ${error.name}: ${error.message}`);
+    if(/EOF|end of JSON|unterminated/i.test(error.message)){
+      add('Interpretatie: het ingelezen bestand lijkt afgebroken of onvolledig.');
+    }
+    backupStatus.textContent='JSON kon niet worden geparseerd.';
+    alert(`JSON parse-fout:\n${error.message}\n\nOpen Meer → Back-up → Importdiagnose voor details.`);
     return;
   }
 
   let restored;
   try{
     restored=normalizeBackupData(parsed);
+    add('Back-upstructuur: herkend');
+    add(`Filamenten: ${restored.catalog.length}`);
+    add(`Spoelen: ${restored.spools.length}`);
+    add(`Refills: ${restored.refills.length}`);
+    add(`Bestellingen: ${restored.orders.length}`);
+    add(`Historiekregels: ${restored.history.length}`);
   }catch(error){
-    alert(`Back-up niet herkend: ${error.message}`);
-    backupStatus.textContent='Back-upformaat niet herkend.';
+    add('Structuurcontrole: MISLUKT');
+    add(`Fout: ${error.name}: ${error.message}`);
+    backupStatus.textContent='Back-upstructuur niet herkend.';
+    alert(`Back-up niet herkend:\n${error.message}`);
     return;
   }
 
   const summary=`${restored.catalog.length} filamenten, ${restored.spools.length} spoelen en ${restored.refills.length} refills`;
-
   if(!confirm(`Deze back-up bevat ${summary}.\n\nHuidige gegevens vervangen?`)){
+    add('Import door gebruiker geannuleerd.');
     backupStatus.textContent='Herstel geannuleerd.';
     return;
   }
 
   const previousState=state;
-
   try{
     state=restored;
     localStorage.setItem(KEY,JSON.stringify(state));
     renderAll();
+    add('Opslaan in browser: geslaagd');
+    add('Schermen opnieuw opbouwen: geslaagd');
     backupStatus.textContent=`Back-up teruggezet: ${summary}.`;
     alert('Back-up succesvol teruggezet.');
   }catch(error){
+    add('Verwerken/opslag: MISLUKT');
+    add(`Fout: ${error.name}: ${error.message}`);
     state=previousState;
     localStorage.setItem(KEY,JSON.stringify(state));
     try{renderAll()}catch{}
@@ -352,3 +394,21 @@ printSelectedLabelsBtn.onclick=()=>{
 
 function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderStock();renderOrderList();renderOrders();renderLibraries();renderLog()}
 renderAll();
+
+if(window.copyDiagnosisBtn){
+  copyDiagnosisBtn.onclick=async()=>{
+    const text=backupDiagnosis?.textContent||'';
+    try{
+      await navigator.clipboard.writeText(text);
+      alert('Diagnose gekopieerd.');
+    }catch{
+      const area=document.createElement('textarea');
+      area.value=text;
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand('copy');
+      area.remove();
+      alert('Diagnose gekopieerd.');
+    }
+  };
+}
