@@ -1,485 +1,286 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="nl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111827">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Filament">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="assets/icon-180.png">
-<title>Filament Manager v7.0 Stable</title>
-<link rel="stylesheet" href="assets/app.css?v=7.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Filament">
+  <title>Filament Manager v7.1</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icon-180.png">
+  <link rel="stylesheet" href="assets/app.css?v=7.1">
 </head>
 <body>
-<header class="app-header">
-  <div>
-    <h1>Filament Manager</h1>
-    <div class="version">Versie 7.0 · Stable</div>
-  </div>
-  <button id="installAppBtn" class="install-button hidden">Installeer</button>
-</header>
-<div class="global-search-wrap">
-  <input id="globalSearch" placeholder="Zoek filament, spoel, refill of bestelling">
-  <div id="globalResults" class="global-results hidden"></div>
-</div>
-<main>
-<section id="dashboard" class="view active">
-  <div class="summary-grid">
-    <div class="summary-card"><span>Spoelen</span><strong id="sumSpools">0</strong></div>
-    <div class="summary-card"><span>Refills</span><strong id="sumRefills">0</strong></div>
-    <div class="summary-card"><span>Lege spoelen</span><strong id="sumEmpty">0</strong></div>
-    <div class="summary-card"><span>Onder minimum</span><strong id="sumLow">0</strong></div>
-  </div>
-  <div class="panel">
-    <div class="panel-head">
-      <h2>Voorraad per type en kleur</h2>
-      <input id="dashboardSearch" placeholder="Zoek type of kleur">
+<div class="app-shell">
+
+  <aside class="desktop-sidebar">
+    <div class="brand">
+      <strong>Filament Manager</strong>
+      <span>Versie 7.1 · Clean</span>
     </div>
-    <div id="dashboardList"></div>
-  </div>
-</section>
+    <nav>
+      <button data-view="dashboard" class="active">Dashboard</button>
+      <button data-view="catalogus">Catalogus</button>
+      <button data-view="voorraad">Voorraad</button>
+      <button data-view="bestellijst">Bestellijst</button>
+      <button data-view="bestellingen">Bestellingen</button>
+      <button data-view="scannen">Scannen</button>
+      <button data-view="bibliotheken">Bibliotheken</button>
+      <button data-view="logboek">Logboek</button>
+      <button data-view="meer">Meer</button>
+    </nav>
+  </aside>
 
-<section id="catalogus" class="view">
-  <div class="toolbar">
-    <button class="primary" id="newFilamentBtn">Nieuw filament</button>
-    <input id="catalogSearch" placeholder="Zoek categorie, merk, type of kleur">
-  </div>
-  <div class="panel"><div id="catalogList"></div></div>
-</section>
-
-<section id="voorraad" class="view">
-  <div class="toolbar">
-    <button class="primary" id="newSpoolBtn">Nieuwe spoel</button>
-    <button id="newRefillBtn">Nieuwe refill</button>
-    <button id="printAllLabelsBtn">Print geselecteerde stickers</button>
-    <input id="stockSearch" placeholder="Zoek categorie, type, kleur of nummer">
-    <select id="stockSort">
-      <option value="filament">Categorie → type → kleur</option>
-      <option value="number-asc">Spoelnummer oplopend</option>
-      <option value="number-desc">Spoelnummer aflopend</option>
-    </select>
-  </div>
-  <div class="segmented">
-    <button data-stock-mode="spools" class="active">Spoelen</button>
-    <button data-stock-mode="refills">Refills</button>
-  </div>
-  <div class="panel"><div id="stockList"></div></div>
-</section>
-
-<section id="bestellijst" class="view">
-  <div class="panel">
-    <div class="panel-head">
+  <div class="main-shell">
+    <header class="mobile-header">
       <div>
-        <h2>Automatische bestellijst</h2>
-        <p class="note">Onder minimum? Dan aanvullen tot gewenste voorraad, rekening houdend met open bestellingen.</p>
+        <strong>Filament Manager</strong>
+        <span>Versie 7.1 · Clean</span>
       </div>
-      <input id="orderListSearch" placeholder="Zoek type of kleur">
+    </header>
+
+    <div class="global-search">
+      <input id="globalSearch" placeholder="Zoek filament, spoel of refill">
+      <div id="globalResults" class="search-results hidden"></div>
     </div>
-    <div class="toolbar">
-      <button class="primary" id="createOrderFromListBtn">Maak bestelling van selectie</button>
-    </div>
-    <div id="orderList"></div>
+
+    <main>
+      <section id="dashboard" class="view active">
+        <div class="summary-grid">
+          <div class="summary-card"><span>Spoelen</span><strong id="sumSpools">0</strong></div>
+          <div class="summary-card"><span>Refills</span><strong id="sumRefills">0</strong></div>
+          <div class="summary-card"><span>Lege spoelen</span><strong id="sumEmpty">0</strong></div>
+          <div class="summary-card"><span>Onder minimum</span><strong id="sumLow">0</strong></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Voorraad</h2>
+            <input id="dashboardSearch" placeholder="Zoek type of kleur">
+          </div>
+          <div id="dashboardList"></div>
+        </div>
+      </section>
+
+      <section id="catalogus" class="view">
+        <div class="toolbar">
+          <button class="primary" id="newFilamentBtn">Nieuw filament</button>
+          <input id="catalogSearch" placeholder="Zoek categorie, type of kleur">
+        </div>
+        <div class="panel"><div id="catalogList"></div></div>
+      </section>
+
+      <section id="voorraad" class="view">
+        <div class="toolbar">
+          <button class="primary" id="newSpoolBtn">Nieuwe spoel</button>
+          <button id="newRefillBtn">Nieuwe refill</button>
+          <input id="stockSearch" placeholder="Zoek nummer, type of kleur">
+          <select id="stockSort">
+            <option value="filament">Categorie → type → kleur</option>
+            <option value="number-asc">Nummer oplopend</option>
+            <option value="number-desc">Nummer aflopend</option>
+          </select>
+        </div>
+        <div class="tabs">
+          <button data-stock-mode="spools" class="active">Spoelen</button>
+          <button data-stock-mode="refills">Refills</button>
+        </div>
+        <div class="panel"><div id="stockList"></div></div>
+      </section>
+
+      <section id="bestellijst" class="view">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Automatische bestellijst</h2>
+            <input id="orderListSearch" placeholder="Zoek type of kleur">
+          </div>
+          <div id="orderList"></div>
+        </div>
+      </section>
+
+      <section id="bestellingen" class="view">
+        <div class="toolbar">
+          <button class="primary" id="newOrderBtn">Nieuwe bestelling</button>
+          <input id="ordersSearch" placeholder="Zoek leverancier">
+        </div>
+        <div class="panel"><div id="ordersList"></div></div>
+      </section>
+
+      <section id="scannen" class="view">
+        <div class="panel">
+          <h2>QR scannen</h2>
+          <p class="note">Camera volgt later. Handmatig invoeren werkt nu al.</p>
+          <div class="form-grid">
+            <label>Code<input id="manualScanCode" placeholder="S0001 of R0001"></label>
+          </div>
+          <div class="dialog-actions">
+            <button class="primary" id="manualScanBtn">Open code</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>Spoel vullen</h2>
+          <div class="form-grid">
+            <label>Lege spoel<input id="quickFillSpool" placeholder="S0001"></label>
+            <label>Refill<input id="quickFillRefill" placeholder="R0001"></label>
+          </div>
+          <div class="dialog-actions">
+            <button class="primary" id="quickFillBtn">Koppelen</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="bibliotheken" class="view">
+        <div class="panel">
+          <div class="library-tabs">
+            <button data-library-kind="colors" class="active">Kleuren</button>
+            <button data-library-kind="types">Types</button>
+            <button data-library-kind="brands">Merken</button>
+            <button data-library-kind="suppliers">Leveranciers</button>
+            <button data-library-kind="categories">Categorieën</button>
+          </div>
+          <div class="toolbar">
+            <button class="primary" id="addLibraryValueBtn">Nieuwe waarde</button>
+            <input id="librarySearch" placeholder="Zoeken">
+          </div>
+          <div id="libraryManagerList"></div>
+        </div>
+      </section>
+
+      <section id="logboek" class="view">
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Logboek</h2>
+            <input id="logSearch" placeholder="Zoek actie">
+          </div>
+          <div id="logList"></div>
+        </div>
+      </section>
+
+      <section id="meer" class="view">
+        <div class="panel">
+          <h2>Beheer</h2>
+          <div class="menu-grid">
+            <button data-view="catalogus">Catalogus</button>
+            <button data-view="bestellingen">Bestellingen</button>
+            <button data-view="bibliotheken">Bibliotheken</button>
+            <button data-view="logboek">Logboek</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>Back-up</h2>
+          <div class="menu-grid">
+            <button class="primary" id="createBackupBtn">Back-up maken</button>
+            <label class="file-button">Back-up terugzetten<input id="restoreBackupInput" type="file" accept=".json"></label>
+          </div>
+          <div id="backupStatus" class="note"></div>
+        </div>
+      </section>
+
+      <section id="detail" class="view">
+        <div class="toolbar"><button id="backFromDetail">← Terug</button></div>
+        <div id="detailContent"></div>
+      </section>
+    </main>
   </div>
-</section>
+</div>
 
-<section id="bestellingen" class="view">
-  <div class="toolbar">
-    <button class="primary" id="newOrderBtn">Nieuwe bestelling</button>
-    <input id="ordersSearch" placeholder="Zoek leverancier of referentie">
-  </div>
-  <div class="panel"><div id="ordersList"></div></div>
-</section>
-
-
-<section id="scannen" class="view">
-  <div class="panel">
-    <h2>QR-code scannen</h2>
-    <div id="scannerStatus" class="note">Gebruik de camera wanneer de app als PWA via HTTPS geopend is. Handmatige invoer blijft beschikbaar.</div>
-    <div id="qrReader" class="qr-reader hidden"></div>
-    <div class="toolbar">
-      <button class="primary" id="startScannerBtn">Start camera</button>
-      <button id="stopScannerBtn">Stop camera</button>
-    </div>
-    <div class="form-grid">
-      <label>Code handmatig invoeren
-        <input id="manualScanCode" placeholder="Bijv. S0001 of R0001">
-      </label>
-    </div>
-    <div class="dialog-actions">
-      <button class="primary" id="manualScanBtn">Open code</button>
-    </div>
-  </div>
-
-  <div class="panel">
-    <h2>Snel spoel vullen</h2>
-    <p class="note">Scan eerst een lege spoel en daarna een refill. In deze lokale versie kan dit ook handmatig.</p>
-    <div class="form-grid">
-      <label>Lege spoel
-        <input id="quickFillSpool" placeholder="S0001">
-      </label>
-      <label>Refill
-        <input id="quickFillRefill" placeholder="R0001">
-      </label>
-    </div>
-    <div class="dialog-actions">
-      <button class="primary" id="quickFillBtn">Koppelen</button>
-    </div>
-  </div>
-</section>
-
-<section id="instellingen" class="view">
-  <div class="panel">
-    <h2>Instellingen</h2>
-    <div class="form-grid">
-      <label>Voorvoegsel spoelen<input id="setSpoolPrefix" maxlength="4"></label>
-      <label>Voorvoegsel refills<input id="setRefillPrefix" maxlength="4"></label>
-      <label>Aantal cijfers<input id="setDigits" type="number" min="2" max="6"></label>
-      <label>Standaardmerk<input id="setDefaultBrand"></label>
-      <label>Standaardleverancier<input id="setDefaultSupplier"></label>
-    </div>
-    <div class="dialog-actions"><button class="primary" id="saveSettingsBtn">Instellingen opslaan</button></div>
-  </div>
-  <div class="panel">
-    <h2>QR-status</h2>
-    <p class="note">Elke spoel en refill heeft al een unieke code. QR-afbeeldingen en afdrukken volgen in de volgende versie.</p>
-    <div class="item-row"><div class="item-main"><strong>Spoelen QR-ready</strong><div class="item-meta" id="qrSpoolCount">0</div></div></div>
-    <div class="item-row"><div class="item-main"><strong>Refills QR-ready</strong><div class="item-meta" id="qrRefillCount">0</div></div></div>
-  </div>
-</section>
-
-<section id="detail" class="view">
-  <div class="toolbar"><button id="backFromDetail">← Terug</button></div>
-  <div id="detailContent"></div>
-</section>
-
-
-
-<section id="bibliotheken" class="view">
-  <div class="panel">
-    <h2>Bibliotheken</h2>
-    <p class="note">Pas waarden aan die je gebruikt bij het aanmaken van filamenten.</p>
-
-    <div class="library-tabs">
-      <button class="active" data-library-kind="colors">Kleuren</button>
-      <button data-library-kind="types">Types</button>
-      <button data-library-kind="brands">Merken</button>
-      <button data-library-kind="suppliers">Leveranciers</button>
-      <button data-library-kind="categories">Categorieën</button>
-    </div>
-
-    <div class="toolbar">
-      <button class="primary" id="addLibraryValueBtn">Nieuwe waarde</button>
-      <input id="librarySearch" placeholder="Zoeken">
-    </div>
-
-    <div id="libraryManagerList"></div>
-  </div>
-</section>
-
-<section id="logboek" class="view">
-  <div class="panel">
-    <div class="panel-head">
-      <h2>Transactielog</h2>
-      <input id="logSearch" placeholder="Zoek nummer, type of actie">
-    </div>
-    <div id="logList"></div>
-  </div>
-</section>
-
-<section id="meer" class="view">
-  <div class="panel">
-    <h2>Beheer</h2>
-    <div class="toolbar" style="display:grid;grid-template-columns:1fr;gap:10px">
-      <button data-view="catalogus">🧵 Catalogus</button>
-      <button data-view="bestellingen">📦 Bestellingen</button>
-      <button data-view="bibliotheken">📚 Bibliotheken</button>
-      <button data-view="logboek">📝 Transactielog</button>
-      <button data-view="instellingen">⚙️ Instellingen</button>
-    </div>
-  </div>
-
-  <div class="panel mobile-highlight">
-    <h2>iPhone-installatie</h2>
-    <p class="note">Open de app in Safari via een beveiligd webadres en kies Deel → Zet op beginscherm. De app werkt daarna als zelfstandige webapp.</p>
-    <div class="toolbar">
-      <button id="installHelpBtn">Installatie-uitleg</button>
-    </div>
-  </div>
-
-  <div class="panel">
-    <h2>Overzetten naar andere iPhone</h2>
-    <p class="note">Exporteer op deze iPhone een JSON-back-up. Importeer die later op de dedicated iPhone.</p>
-    <div class="toolbar">
-      <button id="mobileExportBtn">Maak overdrachtsbestand</button>
-    </div>
-  </div>
-  <div class="panel backup-panel">
-    <h2>Back-up en herstel</h2>
-    <p class="note">Maak regelmatig een back-up, zeker vóór een update of wanneer je naar een andere iPhone overstapt.</p>
-
-    <div class="backup-actions">
-      <button class="primary" id="createBackupBtn">Back-up maken</button>
-      <label class="file-button restore-button">
-        Back-up terugzetten
-        <input id="restoreBackupInput" type="file" accept=".json,application/json">
-      </label>
-    </div>
-
-    <div class="backup-status" id="backupStatus">
-      Nog geen back-up gemaakt in deze sessie.
-    </div>
-  </div>
-  </div>
-  <div class="panel">
-    <h2>Bibliotheken</h2>
-    <div id="librarySummary"></div>
-  </div>
-</section>
-</main>
-
-<nav class="bottom-nav">
+<nav class="mobile-bottom-nav">
   <button data-view="dashboard" class="active"><span>⌂</span>Dashboard</button>
   <button data-view="voorraad"><span>◫</span>Voorraad</button>
   <button data-view="scannen"><span>▣</span>Scannen</button>
-  <button data-view="bestellijst"><span>☷</span>Bestellijst</button>
+  <button data-view="bestellijst"><span>☷</span>Bestellen</button>
   <button data-view="meer"><span>•••</span>Meer</button>
 </nav>
 
-
-<dialog id="dashboardLevelDialog">
-  <div class="dialog-card">
-    <h2 id="dashboardLevelTitle">Hoeveelheid aanpassen</h2>
-    <div class="tap-choice-grid" id="dashboardLevelChoices">
-      <button type="button" data-value="0">0%</button>
-      <button type="button" data-value="25">25%</button>
-      <button type="button" data-value="50">50%</button>
-      <button type="button" data-value="75">75%</button>
-      <button type="button" data-value="100">100%</button>
-    </div>
-    <div class="dialog-actions">
-      <button type="button" onclick="dashboardLevelDialog.close()">Annuleren</button>
-    </div>
-  </div>
-</dialog>
-
 <dialog id="filamentDialog">
-<form method="dialog" id="filamentForm" class="dialog-card">
-<h2 id="filamentTitle">Nieuw filament</h2>
-
-<div class="tap-form">
-
-  <div class="tap-field">
-    <span class="tap-label">Categorie</span>
-    <button type="button" class="tap-picker" data-picker="category"><span id="pickCategoryText">Kies categorie</span><span>›</span></button>
-    <input type="hidden" id="fCategory">
-  </div>
-
-  <div class="tap-field">
-    <span class="tap-label">Type</span>
-    <button type="button" class="tap-picker" data-picker="type"><span id="pickTypeText">Kies type</span><span>›</span></button>
-    <input type="hidden" id="fType">
-  </div>
-
-  <div class="tap-field">
-    <span class="tap-label">Kleur</span>
-    <button type="button" class="tap-picker" data-picker="color"><span id="pickColorText">Kies kleur</span><span>›</span></button>
-    <input type="hidden" id="fColor">
-  </div>
-
-  <div class="tap-field">
-    <span class="tap-label">Merk</span>
-    <button type="button" class="tap-picker" data-picker="brand"><span id="pickBrandText">Kies merk</span><span>›</span></button>
-    <input type="hidden" id="fBrand">
-  </div>
-
-  <div class="tap-field">
-    <span class="tap-label">Leverancier</span>
-    <button type="button" class="tap-picker" data-picker="supplier"><span id="pickSupplierText">Kies leverancier</span><span>›</span></button>
-    <input type="hidden" id="fSupplier">
-  </div>
-
-  <div class="tap-field">
-    <span class="tap-label">Minimumvoorraad</span>
-    <div class="tap-choice-grid" id="minimumChoices">
-      <button type="button" data-value="0">0%</button>
-      <button type="button" data-value="0.25">25%</button>
-      <button type="button" data-value="0.5">50%</button>
-      <button type="button" data-value="0.75">75%</button>
-      <button type="button" data-value="1">100%</button>
+  <form class="dialog-card" id="filamentForm">
+    <h2 id="filamentTitle">Nieuw filament</h2>
+    <div class="form-grid">
+      <label>Categorie<input id="fCategory" list="categoryOptions" required><datalist id="categoryOptions"></datalist></label>
+      <label>Type<input id="fType" list="typeOptions" required><datalist id="typeOptions"></datalist></label>
+      <label>Kleur<input id="fColor" list="colorOptions" required><datalist id="colorOptions"></datalist></label>
+      <label>Merk<input id="fBrand" list="brandOptions" required><datalist id="brandOptions"></datalist></label>
+      <label>Leverancier<input id="fSupplier" list="supplierOptions"><datalist id="supplierOptions"></datalist></label>
+      <label>Minimumvoorraad
+        <select id="fMinimum">
+          <option value="0">0%</option>
+          <option value="0.25">25%</option>
+          <option value="0.5">50%</option>
+          <option value="0.75">75%</option>
+          <option value="1">100%</option>
+        </select>
+      </label>
+      <label>Gewenste voorraad<select id="fTarget">
+        <option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option>
+      </select></label>
+      <label>Leveranciersreferentie<input id="fSupplierRef"></label>
     </div>
-    <input type="hidden" id="fMinimum" value="1">
-  </div>
-
-  <div class="tap-field">
-    <label class="tap-label" for="fTarget">Gewenste voorraad</label>
-    <select id="fTarget">
-      <option value="1">1 rol</option>
-      <option value="2" selected>2 rollen</option>
-      <option value="3">3 rollen</option>
-      <option value="4">4 rollen</option>
-      <option value="5">5 rollen</option>
-      <option value="6">6 rollen</option>
-      <option value="8">8 rollen</option>
-      <option value="10">10 rollen</option>
-    </select>
-  </div>
-
-  <div class="tap-field">
-    <label class="tap-label" for="fSupplierRef">Leveranciersreferentie</label>
-    <input id="fSupplierRef" placeholder="Optioneel">
-  </div>
-
-</div>
-
-<div class="dialog-actions">
-  <button type="button" id="cancelFilamentBtn" onclick="document.getElementById('filamentDialog').close()">Annuleren</button>
-  <button type="submit" class="primary">Opslaan</button>
-</div>
-</form>
-</dialog>
-
-<dialog id="pickerDialog">
-  <div class="dialog-card picker-dialog-card">
-    <div class="picker-head">
-      <button type="button" id="closePickerBtn">←</button>
-      <h2 id="pickerTitle">Kies</h2>
-    </div>
-    <input id="pickerSearch" placeholder="Zoeken">
-    <div id="pickerList" class="picker-list"></div>
-    <button type="button" class="primary picker-add-btn" id="pickerAddBtn">+ Nieuw toevoegen</button>
-  </div>
-</dialog>
-
-<dialog id="newPickerValueDialog">
-  <form method="dialog" class="dialog-card" id="newPickerValueForm">
-    <h2 id="newPickerValueTitle">Nieuwe waarde</h2>
-    <label>Naam<input id="newPickerValueInput" required></label>
     <div class="dialog-actions">
-      <button type="button" data-close-current-dialog>Annuleren</button>
-      <button type="submit" class="primary">Toevoegen</button>
+      <button type="button" id="cancelFilamentBtn">Annuleren</button>
+      <button class="primary" type="submit">Opslaan</button>
     </div>
   </form>
 </dialog>
 
 <dialog id="spoolDialog">
-<form method="dialog" id="spoolForm" class="dialog-card">
-<h2 id="spoolTitle">Nieuwe spoel</h2>
-<div class="form-grid">
-<label>Nummer<input id="sNumber" required></label>
-<label>Filament<select id="sFilament" required></select></label>
-<div class="tap-field">
-<span class="tap-label">Inhoud</span>
-<div class="tap-choice-grid" id="spoolLevelChoices">
-  <button type="button" data-value="0">0%</button>
-  <button type="button" data-value="25">25%</button>
-  <button type="button" data-value="50">50%</button>
-  <button type="button" data-value="75">75%</button>
-  <button type="button" data-value="100">100%</button>
-</div>
-<input type="hidden" id="sLevel" value="100">
-</div>
-<label>Status<select id="sStatus"><option value="active">Actief</option><option value="inactive">Buiten gebruik</option></select></label>
-</div>
-<div class="dialog-actions"><button type="button" data-close-current-dialog>Annuleren</button><button type="submit" class="primary">Opslaan</button></div>
-</form>
+  <form class="dialog-card" id="spoolForm">
+    <h2 id="spoolTitle">Nieuwe spoel</h2>
+    <div class="form-grid">
+      <label>Nummer<input id="sNumber" required></label>
+      <label>Filament<select id="sFilament" required></select></label>
+      <label>Inhoud<select id="sLevel">
+        <option value="0">0%</option><option value="25">25%</option><option value="50">50%</option><option value="75">75%</option><option value="100" selected>100%</option>
+      </select></label>
+      <label>Status<select id="sStatus"><option value="active">Actief</option><option value="inactive">Buiten gebruik</option></select></label>
+    </div>
+    <div class="dialog-actions">
+      <button type="button" data-close="spoolDialog">Annuleren</button>
+      <button class="primary" type="submit">Opslaan</button>
+    </div>
+  </form>
 </dialog>
 
 <dialog id="refillDialog">
-<form method="dialog" id="refillForm" class="dialog-card">
-<h2 id="refillTitle">Nieuwe refill</h2>
-<div class="form-grid">
-<label>Nummer<input id="rNumber" required></label>
-<label>Filament<select id="rFilament" required></select></label>
-</div>
-<div class="dialog-actions"><button type="button" data-close-current-dialog>Annuleren</button><button type="submit" class="primary">Opslaan</button></div>
-</form>
-</dialog>
-
-<dialog id="fillDialog">
-<form method="dialog" id="fillForm" class="dialog-card">
-<h2>Spoel vullen met refill</h2>
-<div class="form-grid">
-<label>Lege spoel<select id="fillSpool"></select></label>
-<label>Refill<select id="fillRefill"></select></label>
-</div>
-<div class="dialog-actions"><button type="button" data-close-current-dialog>Annuleren</button><button type="submit" class="primary">Koppelen</button></div>
-</form>
+  <form class="dialog-card" id="refillForm">
+    <h2 id="refillTitle">Nieuwe refill</h2>
+    <div class="form-grid">
+      <label>Nummer<input id="rNumber" required></label>
+      <label>Filament<select id="rFilament" required></select></label>
+    </div>
+    <div class="dialog-actions">
+      <button type="button" data-close="refillDialog">Annuleren</button>
+      <button class="primary" type="submit">Opslaan</button>
+    </div>
+  </form>
 </dialog>
 
 <dialog id="orderDialog">
-<form method="dialog" id="orderForm" class="dialog-card wide">
-<h2>Nieuwe bestelling</h2>
-<div class="form-grid">
-<label>Leverancier<input id="oSupplier" list="supplierOptions" required></label>
-<label>Besteldatum<input id="oDate" type="date"></label>
-<label>Verwachte levering<input id="oExpected" type="date"></label>
-<label>Referentie<input id="oReference"></label>
-</div>
-<h3>Bestelregels</h3>
-<div id="orderLines"></div>
-<div class="toolbar"><button type="button" id="addOrderLineBtn">Regel toevoegen</button></div>
-<div class="dialog-actions"><button type="button" data-close-current-dialog>Annuleren</button><button type="submit" class="primary">Bestelling opslaan</button></div>
-</form>
-</dialog>
-
-<dialog id="receiveDialog">
-<form method="dialog" id="receiveForm" class="dialog-card wide">
-<h2>Levering ontvangen</h2>
-<div id="receiveHeader" class="panel"></div>
-<div id="receiveLines"></div>
-<div class="dialog-actions"><button type="button" data-close-current-dialog>Annuleren</button><button type="submit" class="primary">Ontvangst verwerken</button></div>
-</form>
-</dialog>
-
-
-<dialog id="qrDialog">
-  <div class="dialog-card">
-    <h2 id="qrDialogTitle">QR-sticker</h2>
-    <div id="qrSticker" class="qr-sticker">
-      <img id="qrImage" alt="QR-code">
-      <div id="qrNumber" class="qr-number"></div>
-      <div class="qr-divider"></div>
-      <div id="qrType" class="qr-line qr-main"></div>
-      <div id="qrColor" class="qr-line"></div>
-      <div id="qrSupplier" class="qr-line"></div>
-      <div id="qrReference" class="qr-line qr-small"></div>
-      <div id="qrKind" class="qr-kind"></div>
+  <form class="dialog-card" id="orderForm">
+    <h2>Nieuwe bestelling</h2>
+    <div class="form-grid">
+      <label>Filament<select id="oFilament"></select></label>
+      <label>Aantal<input id="oQuantity" type="number" min="1" value="1"></label>
+      <label>Leverancier<input id="oSupplier"></label>
     </div>
-    <p class="note">De QR-code bevat het unieke spoel- of refillnummer.</p>
     <div class="dialog-actions">
-      <button onclick="qrDialog.close()">Sluiten</button>
-      <button class="primary" id="printQrBtn">Sticker afdrukken</button>
+      <button type="button" data-close="orderDialog">Annuleren</button>
+      <button class="primary" type="submit">Opslaan</button>
     </div>
-  </div>
+  </form>
 </dialog>
 
-
-<dialog id="libraryValueDialog">
-  <form method="dialog" class="dialog-card" id="libraryValueForm">
-    <h2 id="libraryValueTitle">Nieuwe waarde</h2>
+<dialog id="libraryDialog">
+  <form class="dialog-card" id="libraryForm">
+    <h2 id="libraryTitle">Waarde</h2>
     <label>Naam<input id="libraryValueInput" required></label>
     <div class="dialog-actions">
-      <button type="button" onclick="libraryValueDialog.close()">Annuleren</button>
-      <button type="submit" class="primary">Opslaan</button>
+      <button type="button" data-close="libraryDialog">Annuleren</button>
+      <button class="primary" type="submit">Opslaan</button>
     </div>
   </form>
 </dialog>
 
-<dialog id="replaceLibraryValueDialog">
-  <form method="dialog" class="dialog-card" id="replaceLibraryValueForm">
-    <h2>Waarde vervangen</h2>
-    <p id="replaceLibraryMessage" class="note"></p>
-    <label>Vervangen door<select id="replaceLibrarySelect"></select></label>
-    <div class="dialog-actions">
-      <button type="button" onclick="replaceLibraryValueDialog.close()">Annuleren</button>
-      <button type="submit" class="primary">Vervangen</button>
-    </div>
-  </form>
-</dialog>
-
-<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="js/app.js?v=7.0"></script>
+<script src="js/app.js?v=7.1"></script>
 </body>
 </html>
