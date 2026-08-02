@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   }
 });
-function fresh(){return{appVersion:'6.3.4',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS),settings:{spoolPrefix:'S',refillPrefix:'R',digits:4,defaultBrand:'Bambu Lab',defaultSupplier:'Bambu Lab'}}}
+function fresh(){return{appVersion:'7.0',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS),settings:{spoolPrefix:'S',refillPrefix:'R',digits:4,defaultBrand:'Bambu Lab',defaultSupplier:'Bambu Lab'}}}
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
 function pushUnique(a,v){v=String(v||'').trim();if(v&&!a.some(x=>x.toLowerCase()===v.toLowerCase()))a.push(v)}
 function migrate(raw){
@@ -43,7 +43,7 @@ function migrate(raw){
     };
   });
   d.settings={...d.settings,...(raw.settings||{})};
-  d.appVersion='6.3.4';
+  d.appVersion='7.0';
   return d;
 }
 function loadState(){try{return migrate(JSON.parse(localStorage.getItem(KEY)||'null'))}catch{return fresh()}}
@@ -644,7 +644,7 @@ function renderLog(){
 }
 if(window.logSearch)logSearch.oninput=renderLog;
 
-function renderAll(){refreshLists();renderDashboard();renderCatalog();renderStock();renderOrderList();renderOrders();renderLibraries();renderSettings();renderLog();if(currentDetailId&&detail.classList.contains('active'))renderDetail()}
+function renderAll(){refreshLists();renderDashboard();renderCatalog();renderStock();renderOrderList();renderOrders();renderLibraries();renderSettings();renderLog();renderLibraryManager();if(currentDetailId&&detail.classList.contains('active'))renderDetail()}
 renderAll();
 
 
@@ -719,7 +719,7 @@ function setBackupStatus(message,type=''){
 function downloadBackup(){
   const backup={
     ...state,
-    appVersion:'6.3.4',
+    appVersion:'7.0',
     exportedAt:new Date().toISOString(),
     backupFormat:'filament-manager-json-v1'
   };
@@ -877,3 +877,205 @@ if(filamentDialogElement){
 removeDefaultColors();
 localStorage.setItem(KEY,JSON.stringify(state));
 renderAll();
+
+
+let activeLibraryKind='colors';
+let editingLibraryValue=null;
+let replacingLibraryValue=null;
+
+function libraryDisplayName(kind){
+  return {
+    colors:'Kleur',
+    types:'Type',
+    brands:'Merk',
+    suppliers:'Leverancier',
+    categories:'Categorie'
+  }[kind]||'Waarde';
+}
+
+function libraryValues(kind){
+  if(kind==='types'){
+    const values=[];
+    Object.values(state.libraries.types||{}).forEach(list=>{
+      (list||[]).forEach(v=>pushUnique(values,v));
+    });
+    return values;
+  }
+  return [...(state.libraries[kind]||[])];
+}
+
+function valueUsageCount(kind,value){
+  return state.catalog.filter(f=>{
+    if(kind==='colors')return f.color===value;
+    if(kind==='brands')return f.brand===value;
+    if(kind==='suppliers')return f.supplier===value;
+    if(kind==='categories')return f.category===value;
+    if(kind==='types')return f.type===value;
+    return false;
+  }).length;
+}
+
+function replaceValueEverywhere(kind,oldValue,newValue){
+  state.catalog.forEach(f=>{
+    if(kind==='colors'&&f.color===oldValue)f.color=newValue;
+    if(kind==='brands'&&f.brand===oldValue)f.brand=newValue;
+    if(kind==='suppliers'&&f.supplier===oldValue)f.supplier=newValue;
+    if(kind==='categories'&&f.category===oldValue)f.category=newValue;
+    if(kind==='types'&&f.type===oldValue)f.type=newValue;
+  });
+
+  if(kind==='types'){
+    Object.keys(state.libraries.types||{}).forEach(category=>{
+      state.libraries.types[category]=(state.libraries.types[category]||[]).map(v=>v===oldValue?newValue:v);
+      state.libraries.types[category]=[...new Set(state.libraries.types[category])];
+    });
+  }else{
+    state.libraries[kind]=(state.libraries[kind]||[]).map(v=>v===oldValue?newValue:v);
+    state.libraries[kind]=[...new Set(state.libraries[kind])];
+  }
+}
+
+function removeLibraryValue(kind,value){
+  const usage=valueUsageCount(kind,value);
+
+  if(usage>0){
+    replacingLibraryValue={kind,value};
+    const alternatives=libraryValues(kind).filter(v=>v!==value);
+    if(!alternatives.length){
+      alert(`Deze ${libraryDisplayName(kind).toLowerCase()} wordt gebruikt en er is geen andere waarde om naar te vervangen.`);
+      return;
+    }
+    replaceLibraryMessage.textContent=`${value} wordt gebruikt door ${usage} filament(en). Kies een vervangende waarde.`;
+    replaceLibrarySelect.innerHTML=alternatives.sort((a,b)=>a.localeCompare(b,'nl')).map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
+    replaceLibraryValueDialog.showModal();
+    return;
+  }
+
+  if(!confirm(`${value} verwijderen?`))return;
+
+  if(kind==='types'){
+    Object.keys(state.libraries.types||{}).forEach(category=>{
+      state.libraries.types[category]=(state.libraries.types[category]||[]).filter(v=>v!==value);
+    });
+  }else{
+    state.libraries[kind]=(state.libraries[kind]||[]).filter(v=>v!==value);
+  }
+
+  addLog('library_delete',`${libraryDisplayName(kind)} ${value} verwijderd`);
+  save();
+}
+
+function renderLibraryManager(){
+  if(!window.libraryManagerList)return;
+  const q=(librarySearch?.value||'').trim().toLowerCase();
+  const values=libraryValues(activeLibraryKind)
+    .filter(v=>!q||String(v).toLowerCase().includes(q))
+    .sort((a,b)=>String(a).localeCompare(String(b),'nl'));
+
+  libraryManagerList.innerHTML=values.map(value=>`
+    <div class="library-row">
+      <div>
+        <strong>${esc(value)}</strong>
+        <div class="item-meta">${valueUsageCount(activeLibraryKind,value)} filament(en)</div>
+      </div>
+      <div class="item-actions">
+        <button data-library-edit="${encodeURIComponent(value)}">Wijzig</button>
+        <button data-library-delete="${encodeURIComponent(value)}">Verwijder</button>
+      </div>
+    </div>`).join('')||'<div class="empty">Geen waarden.</div>';
+}
+
+window.editLibraryValue=function(encoded){
+  const value=decodeURIComponent(encoded);
+  editingLibraryValue={kind:activeLibraryKind,value};
+  libraryValueTitle.textContent=`${libraryDisplayName(activeLibraryKind)} wijzigen`;
+  libraryValueInput.value=value;
+  libraryValueDialog.showModal();
+};
+
+const originalRemoveLibraryValue=removeLibraryValue;
+window.removeLibraryValue=function(kind,encoded){
+  originalRemoveLibraryValue(kind,decodeURIComponent(encoded));
+};
+
+document.querySelectorAll('[data-library-kind]').forEach(btn=>{
+  btn.onclick=()=>{
+    activeLibraryKind=btn.dataset.libraryKind;
+    document.querySelectorAll('[data-library-kind]').forEach(b=>b.classList.toggle('active',b===btn));
+    renderLibraryManager();
+  };
+});
+
+addLibraryValueBtn.onclick=()=>{
+  editingLibraryValue={kind:activeLibraryKind,value:null};
+  libraryValueTitle.textContent=`Nieuwe ${libraryDisplayName(activeLibraryKind).toLowerCase()}`;
+  libraryValueInput.value='';
+  libraryValueDialog.showModal();
+};
+
+librarySearch.oninput=renderLibraryManager;
+
+libraryValueForm.onsubmit=event=>{
+  event.preventDefault();
+  const value=libraryValueInput.value.trim();
+  if(!value)return;
+
+  const {kind}=editingLibraryValue||{kind:activeLibraryKind};
+  const oldValue=editingLibraryValue?.value;
+
+  const exists=libraryValues(kind).some(v=>v.toLowerCase()===value.toLowerCase()&&v!==oldValue);
+  if(exists){
+    alert('Deze waarde bestaat al.');
+    return;
+  }
+
+  if(oldValue){
+    replaceValueEverywhere(kind,oldValue,value);
+    addLog('library_rename',`${libraryDisplayName(kind)} ${oldValue} gewijzigd naar ${value}`);
+  }else{
+    if(kind==='types'){
+      if(!state.libraries.types['Andere'])state.libraries.types['Andere']=[];
+      pushUnique(state.libraries.types['Andere'],value);
+    }else{
+      pushUnique(state.libraries[kind],value);
+    }
+    addLog('library_add',`${libraryDisplayName(kind)} ${value} toegevoegd`);
+  }
+
+  libraryValueDialog.close();
+  save();
+};
+
+replaceLibraryValueForm.onsubmit=event=>{
+  event.preventDefault();
+  if(!replacingLibraryValue)return;
+
+  const {kind,value}=replacingLibraryValue;
+  const replacement=replaceLibrarySelect.value;
+  replaceValueEverywhere(kind,value,replacement);
+
+  if(kind==='types'){
+    Object.keys(state.libraries.types||{}).forEach(category=>{
+      state.libraries.types[category]=(state.libraries.types[category]||[]).filter(v=>v!==value);
+    });
+  }else{
+    state.libraries[kind]=(state.libraries[kind]||[]).filter(v=>v!==value);
+  }
+
+  addLog('library_replace',`${libraryDisplayName(kind)} ${value} vervangen door ${replacement}`);
+  replacingLibraryValue=null;
+  replaceLibraryValueDialog.close();
+  save();
+};
+
+document.addEventListener('click',event=>{
+  const edit=event.target.closest('[data-library-edit]');
+  if(edit){
+    window.editLibraryValue(edit.dataset.libraryEdit);
+    return;
+  }
+  const del=event.target.closest('[data-library-delete]');
+  if(del){
+    window.removeLibraryValue(activeLibraryKind,del.dataset.libraryDelete);
+  }
+});

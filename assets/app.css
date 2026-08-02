@@ -168,3 +168,11 @@ button,.file-button,input,select{min-height:var(--tap);font-size:16px}
 .backup-status.error{background:#fef2f2;color:#b91c1c}
 .legacy-backup-control{display:none!important}
 @media(min-width:700px){.backup-actions{grid-template-columns:1fr 1fr}}
+
+.library-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:10px}
+.library-tabs button{white-space:nowrap;min-height:42px}
+.library-tabs button.active{background:var(--accent);color:#fff}
+.library-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid #ececec}
+.library-row strong{font-size:16px}
+.library-row .item-actions{display:flex;gap:6px}
+.library-row .item-actions button{min-height:40px}

@@ -9,14 +9,14 @@
 <meta name="apple-mobile-web-app-title" content="Filament">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
-<title>Filament Manager v6.3.4 Mobile</title>
-<link rel="stylesheet" href="assets/app.css?v=6.3.4">
+<title>Filament Manager v7.0 Stable</title>
+<link rel="stylesheet" href="assets/app.css?v=7.0">
 </head>
 <body>
 <header class="app-header">
   <div>
     <h1>Filament Manager</h1>
-    <div class="version">Versie 6.3.4 · Cacheherstel</div>
+    <div class="version">Versie 7.0 · Stable</div>
   </div>
   <button id="installAppBtn" class="install-button hidden">Installeer</button>
 </header>
@@ -154,6 +154,29 @@
   <div id="detailContent"></div>
 </section>
 
+
+
+<section id="bibliotheken" class="view">
+  <div class="panel">
+    <h2>Bibliotheken</h2>
+    <p class="note">Pas waarden aan die je gebruikt bij het aanmaken van filamenten.</p>
+
+    <div class="library-tabs">
+      <button class="active" data-library-kind="colors">Kleuren</button>
+      <button data-library-kind="types">Types</button>
+      <button data-library-kind="brands">Merken</button>
+      <button data-library-kind="suppliers">Leveranciers</button>
+      <button data-library-kind="categories">Categorieën</button>
+    </div>
+
+    <div class="toolbar">
+      <button class="primary" id="addLibraryValueBtn">Nieuwe waarde</button>
+      <input id="librarySearch" placeholder="Zoeken">
+    </div>
+
+    <div id="libraryManagerList"></div>
+  </div>
+</section>
 
 <section id="logboek" class="view">
   <div class="panel">
@@ -432,7 +455,31 @@
   </div>
 </dialog>
 
+
+<dialog id="libraryValueDialog">
+  <form method="dialog" class="dialog-card" id="libraryValueForm">
+    <h2 id="libraryValueTitle">Nieuwe waarde</h2>
+    <label>Naam<input id="libraryValueInput" required></label>
+    <div class="dialog-actions">
+      <button type="button" onclick="libraryValueDialog.close()">Annuleren</button>
+      <button type="submit" class="primary">Opslaan</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="replaceLibraryValueDialog">
+  <form method="dialog" class="dialog-card" id="replaceLibraryValueForm">
+    <h2>Waarde vervangen</h2>
+    <p id="replaceLibraryMessage" class="note"></p>
+    <label>Vervangen door<select id="replaceLibrarySelect"></select></label>
+    <div class="dialog-actions">
+      <button type="button" onclick="replaceLibraryValueDialog.close()">Annuleren</button>
+      <button type="submit" class="primary">Vervangen</button>
+    </div>
+  </form>
+</dialog>
+
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="js/app.js?v=6.3.4"></script>
+<script src="js/app.js?v=7.0"></script>
 </body>
 </html>

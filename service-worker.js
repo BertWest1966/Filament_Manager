@@ -1,10 +1,10 @@
 
-const CACHE='filament-manager-v6-3-4';
+const CACHE='filament-manager-v7-0';
 const APP_SHELL=[
   './',
   './index.html',
-  './assets/app.css?v=6.3.4',
-  './js/app.js?v=6.3.4',
+  './assets/app.css?v=7.0',
+  './js/app.js?v=7.0',
   './manifest.webmanifest',
   './assets/icon-180.png',
   './assets/icon-192.png',
@@ -18,18 +18,15 @@ self.addEventListener('install',event=>{
 
 self.addEventListener('activate',event=>{
   event.waitUntil(
-    caches.keys().then(keys=>Promise.all(keys.map(key=>key===CACHE?null:caches.delete(key))))
+    caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key))))
   );
   self.clients.claim();
 });
 
 self.addEventListener('fetch',event=>{
   if(event.request.method!=='GET')return;
-
   const url=new URL(event.request.url);
-  const sameOrigin=url.origin===self.location.origin;
-
-  if(sameOrigin){
+  if(url.origin===self.location.origin){
     event.respondWith(
       fetch(event.request,{cache:'no-store'})
         .then(response=>{
@@ -39,8 +36,7 @@ self.addEventListener('fetch',event=>{
         })
         .catch(()=>caches.match(event.request).then(hit=>hit||caches.match('./index.html')))
     );
-    return;
+  }else{
+    event.respondWith(fetch(event.request).catch(()=>caches.match(event.request)));
   }
-
-  event.respondWith(fetch(event.request).catch(()=>caches.match(event.request)));
 });
