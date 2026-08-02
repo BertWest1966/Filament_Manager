@@ -9,14 +9,14 @@
 <meta name="apple-mobile-web-app-title" content="Filament">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
-<title>Filament Manager v6.3.3 Mobile</title>
-<link rel="stylesheet" href="assets/app.css">
+<title>Filament Manager v6.3.4 Mobile</title>
+<link rel="stylesheet" href="assets/app.css?v=6.3.4">
 </head>
 <body>
 <header class="app-header">
   <div>
     <h1>Filament Manager</h1>
-    <div class="version">Versie 6.3.3 · Herstel</div>
+    <div class="version">Versie 6.3.4 · Cacheherstel</div>
   </div>
   <button id="installAppBtn" class="install-button hidden">Installeer</button>
 </header>
@@ -311,7 +311,7 @@
 </div>
 
 <div class="dialog-actions">
-  <button type="button" id="cancelFilamentBtn" data-close-dialog="filamentDialog">Annuleren</button>
+  <button type="button" id="cancelFilamentBtn" onclick="document.getElementById('filamentDialog').close()">Annuleren</button>
   <button type="submit" class="primary">Opslaan</button>
 </div>
 </form>
@@ -433,6 +433,6 @@
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="js/app.js"></script>
+<script src="js/app.js?v=6.3.4"></script>
 </body>
 </html>

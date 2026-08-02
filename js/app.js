@@ -4,7 +4,19 @@ const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','PA / Nylon','PC','PV
 let state=loadState(),stockMode='spools',stockSortMode='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,currentDetailId=null,previousView='dashboard',receiveOrderId=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-function fresh(){return{appVersion:'6.3.3',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS),settings:{spoolPrefix:'S',refillPrefix:'R',digits:4,defaultBrand:'Bambu Lab',defaultSupplier:'Bambu Lab'}}}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const cancel=document.getElementById('cancelFilamentBtn');
+  const dialog=document.getElementById('filamentDialog');
+  if(cancel&&dialog){
+    cancel.addEventListener('click',event=>{
+      event.preventDefault();
+      event.stopPropagation();
+      if(dialog.open)dialog.close();
+    });
+  }
+});
+function fresh(){return{appVersion:'6.3.4',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS),settings:{spoolPrefix:'S',refillPrefix:'R',digits:4,defaultBrand:'Bambu Lab',defaultSupplier:'Bambu Lab'}}}
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
 function pushUnique(a,v){v=String(v||'').trim();if(v&&!a.some(x=>x.toLowerCase()===v.toLowerCase()))a.push(v)}
 function migrate(raw){
@@ -31,7 +43,7 @@ function migrate(raw){
     };
   });
   d.settings={...d.settings,...(raw.settings||{})};
-  d.appVersion='6.3.3';
+  d.appVersion='6.3.4';
   return d;
 }
 function loadState(){try{return migrate(JSON.parse(localStorage.getItem(KEY)||'null'))}catch{return fresh()}}
@@ -64,7 +76,12 @@ let activePicker=null;
 function pickerValues(kind){
   if(kind==='category')return [...state.libraries.categories];
   if(kind==='brand')return [...state.libraries.brands];
-  if(kind==='color')return [...state.libraries.colors];
+  if(kind==='color'){
+    const blocked=new Set(['white','black','wit','zwart']);
+    return [...state.libraries.colors].filter(
+      value=>!blocked.has(String(value||'').trim().toLowerCase())
+    );
+  }
   if(kind==='supplier')return [...state.libraries.suppliers];
   if(kind==='type')return [...(state.libraries.types[fCategory.value]||[])];
   return [];
@@ -89,6 +106,12 @@ function pickerTextElement(kind){
 }
 
 function renderPicker(){
+  if(activePicker==='color'){
+    const blocked=new Set(['white','black','wit','zwart']);
+    state.libraries.colors=(state.libraries.colors||[]).filter(
+      value=>!blocked.has(String(value||'').trim().toLowerCase())
+    );
+  }
   const q=pickerSearch.value.trim().toLowerCase();
   const selected=pickerInput(activePicker).value;
   const values=pickerValues(activePicker)
@@ -696,7 +719,7 @@ function setBackupStatus(message,type=''){
 function downloadBackup(){
   const backup={
     ...state,
-    appVersion:'6.3.3',
+    appVersion:'6.3.4',
     exportedAt:new Date().toISOString(),
     backupFormat:'filament-manager-json-v1'
   };
