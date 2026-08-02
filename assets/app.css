@@ -119,3 +119,24 @@ button,.file-button,input,select{min-height:var(--tap);font-size:16px}
   .item-actions button{flex:0}
   .quick-actions{grid-template-columns:repeat(4,auto)}
 }
+
+.tap-form{display:grid;gap:12px}
+.tap-field{display:grid;gap:7px}
+.tap-label{font-size:13px;font-weight:700;color:var(--muted)}
+.tap-picker{width:100%;display:flex;align-items:center;justify-content:space-between;text-align:left;background:#fff;border:1px solid var(--line);font-size:17px;font-weight:700;padding:13px 14px}
+.tap-choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tap-choice-grid button{min-height:50px;font-weight:800;background:#fff}
+.tap-choice-grid button.selected{background:var(--accent);color:#fff;border-color:var(--accent)}
+.picker-dialog-card{padding:0;min-height:70vh}
+.picker-head{display:grid;grid-template-columns:50px 1fr 50px;align-items:center;padding:12px;border-bottom:1px solid var(--line)}
+.picker-head h2{margin:0;text-align:center;font-size:19px}
+.picker-head button{border:none;background:none;font-size:22px}
+.picker-dialog-card>input{margin:12px;width:calc(100% - 24px)}
+.picker-list{max-height:55vh;overflow:auto;border-top:1px solid #eee}
+.picker-option{width:100%;display:flex;justify-content:space-between;align-items:center;border:none;border-bottom:1px solid #eee;border-radius:0;padding:14px;background:#fff;text-align:left;font-size:17px}
+.picker-option.selected{font-weight:800;background:#f3f4f6}
+.picker-add-btn{margin:12px;width:calc(100% - 24px)}
+@media(min-width:900px){
+  .tap-form{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tap-field:last-child{grid-column:1/-1}
+}

@@ -4,7 +4,7 @@ const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','PA / Nylon','PC','PV
 let state=loadState(),stockMode='spools',editFilamentId=null,editSpoolId=null,editRefillId=null,currentDetailId=null,previousView='dashboard',receiveOrderId=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-function fresh(){return{appVersion:'5.9',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS),settings:{spoolPrefix:'S',refillPrefix:'R',digits:4,defaultBrand:'Bambu Lab',defaultSupplier:'Bambu Lab'}}}
+function fresh(){return{appVersion:'6.0',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS),settings:{spoolPrefix:'S',refillPrefix:'R',digits:4,defaultBrand:'Bambu Lab',defaultSupplier:'Bambu Lab'}}}
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
 function pushUnique(a,v){v=String(v||'').trim();if(v&&!a.some(x=>x.toLowerCase()===v.toLowerCase()))a.push(v)}
 function migrate(raw){
@@ -31,7 +31,7 @@ function migrate(raw){
     };
   });
   d.settings={...d.settings,...(raw.settings||{})};
-  d.appVersion='5.9';
+  d.appVersion='6.0';
   return d;
 }
 function loadState(){try{return migrate(JSON.parse(localStorage.getItem(KEY)||'null'))}catch{return fresh()}}
@@ -55,19 +55,165 @@ function toOrder(f){const available=totalStock(f.id);if(available>=Number(f.min)
 function sortByFilament(a,b){const fa=filament(a.filamentId),fb=filament(b.filamentId);return (fa?.category||'').localeCompare(fb?.category||'','nl')||(fa?.type||'').localeCompare(fb?.type||'','nl')||(fa?.color||'').localeCompare(fb?.color||'','nl')||String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true})}
 function setView(v){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===v));document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===v))}
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
-function refreshLists(){fCategory.innerHTML=state.libraries.categories.sort().map(x=>`<option>${esc(x)}</option>`).join('');brandOptions.innerHTML=state.libraries.brands.sort().map(x=>`<option value="${esc(x)}">`).join('');colorOptions.innerHTML=state.libraries.colors.sort().map(x=>`<option value="${esc(x)}">`).join('');supplierOptions.innerHTML=state.libraries.suppliers.sort().map(x=>`<option value="${esc(x)}">`).join('');refreshTypeOptions()}
-function refreshTypeOptions(){typeOptions.innerHTML=(state.libraries.types[fCategory.value]||[]).sort().map(x=>`<option value="${esc(x)}">`).join('')}
-fCategory.addEventListener('change',refreshTypeOptions);
+function refreshLists(){}
+function refreshTypeOptions(){}
 function fillFilaments(el,selected=''){el.innerHTML=state.catalog.slice().sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl')).map(f=>`<option value="${f.id}" ${f.id===selected?'selected':''}>${esc(label(f))}</option>`).join('')}
-function openFilament(id=null){editFilamentId=id;refreshLists();const f=filament(id);filamentTitle.textContent=f?'Filament wijzigen':'Nieuw filament';fCategory.value=f?.category||state.libraries.categories[0];refreshTypeOptions();fBrand.value=f?.brand||localStorage.getItem('lastBrand')||state.settings.defaultBrand||'Bambu Lab';fType.value=f?.type||'';fColor.value=f?.color||'';{
+
+let activePicker=null;
+
+function pickerValues(kind){
+  if(kind==='category')return [...state.libraries.categories];
+  if(kind==='brand')return [...state.libraries.brands];
+  if(kind==='color')return [...state.libraries.colors];
+  if(kind==='supplier')return [...state.libraries.suppliers];
+  if(kind==='type')return [...(state.libraries.types[fCategory.value]||[])];
+  return [];
+}
+
+function pickerLabel(kind){
+  return {category:'Categorie',type:'Type',color:'Kleur',brand:'Merk',supplier:'Leverancier'}[kind]||'Kies';
+}
+
+function pickerInput(kind){
+  return {category:fCategory,type:fType,color:fColor,brand:fBrand,supplier:fSupplier}[kind];
+}
+
+function pickerTextElement(kind){
+  return {
+    category:pickCategoryText,
+    type:pickTypeText,
+    color:pickColorText,
+    brand:pickBrandText,
+    supplier:pickSupplierText
+  }[kind];
+}
+
+function renderPicker(){
+  const q=pickerSearch.value.trim().toLowerCase();
+  const selected=pickerInput(activePicker).value;
+  const values=pickerValues(activePicker)
+    .filter(v=>!q||String(v).toLowerCase().includes(q))
+    .sort((a,b)=>String(a).localeCompare(String(b),'nl'));
+
+  pickerList.innerHTML=values.map(v=>`
+    <button type="button" class="picker-option ${v===selected?'selected':''}" data-value="${esc(v)}">
+      <span>${esc(v)}</span><span>${v===selected?'✓':''}</span>
+    </button>`).join('')||'<div class="empty">Geen resultaten.</div>';
+
+  pickerList.querySelectorAll('.picker-option').forEach(btn=>{
+    btn.onclick=()=>{
+      const value=btn.dataset.value;
+      pickerInput(activePicker).value=value;
+      pickerTextElement(activePicker).textContent=value;
+
+      if(activePicker==='category'){
+        fType.value='';
+        pickTypeText.textContent='Kies type';
+      }
+
+      pickerDialog.close();
+    };
+  });
+}
+
+function openPicker(kind){
+  activePicker=kind;
+  pickerTitle.textContent=`Kies ${pickerLabel(kind).toLowerCase()}`;
+  pickerSearch.value='';
+  pickerAddBtn.textContent=`+ Nieuwe ${pickerLabel(kind).toLowerCase()} toevoegen`;
+  renderPicker();
+  pickerDialog.showModal();
+}
+
+document.querySelectorAll('[data-picker]').forEach(btn=>{
+  btn.onclick=()=>openPicker(btn.dataset.picker);
+});
+
+pickerSearch.oninput=renderPicker;
+closePickerBtn.onclick=()=>pickerDialog.close();
+
+pickerAddBtn.onclick=()=>{
+  newPickerValueTitle.textContent=`Nieuwe ${pickerLabel(activePicker).toLowerCase()}`;
+  newPickerValueInput.value=pickerSearch.value.trim();
+  newPickerValueDialog.showModal();
+};
+
+newPickerValueForm.onsubmit=e=>{
+  e.preventDefault();
+  const value=newPickerValueInput.value.trim();
+  if(!value)return;
+
+  if(activePicker==='type'){
+    const category=fCategory.value;
+    if(!category){alert('Kies eerst een categorie.');return}
+    if(!state.libraries.types[category])state.libraries.types[category]=[];
+    pushUnique(state.libraries.types[category],value);
+  }else{
+    const map={category:'categories',brand:'brands',color:'colors',supplier:'suppliers'};
+    pushUnique(state.libraries[map[activePicker]],value);
+  }
+
+  pickerInput(activePicker).value=value;
+  pickerTextElement(activePicker).textContent=value;
+  newPickerValueDialog.close();
+  pickerDialog.close();
+};
+
+function setTapChoice(container,value){
+  container.querySelectorAll('button[data-value]').forEach(btn=>{
+    btn.classList.toggle('selected',String(btn.dataset.value)===String(value));
+  });
+}
+
+minimumChoices.querySelectorAll('button').forEach(btn=>{
+  btn.onclick=()=>{
+    fMinimum.value=btn.dataset.value;
+    setTapChoice(minimumChoices,btn.dataset.value);
+  };
+});
+
+spoolLevelChoices.querySelectorAll('button').forEach(btn=>{
+  btn.onclick=()=>{
+    sLevel.value=btn.dataset.value;
+    setTapChoice(spoolLevelChoices,btn.dataset.value);
+  };
+});
+
+function openFilament(id=null){
+  editFilamentId=id;
+  const f=filament(id);
+
+  filamentTitle.textContent=f?'Filament wijzigen':'Nieuw filament';
+
+  fCategory.value=f?.category||state.libraries.categories[0]||'PLA';
+  pickCategoryText.textContent=fCategory.value||'Kies categorie';
+
+  fType.value=f?.type||'';
+  pickTypeText.textContent=fType.value||'Kies type';
+
+  fColor.value=f?.color||'';
+  pickColorText.textContent=fColor.value||'Kies kleur';
+
+  fBrand.value=f?.brand||localStorage.getItem('lastBrand')||state.settings.defaultBrand||'Bambu Lab';
+  pickBrandText.textContent=fBrand.value||'Kies merk';
+
+  fSupplier.value=f?.supplier||localStorage.getItem('lastSupplier')||state.settings.defaultSupplier||'Bambu Lab';
+  pickSupplierText.textContent=fSupplier.value||'Kies leverancier';
+
   const allowed=[0,0.25,0.5,0.75,1];
   const current=Number(f?.min??1);
   const nearest=allowed.reduce((best,v)=>Math.abs(v-current)<Math.abs(best-current)?v:best,allowed[0]);
   fMinimum.value=String(nearest);
-}fTarget.value=f?.target??2;fSupplier.value=f?.supplier||localStorage.getItem('lastSupplier')||state.settings.defaultSupplier||'Bambu Lab';fSupplierRef.value=f?.supplierRef||'';filamentDialog.showModal()}
+  setTapChoice(minimumChoices,String(nearest));
+
+  fTarget.value=String(f?.target??2);
+  fSupplierRef.value=f?.supplierRef||'';
+
+  filamentDialog.showModal();
+}
 newFilamentBtn.onclick=()=>openFilament();
 filamentForm.onsubmit=e=>{e.preventDefault();const o={id:editFilamentId||uid(),category:fCategory.value.trim(),brand:fBrand.value.trim(),type:fType.value.trim(),color:fColor.value.trim(),min:[0,0.25,0.5,0.75,1].includes(Number(fMinimum.value))?Number(fMinimum.value):0,target:Number(fTarget.value),supplier:fSupplier.value.trim(),supplierRef:fSupplierRef.value.trim()};if(!o.category||!o.brand||!o.type||!o.color){alert('Vul categorie, merk, type en kleur in.');return}pushUnique(state.libraries.categories,o.category);pushUnique(state.libraries.brands,o.brand);pushUnique(state.libraries.colors,o.color);pushUnique(state.libraries.suppliers,o.supplier);if(!state.libraries.types[o.category])state.libraries.types[o.category]=[];pushUnique(state.libraries.types[o.category],o.type);state.catalog=editFilamentId?state.catalog.map(f=>f.id===editFilamentId?o:f):[...state.catalog,o];addLog(editFilamentId?'filament_updated':'filament_created',`${o.category} ${o.type} ${o.color} ${editFilamentId?'gewijzigd':'aangemaakt'}`,o.id);filamentDialog.close();save()}
-function openSpool(id=null,preset=null){if(!state.catalog.length)return alert('Maak eerst een filament aan.');editSpoolId=id;const s=state.spools.find(x=>x.id===id);spoolTitle.textContent=s?'Spoel wijzigen':'Nieuwe spoel';sNumber.value=s?.number||nextNumber(state.settings.spoolPrefix||'S',state.spools);fillFilaments(sFilament,s?.filamentId||preset||state.catalog[0].id);sLevel.value=String(s?.level??100);sStatus.value=s?.status||'active';spoolDialog.showModal()}
+function openSpool(id=null,preset=null){if(!state.catalog.length)return alert('Maak eerst een filament aan.');editSpoolId=id;const s=state.spools.find(x=>x.id===id);spoolTitle.textContent=s?'Spoel wijzigen':'Nieuwe spoel';sNumber.value=s?.number||nextNumber(state.settings.spoolPrefix||'S',state.spools);fillFilaments(sFilament,s?.filamentId||preset||state.catalog[0].id);sLevel.value=String(s?.level??100);setTapChoice(spoolLevelChoices,sLevel.value);sStatus.value=s?.status||'active';spoolDialog.showModal()}
 newSpoolBtn.onclick=()=>openSpool();
 spoolForm.onsubmit=e=>{e.preventDefault();const o={id:editSpoolId||uid(),number:sNumber.value.trim().toUpperCase(),filamentId:sFilament.value,level:Number(sLevel.value),status:sStatus.value};state.spools=editSpoolId?state.spools.map(s=>s.id===editSpoolId?o:s):[...state.spools,o];addLog('spool_update',`Spoel ${o.number} ${editSpoolId?'gewijzigd':'aangemaakt'} naar ${o.level}%`,o.filamentId,o.number);spoolDialog.close();save()}
 function openRefill(id=null,preset=null){if(!state.catalog.length)return alert('Maak eerst een filament aan.');editRefillId=id;const r=state.refills.find(x=>x.id===id);refillTitle.textContent=r?'Refill wijzigen':'Nieuwe refill';rNumber.value=r?.number||nextNumber(state.settings.refillPrefix||'R',state.refills);fillFilaments(rFilament,r?.filamentId||preset||state.catalog[0].id);refillDialog.showModal()}

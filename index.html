@@ -9,14 +9,14 @@
 <meta name="apple-mobile-web-app-title" content="Filament">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
-<title>Filament Manager v5.9 Mobile</title>
+<title>Filament Manager v6.0 Mobile</title>
 <link rel="stylesheet" href="assets/app.css">
 </head>
 <body>
 <header class="app-header">
   <div>
     <h1>Filament Manager</h1>
-    <div class="version">Versie 5.9 · Mobile First</div>
+    <div class="version">Versie 6.0 · Tap First</div>
   </div>
   <button id="installAppBtn" class="install-button hidden">Installeer</button>
 </header>
@@ -213,26 +213,100 @@
 <dialog id="filamentDialog">
 <form method="dialog" id="filamentForm" class="dialog-card">
 <h2 id="filamentTitle">Nieuw filament</h2>
-<div class="form-grid">
-<label>Categorie<select id="fCategory" required></select></label>
-<label>Merk<input id="fBrand" list="brandOptions" required><datalist id="brandOptions"></datalist></label>
-<label>Type<input id="fType" list="typeOptions" required><datalist id="typeOptions"></datalist></label>
-<label>Kleur<input id="fColor" list="colorOptions" required><datalist id="colorOptions"></datalist></label>
-<label>Minimumvoorraad
-<select id="fMinimum" required>
-  <option value="0">0% — geen minimum</option>
-  <option value="0.25">25% — kwart rol</option>
-  <option value="0.5">50% — halve rol</option>
-  <option value="0.75">75% — driekwart rol</option>
-  <option value="1">100% — volle rol</option>
-</select>
-</label>
-<label>Gewenste voorraad<input id="fTarget" type="number" min="0" step="1" value="2" required></label>
-<label>Leverancier<input id="fSupplier" list="supplierOptions"><datalist id="supplierOptions"></datalist></label>
-<label>Leveranciersreferentie<input id="fSupplierRef"></label>
+
+<div class="tap-form">
+
+  <div class="tap-field">
+    <span class="tap-label">Categorie</span>
+    <button type="button" class="tap-picker" data-picker="category"><span id="pickCategoryText">Kies categorie</span><span>›</span></button>
+    <input type="hidden" id="fCategory">
+  </div>
+
+  <div class="tap-field">
+    <span class="tap-label">Type</span>
+    <button type="button" class="tap-picker" data-picker="type"><span id="pickTypeText">Kies type</span><span>›</span></button>
+    <input type="hidden" id="fType">
+  </div>
+
+  <div class="tap-field">
+    <span class="tap-label">Kleur</span>
+    <button type="button" class="tap-picker" data-picker="color"><span id="pickColorText">Kies kleur</span><span>›</span></button>
+    <input type="hidden" id="fColor">
+  </div>
+
+  <div class="tap-field">
+    <span class="tap-label">Merk</span>
+    <button type="button" class="tap-picker" data-picker="brand"><span id="pickBrandText">Kies merk</span><span>›</span></button>
+    <input type="hidden" id="fBrand">
+  </div>
+
+  <div class="tap-field">
+    <span class="tap-label">Leverancier</span>
+    <button type="button" class="tap-picker" data-picker="supplier"><span id="pickSupplierText">Kies leverancier</span><span>›</span></button>
+    <input type="hidden" id="fSupplier">
+  </div>
+
+  <div class="tap-field">
+    <span class="tap-label">Minimumvoorraad</span>
+    <div class="tap-choice-grid" id="minimumChoices">
+      <button type="button" data-value="0">0%</button>
+      <button type="button" data-value="0.25">25%</button>
+      <button type="button" data-value="0.5">50%</button>
+      <button type="button" data-value="0.75">75%</button>
+      <button type="button" data-value="1">100%</button>
+    </div>
+    <input type="hidden" id="fMinimum" value="1">
+  </div>
+
+  <div class="tap-field">
+    <label class="tap-label" for="fTarget">Gewenste voorraad</label>
+    <select id="fTarget">
+      <option value="1">1 rol</option>
+      <option value="2" selected>2 rollen</option>
+      <option value="3">3 rollen</option>
+      <option value="4">4 rollen</option>
+      <option value="5">5 rollen</option>
+      <option value="6">6 rollen</option>
+      <option value="8">8 rollen</option>
+      <option value="10">10 rollen</option>
+    </select>
+  </div>
+
+  <div class="tap-field">
+    <label class="tap-label" for="fSupplierRef">Leveranciersreferentie</label>
+    <input id="fSupplierRef" placeholder="Optioneel">
+  </div>
+
 </div>
-<div class="dialog-actions"><button value="cancel">Annuleren</button><button type="submit" class="primary">Opslaan</button></div>
+
+<div class="dialog-actions">
+  <button value="cancel">Annuleren</button>
+  <button type="submit" class="primary">Opslaan</button>
+</div>
 </form>
+</dialog>
+
+<dialog id="pickerDialog">
+  <div class="dialog-card picker-dialog-card">
+    <div class="picker-head">
+      <button type="button" id="closePickerBtn">←</button>
+      <h2 id="pickerTitle">Kies</h2>
+    </div>
+    <input id="pickerSearch" placeholder="Zoeken">
+    <div id="pickerList" class="picker-list"></div>
+    <button type="button" class="primary picker-add-btn" id="pickerAddBtn">+ Nieuw toevoegen</button>
+  </div>
+</dialog>
+
+<dialog id="newPickerValueDialog">
+  <form method="dialog" class="dialog-card" id="newPickerValueForm">
+    <h2 id="newPickerValueTitle">Nieuwe waarde</h2>
+    <label>Naam<input id="newPickerValueInput" required></label>
+    <div class="dialog-actions">
+      <button value="cancel">Annuleren</button>
+      <button type="submit" class="primary">Toevoegen</button>
+    </div>
+  </form>
 </dialog>
 
 <dialog id="spoolDialog">
@@ -241,7 +315,17 @@
 <div class="form-grid">
 <label>Nummer<input id="sNumber" required></label>
 <label>Filament<select id="sFilament" required></select></label>
-<label>Inhoud<select id="sLevel"><option value="100">100%</option><option value="75">75%</option><option value="50">50%</option><option value="25">25%</option><option value="0">Leeg</option></select></label>
+<div class="tap-field">
+<span class="tap-label">Inhoud</span>
+<div class="tap-choice-grid" id="spoolLevelChoices">
+  <button type="button" data-value="0">0%</button>
+  <button type="button" data-value="25">25%</button>
+  <button type="button" data-value="50">50%</button>
+  <button type="button" data-value="75">75%</button>
+  <button type="button" data-value="100">100%</button>
+</div>
+<input type="hidden" id="sLevel" value="100">
+</div>
 <label>Status<select id="sStatus"><option value="active">Actief</option><option value="inactive">Buiten gebruik</option></select></label>
 </div>
 <div class="dialog-actions"><button value="cancel">Annuleren</button><button type="submit" class="primary">Opslaan</button></div>
