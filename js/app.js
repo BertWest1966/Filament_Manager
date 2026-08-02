@@ -101,8 +101,119 @@ function deleteLibrary(v){v=decodeURIComponent(v);if(usage(activeLibraryKind,v)>
 function renderLog(){const q=logSearch.value.toLowerCase();logList.innerHTML=state.history.slice().reverse().filter(h=>!q||h.message.toLowerCase().includes(q)).map(h=>`<div class="item-row"><div><strong>${new Date(h.date).toLocaleString('nl-BE')}</strong><div class="item-meta">${esc(h.message)}</div></div></div>`).join('')||'<div class="note">Geen logboekregels.</div>'}
 logSearch.oninput=renderLog;
 
-createBackupBtn.onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`FilamentManager_Backup_${new Date().toISOString().slice(0,10)}.json`;a.click();backupStatus.textContent='Back-up gemaakt.'}
-restoreBackupInput.onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!confirm('Huidige gegevens vervangen?'))return;state={...fresh(),...d};save();backupStatus.textContent='Back-up teruggezet.'}catch{alert('Ongeldig back-upbestand.')}}
+createBackupBtn.onclick=()=>{
+  try{
+    const backup={
+      backupFormat:'filament-manager',
+      backupVersion:1,
+      exportedAt:new Date().toISOString(),
+      appVersion:'7.2.2',
+      data:state
+    };
+    const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+    const a=document.createElement('a');
+    const url=URL.createObjectURL(blob);
+    a.href=url;
+    a.download=`FilamentManager_Backup_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    backupStatus.textContent='Back-up gemaakt.';
+  }catch(error){
+    backupStatus.textContent='Back-up maken mislukt.';
+    alert(`Back-up maken mislukt: ${error.message}`);
+  }
+}
+function normalizeBackupData(raw){
+  const source=raw?.backupFormat==='filament-manager' && raw?.data ? raw.data : raw;
+
+  if(!source || typeof source!=='object' || Array.isArray(source)){
+    throw new Error('Het bestand bevat geen Filament Manager-gegevens.');
+  }
+
+  const normalized={
+    ...fresh(),
+    ...source,
+    catalog:Array.isArray(source.catalog)?source.catalog:[],
+    spools:Array.isArray(source.spools)?source.spools:[],
+    refills:Array.isArray(source.refills)?source.refills:[],
+    orders:Array.isArray(source.orders)?source.orders:[],
+    history:Array.isArray(source.history)?source.history:[],
+    libraries:{
+      ...structuredClone(DEFAULTS),
+      ...(source.libraries||{}),
+      types:{
+        ...structuredClone(DEFAULTS.types),
+        ...((source.libraries||{}).types||{})
+      }
+    }
+  };
+
+  // Oude enkelvoudige bestellingen en ontbrekende velden veilig aanvullen.
+  normalized.spools=normalized.spools.map(s=>({
+    ...s,
+    status:s.status||'active',
+    level:Number(s.level??100)
+  }));
+
+  normalized.orders=normalized.orders.map(o=>({
+    ...o,
+    quantity:Number(o.quantity??1),
+    received:Number(o.received??0),
+    status:o.status||'Besteld'
+  }));
+
+  return normalized;
+}
+
+restoreBackupInput.onchange=async event=>{
+  const file=event.target.files?.[0];
+  event.target.value='';
+  if(!file)return;
+
+  let parsed;
+  try{
+    const text=await file.text();
+    parsed=JSON.parse(text);
+  }catch(error){
+    alert(`Het bestand is geen geldige JSON: ${error.message}`);
+    backupStatus.textContent='Back-up kon niet worden gelezen.';
+    return;
+  }
+
+  let restored;
+  try{
+    restored=normalizeBackupData(parsed);
+  }catch(error){
+    alert(`Back-up niet herkend: ${error.message}`);
+    backupStatus.textContent='Back-upformaat niet herkend.';
+    return;
+  }
+
+  const summary=`${restored.catalog.length} filamenten, ${restored.spools.length} spoelen en ${restored.refills.length} refills`;
+
+  if(!confirm(`Deze back-up bevat ${summary}.\n\nHuidige gegevens vervangen?`)){
+    backupStatus.textContent='Herstel geannuleerd.';
+    return;
+  }
+
+  const previousState=state;
+
+  try{
+    state=restored;
+    localStorage.setItem(KEY,JSON.stringify(state));
+    renderAll();
+    backupStatus.textContent=`Back-up teruggezet: ${summary}.`;
+    alert('Back-up succesvol teruggezet.');
+  }catch(error){
+    state=previousState;
+    localStorage.setItem(KEY,JSON.stringify(state));
+    try{renderAll()}catch{}
+    backupStatus.textContent='Terugzetten mislukt; oude gegevens zijn behouden.';
+    alert(`De JSON is geldig, maar verwerken mislukte:\n${error.message}`);
+  }
+}
 
 globalSearch.oninput=()=>{const q=globalSearch.value.toLowerCase();if(!q){globalResults.classList.add('hidden');return}const rows=[];state.catalog.forEach(f=>{if(label(f).toLowerCase().includes(q))rows.push({t:label(f),m:'Filament',a:()=>openDetail(f.id)})});state.spools.forEach(s=>{if(s.number.toLowerCase().includes(q))rows.push({t:s.number,m:'Spoel',a:()=>openSpool(s.id)})});state.refills.forEach(r=>{if(r.number.toLowerCase().includes(q))rows.push({t:r.number,m:'Refill',a:()=>openRefill(r.id)})});globalResults.innerHTML=rows.map((r,i)=>`<div class="search-result" data-i="${i}"><strong>${esc(r.t)}</strong><div class="item-meta">${r.m}</div></div>`).join('')||'<div class="search-result">Geen resultaten</div>';globalResults.classList.remove('hidden');globalResults.querySelectorAll('[data-i]').forEach(x=>x.onclick=()=>rows[Number(x.dataset.i)].a())}
 
