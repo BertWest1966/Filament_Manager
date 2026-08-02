@@ -9,14 +9,14 @@
 <meta name="apple-mobile-web-app-title" content="Filament">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
-<title>Filament Manager v6.2 Mobile</title>
+<title>Filament Manager v6.3.2 Mobile</title>
 <link rel="stylesheet" href="assets/app.css">
 </head>
 <body>
 <header class="app-header">
   <div>
     <h1>Filament Manager</h1>
-    <div class="version">Versie 6.2 · Scanner</div>
+    <div class="version">Versie 6.3.2 · Leverancierskleuren</div>
   </div>
   <button id="installAppBtn" class="install-button hidden">Installeer</button>
 </header>
@@ -192,13 +192,22 @@
       <button id="mobileExportBtn">Maak overdrachtsbestand</button>
     </div>
   </div>
-  <div class="panel">
-    <h2>Back-up</h2>
-    <div class="toolbar">
-      <button id="exportBtn">Exporteer JSON</button>
-      <label class="file-button">Importeer JSON<input id="importInput" type="file" accept=".json"></label>
-      <button class="danger" id="resetBtn">Wis alle gegevens</button>
+  <div class="panel backup-panel">
+    <h2>Back-up en herstel</h2>
+    <p class="note">Maak regelmatig een back-up, zeker vóór een update of wanneer je naar een andere iPhone overstapt.</p>
+
+    <div class="backup-actions">
+      <button class="primary" id="createBackupBtn">Back-up maken</button>
+      <label class="file-button restore-button">
+        Back-up terugzetten
+        <input id="restoreBackupInput" type="file" accept=".json,application/json">
+      </label>
     </div>
+
+    <div class="backup-status" id="backupStatus">
+      Nog geen back-up gemaakt in deze sessie.
+    </div>
+  </div>
   </div>
   <div class="panel">
     <h2>Bibliotheken</h2>
@@ -302,7 +311,7 @@
 </div>
 
 <div class="dialog-actions">
-  <button value="cancel">Annuleren</button>
+  <button type="button" id="cancelFilamentBtn">Annuleren</button>
   <button type="submit" class="primary">Opslaan</button>
 </div>
 </form>

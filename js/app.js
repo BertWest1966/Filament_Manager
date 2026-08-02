@@ -4,7 +4,7 @@ const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','PA / Nylon','PC','PV
 let state=loadState(),stockMode='spools',stockSortMode='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,currentDetailId=null,previousView='dashboard',receiveOrderId=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-function fresh(){return{appVersion:'6.2',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS),settings:{spoolPrefix:'S',refillPrefix:'R',digits:4,defaultBrand:'Bambu Lab',defaultSupplier:'Bambu Lab'}}}
+function fresh(){return{appVersion:'6.3.2',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS),settings:{spoolPrefix:'S',refillPrefix:'R',digits:4,defaultBrand:'Bambu Lab',defaultSupplier:'Bambu Lab'}}}
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
 function pushUnique(a,v){v=String(v||'').trim();if(v&&!a.some(x=>x.toLowerCase()===v.toLowerCase()))a.push(v)}
 function migrate(raw){
@@ -31,7 +31,7 @@ function migrate(raw){
     };
   });
   d.settings={...d.settings,...(raw.settings||{})};
-  d.appVersion='6.2';
+  d.appVersion='6.3.2';
   return d;
 }
 function loadState(){try{return migrate(JSON.parse(localStorage.getItem(KEY)||'null'))}catch{return fresh()}}
@@ -339,7 +339,29 @@ function renderDashboard(){
   `).join('')||'<div class="empty">Nog geen filamenten.</div>';
 }
 dashboardSearch.oninput=renderDashboard;
-function renderCatalog(){const q=catalogSearch.value.toLowerCase(),items=state.catalog.filter(f=>!q||label(f).toLowerCase().includes(q)).sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));catalogList.innerHTML=items.map(f=>`<div class="item-row"><div class="item-main"><strong>${esc(f.category)} · ${esc(f.type)} · ${esc(f.color)}</strong><div class="item-meta">${esc(f.brand)} · min. ${f.min} · gewenst ${f.target}</div></div><div class="item-actions"><button onclick="openDetail('${f.id}')">Open</button><button onclick="openFilament('${f.id}')">Wijzig</button></div></div>`).join('')||'<div class="empty">Nog geen filamenten.</div>'}
+function renderCatalog(){
+  const q=catalogSearch.value.toLowerCase();
+
+  const items=state.catalog
+    .filter(f=>!q||label(f).toLowerCase().includes(q))
+    .sort((a,b)=>
+      String(a.category||'').localeCompare(String(b.category||''),'nl') ||
+      String(a.type||'').localeCompare(String(b.type||''),'nl') ||
+      String(a.color||'').localeCompare(String(b.color||''),'nl')
+    );
+
+  catalogList.innerHTML=items.map(f=>`
+    <div class="item-row">
+      <div class="item-main">
+        <strong>${esc(f.category)} · ${esc(f.type)} · ${esc(f.color)}</strong>
+        <div class="item-meta">${esc(f.brand)} · min. ${f.min} · gewenst ${f.target}</div>
+      </div>
+      <div class="item-actions">
+        <button onclick="openDetail('${f.id}')">Open</button>
+        <button onclick="openFilament('${f.id}')">Wijzig</button>
+      </div>
+    </div>`).join('')||'<div class="empty">Nog geen filamenten.</div>';
+}
 catalogSearch.oninput=renderCatalog;
 
 function qrPayload(kind,number){
@@ -648,3 +670,154 @@ document.addEventListener('click',e=>{
  const v=b.dataset.view;
  if(typeof setView==='function') setView(v);
 });
+
+
+function formatBackupTimestamp(date=new Date()){
+  const pad=n=>String(n).padStart(2,'0');
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}_${pad(date.getHours())}-${pad(date.getMinutes())}`;
+}
+
+function validateBackupData(data){
+  if(!data || typeof data!=='object') return 'Het bestand bevat geen geldige gegevens.';
+  if(!Array.isArray(data.catalog)) return 'De filamentcatalogus ontbreekt.';
+  if(!Array.isArray(data.spools)) return 'De spoelenlijst ontbreekt.';
+  if(!Array.isArray(data.refills)) return 'De refillslijst ontbreekt.';
+  if(!Array.isArray(data.orders)) return 'De bestellingenlijst ontbreekt.';
+  if(!Array.isArray(data.history)) return 'De historiek ontbreekt.';
+  return '';
+}
+
+function setBackupStatus(message,type=''){
+  if(!window.backupStatus) return;
+  backupStatus.textContent=message;
+  backupStatus.className=`backup-status ${type}`.trim();
+}
+
+function downloadBackup(){
+  const backup={
+    ...state,
+    appVersion:'6.3.2',
+    exportedAt:new Date().toISOString(),
+    backupFormat:'filament-manager-json-v1'
+  };
+
+  const fileName=`FilamentManager_Backup_${formatBackupTimestamp()}.json`;
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('a');
+
+  link.href=url;
+  link.download=fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  setBackupStatus(`Back-up gemaakt: ${fileName}`,'success');
+}
+
+async function restoreBackupFile(file){
+  if(!file) return;
+
+  try{
+    const text=await file.text();
+    const parsed=JSON.parse(text);
+    const validationError=validateBackupData(parsed);
+
+    if(validationError){
+      setBackupStatus(`Herstel mislukt: ${validationError}`,'error');
+      alert(validationError);
+      return;
+    }
+
+    const summary=[
+      `${parsed.catalog.length} filamenten`,
+      `${parsed.spools.length} spoelen`,
+      `${parsed.refills.length} refills`,
+      `${parsed.orders.length} bestellingen`
+    ].join(', ');
+
+    const confirmed=confirm(
+      `Deze back-up bevat ${summary}.\n\n` +
+      `Je huidige gegevens worden volledig vervangen.\n\n` +
+      `Wil je doorgaan?`
+    );
+
+    if(!confirmed){
+      setBackupStatus('Herstel geannuleerd.');
+      return;
+    }
+
+    state=migrate(parsed);
+    localStorage.setItem(KEY,JSON.stringify(state));
+    renderAll();
+
+    setBackupStatus(`Back-up hersteld uit ${file.name}.`,'success');
+    alert('Back-up succesvol teruggezet.');
+  }catch(error){
+    setBackupStatus(`Herstel mislukt: ${error.message}`,'error');
+    alert('Dit is geen geldig Filament Manager-back-upbestand.');
+  }
+}
+
+if(window.createBackupBtn){
+  createBackupBtn.onclick=downloadBackup;
+}
+
+if(window.restoreBackupInput){
+  restoreBackupInput.onchange=event=>{
+    const file=event.target.files?.[0];
+    restoreBackupFile(file);
+    event.target.value='';
+  };
+}
+
+setTimeout(()=>{
+  if(window.backupStatus){
+    setBackupStatus('Maak vóór verdere tests eerst een back-up.');
+  }
+},300);
+
+
+function resetFilamentDraft(){
+  editFilamentId=null;
+  if(window.fCategory)fCategory.value='';
+  if(window.fType)fType.value='';
+  if(window.fColor)fColor.value='';
+  if(window.fBrand)fBrand.value='';
+  if(window.fSupplier)fSupplier.value='';
+  if(window.fSupplierRef)fSupplierRef.value='';
+  if(window.pickCategoryText)pickCategoryText.textContent='Kies categorie';
+  if(window.pickTypeText)pickTypeText.textContent='Kies type';
+  if(window.pickColorText)pickColorText.textContent='Kies kleur';
+  if(window.pickBrandText)pickBrandText.textContent='Kies merk';
+  if(window.pickSupplierText)pickSupplierText.textContent='Kies leverancier';
+}
+
+if(window.cancelFilamentBtn){
+  cancelFilamentBtn.onclick=()=>{
+    resetFilamentDraft();
+    if(window.pickerDialog?.open)pickerDialog.close();
+    if(window.newPickerValueDialog?.open)newPickerValueDialog.close();
+    if(window.filamentDialog?.open)filamentDialog.close();
+  };
+}
+
+filamentDialog.addEventListener('cancel',event=>{
+  event.preventDefault();
+  resetFilamentDraft();
+  filamentDialog.close();
+});
+
+
+(function(){
+  try{
+    if(state?.libraries?.colors){
+      const defaults=['White','Black','Wit','Zwart'];
+      state.libraries.colors=state.libraries.colors.filter(
+        c=>!defaults.includes(String(c)) || state.catalog.some(f=>String(f.color)===String(c))
+      );
+      save();
+    }
+  }catch(e){}
+})();
