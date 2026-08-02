@@ -1,12 +1,12 @@
-FILAMENT MANAGER v7.1 CLEAN
+FILAMENT MANAGER v7.2 — QR
 
-Schone herbouw:
-- Mac: vaste zijbalk met alle knoppen
-- iPhone: vaste onderste navigatie
-- Catalogus, voorraad, bestellijst, bestellingen, bibliotheken, logboek en back-up
-- Sortering categorie → type → kleur
-- Kleurenbibliotheek start leeg
-- Annuleren sluit vensters rechtstreeks
-- Oude lokale gegevens worden niet automatisch meegenomen; gebruik back-up/import
+Gebouwd op de actuele GitHub-codebasis.
 
-Upload alle bestanden naar GitHub en vervang de bestaande versie.
+Nieuw:
+- QR-knop bij iedere spoel en refill.
+- Individuele sticker afdrukken.
+- Meerdere spoelen/refills selecteren en samen afdrukken.
+- Sticker bevat nummer, categorie/type, kleur, leverancier en leveranciersreferentie.
+- Sortering op voorraadnummer hersteld.
+
+Bestaande functies uit v7.1 zijn behouden.

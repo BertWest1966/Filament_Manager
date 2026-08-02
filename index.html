@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Filament">
-  <title>Filament Manager v7.1</title>
+  <title>Filament Manager v7.2</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=7.1">
+  <link rel="stylesheet" href="assets/app.css?v=7.2">
 </head>
 <body>
 <div class="app-shell">
@@ -18,7 +18,7 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 7.1 · Clean</span>
+      <span>Versie 7.2 · QR</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active">Dashboard</button>
@@ -37,7 +37,7 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 7.1 · Clean</span>
+        <span>Versie 7.2 · QR</span>
       </div>
     </header>
 
@@ -75,6 +75,7 @@
         <div class="toolbar">
           <button class="primary" id="newSpoolBtn">Nieuwe spoel</button>
           <button id="newRefillBtn">Nieuwe refill</button>
+          <button id="printSelectedLabelsBtn">Print geselecteerde stickers</button>
           <input id="stockSearch" placeholder="Zoek nummer, type of kleur">
           <select id="stockSort">
             <option value="filament">Categorie → type → kleur</option>
@@ -281,6 +282,27 @@
   </form>
 </dialog>
 
-<script src="js/app.js?v=7.1"></script>
+
+<dialog id="qrDialog">
+  <div class="dialog-card">
+    <h2 id="qrDialogTitle">QR-sticker</h2>
+    <div id="qrSticker" class="qr-sticker">
+      <img id="qrImage" alt="QR-code">
+      <div id="qrNumber" class="qr-number"></div>
+      <div class="qr-divider"></div>
+      <div id="qrType" class="qr-main"></div>
+      <div id="qrColor" class="qr-line"></div>
+      <div id="qrSupplier" class="qr-line"></div>
+      <div id="qrReference" class="qr-small"></div>
+      <div id="qrKind" class="qr-kind"></div>
+    </div>
+    <div class="dialog-actions">
+      <button type="button" data-close="qrDialog">Sluiten</button>
+      <button type="button" class="primary" id="printQrBtn">Sticker afdrukken</button>
+    </div>
+  </div>
+</dialog>
+
+<script src="js/app.js?v=7.2"></script>
 </body>
 </html>

@@ -2,11 +2,11 @@
 const KEY='filament_manager_v7_1';
 const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','Andere'],types:{PLA:['Basic','Matte'],PETG:['Basic'],TPU:['95A'],ABS:['Basic'],ASA:['Basic'],Andere:[]},colors:[],brands:['Bambu Lab'],suppliers:['Bambu Lab']};
 let state=load();
-let currentView='dashboard',previousView='dashboard',stockMode='spools',stockSort='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,activeLibraryKind='colors',editingLibraryValue=null;
+let currentView='dashboard',previousView='dashboard',stockMode='spools',stockSortMode='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,activeLibraryKind='colors',editingLibraryValue=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
-function fresh(){return{appVersion:'7.1',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS)}}
+function fresh(){return{appVersion:'7.2',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS)}}
 function load(){try{return {...fresh(),...JSON.parse(localStorage.getItem(KEY)||'null')}}catch{return fresh()}}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
 function pushUnique(arr,v){v=String(v||'').trim();if(v&&!arr.some(x=>x.toLowerCase()===v.toLowerCase()))arr.push(v)}
@@ -57,9 +57,23 @@ function quickLevel(id){const s=state.spools.find(x=>x.id===id);const v=prompt(`
 
 function renderCatalog(){const q=catalogSearch.value.toLowerCase();const items=state.catalog.filter(f=>!q||label(f).toLowerCase().includes(q)).sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));catalogList.innerHTML=items.map(f=>`<div class="item-row"><div><strong>${esc(label(f))}</strong><div class="item-meta">${esc(f.brand)} · min ${f.min} · gewenst ${f.target}</div></div><div class="item-actions"><button onclick="openDetail('${f.id}')">Open</button><button onclick="openFilament('${f.id}')">Wijzig</button></div></div>`).join('')||'<div class="note">Geen filamenten.</div>'}
 catalogSearch.oninput=renderCatalog;
-function sortStock(items){if(stockSort==='number-asc')return items.sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));if(stockSort==='number-desc')return items.sort((a,b)=>b.number.localeCompare(a.number,'nl',{numeric:true}));return items.sort((a,b)=>{const fa=filament(a.filamentId),fb=filament(b.filamentId);return fa.category.localeCompare(fb.category,'nl')||fa.type.localeCompare(fb.type,'nl')||fa.color.localeCompare(fb.color,'nl')})}
-function renderStock(){document.querySelectorAll('[data-stock-mode]').forEach(b=>b.classList.toggle('active',b.dataset.stockMode===stockMode));const q=stockSearch.value.toLowerCase(),items=sortStock((stockMode==='spools'?state.spools:state.refills).filter(x=>{const f=filament(x.filamentId);return !q||`${x.number} ${label(f)}`.toLowerCase().includes(q)}));stockList.innerHTML=items.map(x=>{const f=filament(x.filamentId);return `<div class="item-row"><div><strong>${esc(label(f))}</strong><div class="item-meta">${x.number} · ${stockMode==='spools'?x.level+'%':'Refill'}</div></div><div class="item-actions"><button onclick="${stockMode==='spools'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button></div></div>`}).join('')||'<div class="note">Geen voorraad.</div>'}
-document.querySelectorAll('[data-stock-mode]').forEach(b=>b.onclick=()=>{stockMode=b.dataset.stockMode;renderStock()});stockSearch.oninput=renderStock;stockSort.onchange=()=>{stockSort=stockSort.value;renderStock()}
+function sortStock(items){if(stockSortMode==='number-asc')return items.sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));if(stockSortMode==='number-desc')return items.sort((a,b)=>b.number.localeCompare(a.number,'nl',{numeric:true}));return items.sort((a,b)=>{const fa=filament(a.filamentId),fb=filament(b.filamentId);return fa.category.localeCompare(fb.category,'nl')||fa.type.localeCompare(fb.type,'nl')||fa.color.localeCompare(fb.color,'nl')})}
+function renderStock(){
+  document.querySelectorAll('[data-stock-mode]').forEach(b=>b.classList.toggle('active',b.dataset.stockMode===stockMode));
+  const q=stockSearch.value.toLowerCase();
+  const items=sortStock((stockMode==='spools'?state.spools:state.refills).filter(x=>{
+    const f=filament(x.filamentId);
+    return !q||`${x.number} ${label(f)}`.toLowerCase().includes(q);
+  }));
+  stockList.innerHTML=items.map(x=>{
+    const f=filament(x.filamentId);
+    const kind=stockMode==='spools'?'spoel':'refill';
+    return `<div class="item-row"><div><strong>${esc(label(f))}</strong><div class="item-meta">${x.number} · ${stockMode==='spools'?x.level+'%':'Refill'}</div></div><div class="item-actions"><input class="label-select" type="checkbox" data-kind="${kind}" data-id="${x.id}" aria-label="Selecteer ${x.number}"><button onclick="${stockMode==='spools'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button><button onclick="openQr('${kind}','${x.id}')">QR</button></div></div>`;
+  }).join('')||'<div class="note">Geen voorraad.</div>';
+}
+document.querySelectorAll('[data-stock-mode]').forEach(b=>b.onclick=()=>{stockMode=b.dataset.stockMode;renderStock()});
+stockSearch.oninput=renderStock;
+document.getElementById('stockSort').onchange=e=>{stockSortMode=e.target.value;renderStock()};
 
 function renderOrderList(){const q=orderListSearch.value.toLowerCase(),items=state.catalog.map(f=>({f,needed:toOrder(f)})).filter(x=>x.needed>0&&(!q||label(x.f).toLowerCase().includes(q))).sort((a,b)=>a.f.category.localeCompare(b.f.category,'nl')||a.f.type.localeCompare(b.f.type,'nl')||a.f.color.localeCompare(b.f.color,'nl'));orderList.innerHTML=items.map(x=>`<div class="item-row"><div><strong>${esc(label(x.f))}</strong><div class="item-meta">Nog bestellen: ${x.needed}</div></div><div class="item-actions"><button onclick="createOrderFor('${x.f.id}',${x.needed})">Bestellen</button></div></div>`).join('')||'<div class="note">Niets te bestellen.</div>'}
 orderListSearch.oninput=renderOrderList;
@@ -91,6 +105,42 @@ createBackupBtn.onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],
 restoreBackupInput.onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!confirm('Huidige gegevens vervangen?'))return;state={...fresh(),...d};save();backupStatus.textContent='Back-up teruggezet.'}catch{alert('Ongeldig back-upbestand.')}}
 
 globalSearch.oninput=()=>{const q=globalSearch.value.toLowerCase();if(!q){globalResults.classList.add('hidden');return}const rows=[];state.catalog.forEach(f=>{if(label(f).toLowerCase().includes(q))rows.push({t:label(f),m:'Filament',a:()=>openDetail(f.id)})});state.spools.forEach(s=>{if(s.number.toLowerCase().includes(q))rows.push({t:s.number,m:'Spoel',a:()=>openSpool(s.id)})});state.refills.forEach(r=>{if(r.number.toLowerCase().includes(q))rows.push({t:r.number,m:'Refill',a:()=>openRefill(r.id)})});globalResults.innerHTML=rows.map((r,i)=>`<div class="search-result" data-i="${i}"><strong>${esc(r.t)}</strong><div class="item-meta">${r.m}</div></div>`).join('')||'<div class="search-result">Geen resultaten</div>';globalResults.classList.remove('hidden');globalResults.querySelectorAll('[data-i]').forEach(x=>x.onclick=()=>rows[Number(x.dataset.i)].a())}
+
+
+function qrPayload(kind,number){return `filament-manager:${kind}:${number}`}
+function qrImageUrl(kind,number){return `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encodeURIComponent(qrPayload(kind,number))}`}
+function getQrItem(kind,id){return kind==='spoel'?state.spools.find(x=>x.id===id):state.refills.find(x=>x.id===id)}
+function openQr(kind,id){
+  const item=getQrItem(kind,id);if(!item)return;
+  const f=filament(item.filamentId);
+  qrDialogTitle.textContent=`QR-sticker ${item.number}`;
+  qrImage.src=qrImageUrl(kind,item.number);
+  qrNumber.textContent=item.number;
+  qrType.textContent=f?`${f.category} ${f.type}`:'';
+  qrColor.textContent=f?.color||'';
+  qrSupplier.textContent=f?.supplier||f?.brand||'';
+  qrReference.textContent=f?.supplierRef?`Ref. ${f.supplierRef}`:'';
+  qrKind.textContent=kind;
+  qrDialog.showModal();
+}
+printQrBtn.onclick=()=>window.print();
+
+function printableLabel(item){
+  const f=filament(item.filamentId);
+  return {kind:item.kind,number:item.number,category:f?.category||'',type:f?.type||'',color:f?.color||'',supplier:f?.supplier||f?.brand||'',reference:f?.supplierRef||''};
+}
+printSelectedLabelsBtn.onclick=()=>{
+  const selected=[...document.querySelectorAll('.label-select:checked')].map(el=>{
+    const raw=getQrItem(el.dataset.kind,el.dataset.id);
+    return raw?printableLabel({...raw,kind:el.dataset.kind}):null;
+  }).filter(Boolean);
+  if(!selected.length)return alert('Selecteer eerst minstens één spoel of refill.');
+  const win=window.open('','_blank');
+  if(!win)return alert('Sta pop-ups toe om stickers af te drukken.');
+  const labels=selected.map(i=>`<div class="label"><img src="${qrImageUrl(i.kind,i.number)}"><div class="number">${esc(i.number)}</div><div class="divider"></div><div class="main">${esc(i.category)} ${esc(i.type)}</div><div class="line">${esc(i.color)}</div><div class="line">${esc(i.supplier)}</div><div class="small">${i.reference?`Ref. ${esc(i.reference)}`:''}</div><div class="kind">${esc(i.kind)}</div></div>`).join('');
+  win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Filamentstickers</title><style>body{font-family:Arial;margin:8mm}.sheet{display:grid;grid-template-columns:repeat(3,1fr);gap:6mm}.label{border:1.5px solid #000;border-radius:7px;padding:4mm;text-align:center;break-inside:avoid}.label img{width:38mm;height:38mm}.number{font-size:20pt;font-weight:900;letter-spacing:1mm}.divider{border-top:1px solid #000;margin:2mm 0}.main{font-size:12pt;font-weight:800}.line{font-size:10pt;font-weight:700}.small{font-size:8pt}.kind{font-size:8pt;font-weight:800;text-transform:uppercase;margin-top:2mm}@media print{body{margin:5mm}}</style></head><body><div class="sheet">${labels}</div><script>window.onload=()=>setTimeout(()=>window.print(),1000)<\/script></body></html>`);
+  win.document.close();
+};
 
 function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderStock();renderOrderList();renderOrders();renderLibraries();renderLog()}
 renderAll();
