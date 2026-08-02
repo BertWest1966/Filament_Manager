@@ -123,23 +123,120 @@ function openQr(kind,id){
   qrKind.textContent=kind;
   qrDialog.showModal();
 }
-printQrBtn.onclick=()=>window.print();
+
+function labelHtml(i){
+  return `<div class="label">
+    <img src="${qrImageUrl(i.kind,i.number)}" alt="QR">
+    <div class="number">${esc(i.number)}</div>
+    <div class="divider"></div>
+    <div class="main">${esc(i.category)} ${esc(i.type)}</div>
+    <div class="line">${esc(i.color)}</div>
+    <div class="line">${esc(i.supplier)}</div>
+    <div class="small">${i.reference?`Ref. ${esc(i.reference)}`:''}</div>
+    <div class="kind">${esc(i.kind)}</div>
+  </div>`;
+}
+
+function openLabelPrintWindow(items,format='a4'){
+  const win=window.open('','_blank');
+  if(!win){
+    alert('Sta pop-ups toe om stickers af te drukken.');
+    return;
+  }
+
+  const single=items.length===1;
+  const pageCss=format==='label62'
+    ? `@page{size:62mm 90mm;margin:0}
+       body{margin:0;width:62mm;height:90mm}
+       .sheet{display:block}
+       .label{width:62mm;height:90mm;border:none;border-radius:0;padding:4mm;overflow:hidden}`
+    : `@page{size:A4 portrait;margin:10mm}
+       body{margin:0}
+       .sheet{display:grid;grid-template-columns:repeat(3,62mm);gap:5mm;align-items:start}
+       .label{width:62mm;min-height:88mm;padding:4mm}`;
+
+  const html=items.map(labelHtml).join('');
+
+  win.document.write(`<!doctype html>
+  <html lang="nl">
+  <head>
+    <meta charset="utf-8">
+    <title>Filamentstickers</title>
+    <style>
+      *{box-sizing:border-box}
+      body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#000;background:#fff}
+      .sheet{justify-content:start}
+      .label{
+        border:1.2px solid #000;
+        border-radius:4mm;
+        text-align:center;
+        break-inside:avoid;
+        page-break-inside:avoid;
+        background:#fff;
+      }
+      .label img{display:block;width:36mm;height:36mm;margin:0 auto 1.5mm}
+      .number{font-size:20pt;font-weight:900;letter-spacing:.8mm;line-height:1.05}
+      .divider{border-top:1px solid #000;margin:2mm 0}
+      .main{font-size:11pt;font-weight:800;line-height:1.15}
+      .line{font-size:9.5pt;font-weight:700;line-height:1.2;margin-top:.7mm}
+      .small{font-size:7.5pt;line-height:1.2;margin-top:.7mm;min-height:3mm}
+      .kind{font-size:8pt;font-weight:900;text-transform:uppercase;margin-top:2mm}
+      ${pageCss}
+      @media screen{
+        body{padding:10mm;background:#eee}
+        .sheet{background:#fff;padding:5mm;min-height:${format==='label62'?'90mm':'277mm'}}
+      }
+      @media print{
+        body{background:#fff}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sheet">${html}</div>
+    <script>
+      window.onload=()=>{
+        const images=[...document.images];
+        Promise.all(images.map(img=>img.complete?Promise.resolve():new Promise(r=>{img.onload=r;img.onerror=r})))
+          .then(()=>setTimeout(()=>window.print(),250));
+      };
+    <\/script>
+  </body>
+  </html>`);
+  win.document.close();
+}
+
+printQrBtn.onclick=()=>{
+  const kind=qrKind.textContent.trim().toLowerCase();
+  const number=qrNumber.textContent.trim();
+  const raw=kind==='spoel'
+    ?state.spools.find(x=>x.number===number)
+    :state.refills.find(x=>x.number===number);
+
+  if(!raw)return alert('Stickergegevens niet gevonden.');
+  openLabelPrintWindow([printableLabel({...raw,kind})],qrPrintFormat.value);
+};
 
 function printableLabel(item){
   const f=filament(item.filamentId);
-  return {kind:item.kind,number:item.number,category:f?.category||'',type:f?.type||'',color:f?.color||'',supplier:f?.supplier||f?.brand||'',reference:f?.supplierRef||''};
+  return {
+    kind:item.kind,
+    number:item.number,
+    category:f?.category||'',
+    type:f?.type||'',
+    color:f?.color||'',
+    supplier:f?.supplier||f?.brand||'',
+    reference:f?.supplierRef||''
+  };
 }
+
 printSelectedLabelsBtn.onclick=()=>{
   const selected=[...document.querySelectorAll('.label-select:checked')].map(el=>{
     const raw=getQrItem(el.dataset.kind,el.dataset.id);
     return raw?printableLabel({...raw,kind:el.dataset.kind}):null;
   }).filter(Boolean);
+
   if(!selected.length)return alert('Selecteer eerst minstens één spoel of refill.');
-  const win=window.open('','_blank');
-  if(!win)return alert('Sta pop-ups toe om stickers af te drukken.');
-  const labels=selected.map(i=>`<div class="label"><img src="${qrImageUrl(i.kind,i.number)}"><div class="number">${esc(i.number)}</div><div class="divider"></div><div class="main">${esc(i.category)} ${esc(i.type)}</div><div class="line">${esc(i.color)}</div><div class="line">${esc(i.supplier)}</div><div class="small">${i.reference?`Ref. ${esc(i.reference)}`:''}</div><div class="kind">${esc(i.kind)}</div></div>`).join('');
-  win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Filamentstickers</title><style>body{font-family:Arial;margin:8mm}.sheet{display:grid;grid-template-columns:repeat(3,1fr);gap:6mm}.label{border:1.5px solid #000;border-radius:7px;padding:4mm;text-align:center;break-inside:avoid}.label img{width:38mm;height:38mm}.number{font-size:20pt;font-weight:900;letter-spacing:1mm}.divider{border-top:1px solid #000;margin:2mm 0}.main{font-size:12pt;font-weight:800}.line{font-size:10pt;font-weight:700}.small{font-size:8pt}.kind{font-size:8pt;font-weight:800;text-transform:uppercase;margin-top:2mm}@media print{body{margin:5mm}}</style></head><body><div class="sheet">${labels}</div><script>window.onload=()=>setTimeout(()=>window.print(),1000)<\/script></body></html>`);
-  win.document.close();
+  openLabelPrintWindow(selected,'a4');
 };
 
 function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderStock();renderOrderList();renderOrders();renderLibraries();renderLog()}
