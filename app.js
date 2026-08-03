@@ -534,40 +534,10 @@ function printInventoryA4(kind){
   const title=kind==='spools'?'Voorraad Spoelen':'Voorraad Refills';
   const printedAt=new Date().toLocaleString('nl-BE');
 
-  const rowHtml=rows.map(row=>`<tr>
-    <td>${esc(row.category)}</td>
-    <td>${esc(row.type)}</td>
-    <td>${esc(row.color)}</td>
-    <td>${esc(row.number)}</td>
-  </tr>`).join('');
-
-  const printHtml=`<!doctype html>
-  <html lang="nl">
-  <head>
-    <meta charset="utf-8">
-    <title>${title}</title>
-    <style>
-      @page{size:A4 portrait;margin:12mm 12mm 15mm}
-      *{box-sizing:border-box}
-      html,body{margin:0;padding:0;background:#fff;color:#000}
-      body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;font-size:9pt}
-      h1{font-size:17pt;margin:0 0 2mm}
-      .meta{display:flex;justify-content:space-between;gap:8mm;margin-bottom:5mm;font-size:8.5pt}
-      table{width:100%;border-collapse:collapse;table-layout:fixed}
-      thead{display:table-header-group}
-      th{font-size:8.5pt;text-align:left;border-bottom:1.5px solid #000;padding:1.7mm 1.5mm}
-      td{border-bottom:.5px solid #aaa;padding:1.45mm 1.5mm;line-height:1.1}
-      th:nth-child(1),td:nth-child(1){width:18%}
-      th:nth-child(2),td:nth-child(2){width:20%}
-      th:nth-child(3),td:nth-child(3){width:44%}
-      th:nth-child(4),td:nth-child(4){width:18%}
-      tr{break-inside:avoid;page-break-inside:avoid}
-      footer{position:fixed;bottom:0;left:0;right:0;font-size:7.5pt;display:flex;justify-content:space-between;border-top:.5px solid #999;padding-top:1mm}
-    </style>
-  </head>
-  <body>
+  inventoryPrintDialogTitle.textContent=title;
+  inventoryPrintPreview.innerHTML=`
     <h1>Filament Manager – ${title}</h1>
-    <div class="meta">
+    <div class="print-meta">
       <span>Afdrukdatum: ${esc(printedAt)}</span>
       <span>Aantal: ${rows.length}</span>
     </div>
@@ -575,56 +545,21 @@ function printInventoryA4(kind){
       <thead>
         <tr><th>Categorie</th><th>Type</th><th>Kleur</th><th>Nummer</th></tr>
       </thead>
-      <tbody>${rowHtml||'<tr><td colspan="4">Geen gegevens.</td></tr>'}</tbody>
+      <tbody>
+        ${rows.map(row=>`<tr>
+          <td>${esc(row.category)}</td>
+          <td>${esc(row.type)}</td>
+          <td>${esc(row.color)}</td>
+          <td>${esc(row.number)}</td>
+        </tr>`).join('')||'<tr><td colspan="4">Geen gegevens.</td></tr>'}
+      </tbody>
     </table>
-    <footer><span>${title}</span><span>Totaal: ${rows.length}</span></footer>
-  </body>
-  </html>`;
+    <div class="print-footer">
+      <span>${title}</span>
+      <span>Totaal: ${rows.length}</span>
+    </div>`;
 
-  // Gebruik een tijdelijk iframe in dezelfde pagina. Dit vermijdt pop-ups op iPhone.
-  const oldFrame=document.getElementById('inventoryPrintFrame');
-  if(oldFrame)oldFrame.remove();
-
-  const frame=document.createElement('iframe');
-  frame.id='inventoryPrintFrame';
-  frame.setAttribute('title','Afdrukvoorbeeld');
-  frame.style.position='fixed';
-  frame.style.left='-10000px';
-  frame.style.top='0';
-  frame.style.width='210mm';
-  frame.style.height='297mm';
-  frame.style.border='0';
-  frame.style.opacity='0';
-  frame.style.pointerEvents='none';
-  document.body.appendChild(frame);
-
-  const frameDoc=frame.contentDocument||frame.contentWindow?.document;
-  if(!frameDoc){
-    frame.remove();
-    alert('Het afdrukvoorbeeld kon niet worden opgebouwd.');
-    return;
-  }
-
-  frameDoc.open();
-  frameDoc.write(printHtml);
-  frameDoc.close();
-
-  const doPrint=()=>{
-    try{
-      frame.contentWindow.focus();
-      frame.contentWindow.print();
-    }catch(error){
-      alert(`Afdrukken kon niet worden gestart: ${error.message}`);
-    }
-    // Lang genoeg laten bestaan voor iOS Safari.
-    setTimeout(()=>frame.remove(),5000);
-  };
-
-  if(frame.contentWindow?.document?.readyState==='complete'){
-    setTimeout(doPrint,250);
-  }else{
-    frame.onload=()=>setTimeout(doPrint,250);
-  }
+  inventoryPrintDialog.showModal();
 }
 
 const printSpoolInventoryButton=document.getElementById('printSpoolInventoryBtn');
@@ -663,4 +598,19 @@ if(window.copyDiagnosisBtn){
       alert('Diagnose gekopieerd.');
     }
   };
+}
+
+const inventoryPrintDialogElement=document.getElementById('inventoryPrintDialog');
+const closeInventoryPrintButton=document.getElementById('closeInventoryPrintBtn');
+const confirmInventoryPrintButton=document.getElementById('confirmInventoryPrintBtn');
+
+if(closeInventoryPrintButton){
+  closeInventoryPrintButton.addEventListener('click',()=>{
+    if(inventoryPrintDialogElement?.open)inventoryPrintDialogElement.close();
+  });
+}
+if(confirmInventoryPrintButton){
+  confirmInventoryPrintButton.addEventListener('click',()=>{
+    window.print();
+  });
 }
