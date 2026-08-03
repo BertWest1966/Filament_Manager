@@ -68,7 +68,7 @@ function renderStock(){
   stockList.innerHTML=items.map(x=>{
     const f=filament(x.filamentId);
     const kind=stockMode==='spools'?'spoel':'refill';
-    return `<div class="item-row"><div><strong>${esc(label(f))}</strong><div class="item-meta">${x.number} · ${stockMode==='spools'?x.level+'%':'Refill'}</div></div><div class="item-actions"><input class="label-select" type="checkbox" data-kind="${kind}" data-id="${x.id}" aria-label="Selecteer ${x.number}"><button onclick="${stockMode==='spools'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button></div></div>`;
+    return `<div class="item-row"><div><strong>${esc(label(f))}</strong><div class="item-meta">${x.number} · ${stockMode==='spools'?x.level+'%':'Refill'}</div></div><div class="item-actions"><input class="label-select" type="checkbox" data-kind="${kind}" data-id="${x.id}" aria-label="Selecteer ${x.number}"><button onclick="${stockMode==='spools'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button><button onclick="openQr('${kind}','${x.id}')">QR</button></div></div>`;
   }).join('')||'<div class="note">Geen voorraad.</div>';
 }
 document.querySelectorAll('[data-stock-mode]').forEach(b=>b.onclick=()=>{stockMode=b.dataset.stockMode;renderStock()});
@@ -365,6 +365,19 @@ globalSearch.oninput=()=>{const q=globalSearch.value.toLowerCase();if(!q){global
 function qrPayload(kind,number){return `filament-manager:${kind}:${number}`}
 function qrImageUrl(kind,number){return `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encodeURIComponent(qrPayload(kind,number))}`}
 function getQrItem(kind,id){return kind==='spoel'?state.spools.find(x=>x.id===id):state.refills.find(x=>x.id===id)}
+function openQr(kind,id){
+  const item=getQrItem(kind,id);if(!item)return;
+  const f=filament(item.filamentId);
+  qrDialogTitle.textContent=`QR-sticker ${item.number}`;
+  qrImage.src=qrImageUrl(kind,item.number);
+  qrNumber.textContent=item.number;
+  qrType.textContent=f?`${f.category} ${f.type}`:'';
+  qrColor.textContent=f?.color||'';
+  qrSupplier.textContent=f?.supplier||f?.brand||'';
+  qrReference.textContent=f?.supplierRef?`Ref. ${f.supplierRef}`:'';
+  qrKind.textContent=kind;
+  qrDialog.showModal();
+}
 
 function labelHtml(i){
   return `<div class="label">
@@ -387,11 +400,11 @@ function openLabelPrintWindow(items,format='a4'){
   }
 
   const single=items.length===1;
-  const pageCss=format==='label200x60'
-    ? `@page{size:200mm 60mm;margin:0}
-       body{margin:0;width:200mm;height:60mm}
+  const pageCss=format==='label62'
+    ? `@page{size:62mm 90mm;margin:0}
+       body{margin:0;width:62mm;height:90mm}
        .sheet{display:block}
-       .label{width:200mm;height:60mm;border:1px dashed #000;border-radius:0;padding:4mm;overflow:hidden}`
+       .label{width:62mm;height:90mm;border:none;border-radius:0;padding:4mm;overflow:hidden}`
     : `@page{size:A4 portrait;margin:10mm}
        body{margin:0}
        .sheet{display:grid;grid-template-columns:repeat(3,62mm);gap:5mm;align-items:start}
@@ -426,7 +439,7 @@ function openLabelPrintWindow(items,format='a4'){
       ${pageCss}
       @media screen{
         body{padding:10mm;background:#eee}
-        .sheet{background:#fff;padding:5mm;min-height:${format==='label200x60'?'90mm':'277mm'}}
+        .sheet{background:#fff;padding:5mm;min-height:${format==='label62'?'90mm':'277mm'}}
       }
       @media print{
         body{background:#fff}
@@ -447,6 +460,16 @@ function openLabelPrintWindow(items,format='a4'){
   win.document.close();
 }
 
+printQrBtn.onclick=()=>{
+  const kind=qrKind.textContent.trim().toLowerCase();
+  const number=qrNumber.textContent.trim();
+  const raw=kind==='spoel'
+    ?state.spools.find(x=>x.number===number)
+    :state.refills.find(x=>x.number===number);
+
+  if(!raw)return alert('Stickergegevens niet gevonden.');
+  openLabelPrintWindow([printableLabel({...raw,kind})],qrPrintFormat.value);
+};
 
 function printableLabel(item){
   const f=filament(item.filamentId);
@@ -467,19 +490,8 @@ printSelectedLabelsBtn.onclick=()=>{
     return raw?printableLabel({...raw,kind:el.dataset.kind}):null;
   }).filter(Boolean);
 
-  if(!selected.length){
-    alert('Selecteer eerst minstens één spoel of refill.');
-    return;
-  }
-
-  try{
-    sessionStorage.setItem('filament_manager_selected_labels',JSON.stringify(selected));
-  }catch(error){
-    alert(`De selectie kon niet worden voorbereid: ${error.message}`);
-    return;
-  }
-
-  window.location.href='stickers-geselecteerd.html';
+  if(!selected.length)return alert('Selecteer eerst minstens één spoel of refill.');
+  openLabelPrintWindow(selected,'a4');
 };
 
 function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderStock();renderOrderList();renderOrders();renderLibraries();renderLog()}
@@ -502,5 +514,3 @@ if(window.copyDiagnosisBtn){
     }
   };
 }
-
-
