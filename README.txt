@@ -1,13 +1,13 @@
-FILAMENT MANAGER v7.5.3 — IPHONE AFDRUKVOORBEELD
+FILAMENT MANAGER v7.5.4 — ZELFSTANDIGE A4-PRINTMODULE
 
-Opgelost:
-- Klik op Voorraad Spoelen of Voorraad Refills opent nu eerst een zichtbaar afdrukvoorbeeld.
-- In het voorbeeld staat een aparte knop Afdrukken.
-- Die knop roept rechtstreeks het iOS-afdrukvenster aan.
-- Geen pop-up en geen verborgen iframe meer.
+Belangrijk:
+- De A4-knoppen zijn niet meer afhankelijk van app.js.
+- Een aparte print-tools.js leest de voorraad rechtstreeks uit localStorage.
+- Werkt ook wanneer een andere functie in de app een JavaScript-fout veroorzaakt.
+- Klik opent altijd eerst een zichtbaar voorbeeld.
+- Vanuit het voorbeeld klik je op Afdrukken.
 
-Gebruik:
+Test:
 1. Meer > Afdrukken.
-2. Kies Voorraad Spoelen of Voorraad Refills.
-3. Controleer het voorbeeld.
-4. Tik op Afdrukken.
+2. Voorraad Spoelen of Voorraad Refills.
+3. Het voorbeeld moet direct zichtbaar worden.
