@@ -68,7 +68,7 @@ function renderStock(){
   stockList.innerHTML=items.map(x=>{
     const f=filament(x.filamentId);
     const kind=stockMode==='spools'?'spoel':'refill';
-    return `<div class="item-row"><div><strong>${esc(label(f))}</strong><div class="item-meta">${x.number} · ${stockMode==='spools'?x.level+'%':'Refill'}</div></div><div class="item-actions"><input class="label-select" type="checkbox" data-kind="${kind}" data-id="${x.id}" aria-label="Selecteer ${x.number}"><button onclick="${stockMode==='spools'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button><button onclick="openQr('${kind}','${x.id}')">QR</button></div></div>`;
+    return `<div class="item-row"><div><strong>${esc(label(f))}</strong><div class="item-meta">${x.number} · ${stockMode==='spools'?x.level+'%':'Refill'}</div></div><div class="item-actions"><input class="label-select" type="checkbox" data-kind="${kind}" data-id="${x.id}" aria-label="Selecteer ${x.number}"><button onclick="${stockMode==='spools'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button></div></div>`;
   }).join('')||'<div class="note">Geen voorraad.</div>';
 }
 document.querySelectorAll('[data-stock-mode]').forEach(b=>b.onclick=()=>{stockMode=b.dataset.stockMode;renderStock()});
@@ -365,19 +365,6 @@ globalSearch.oninput=()=>{const q=globalSearch.value.toLowerCase();if(!q){global
 function qrPayload(kind,number){return `filament-manager:${kind}:${number}`}
 function qrImageUrl(kind,number){return `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encodeURIComponent(qrPayload(kind,number))}`}
 function getQrItem(kind,id){return kind==='spoel'?state.spools.find(x=>x.id===id):state.refills.find(x=>x.id===id)}
-function openQr(kind,id){
-  const item=getQrItem(kind,id);if(!item)return;
-  const f=filament(item.filamentId);
-  qrDialogTitle.textContent=`QR-sticker ${item.number}`;
-  qrImage.src=qrImageUrl(kind,item.number);
-  qrNumber.textContent=item.number;
-  qrType.textContent=f?`${f.category} ${f.type}`:'';
-  qrColor.textContent=f?.color||'';
-  qrSupplier.textContent=f?.supplier||f?.brand||'';
-  qrReference.textContent=f?.supplierRef?`Ref. ${f.supplierRef}`:'';
-  qrKind.textContent=kind;
-  qrDialog.showModal();
-}
 
 function labelHtml(i){
   return `<div class="label">
@@ -460,22 +447,6 @@ function openLabelPrintWindow(items,format='a4'){
   win.document.close();
 }
 
-printQrBtn.onclick=()=>{
-  const kind=qrKind.textContent.trim().toLowerCase();
-  const number=qrNumber.textContent.trim();
-
-  if(!number){
-    alert('Stickergegevens niet gevonden.');
-    return;
-  }
-
-  const url=new URL('sticker-afdrukken.html',window.location.href);
-  url.searchParams.set('kind',kind);
-  url.searchParams.set('number',number);
-  url.searchParams.set('format','label200x60');
-
-  window.location.href=url.toString();
-};
 
 function printableLabel(item){
   const f=filament(item.filamentId);
@@ -521,65 +492,4 @@ if(window.copyDiagnosisBtn){
   };
 }
 
-(function(){
-  const dialog=document.getElementById('qrDialog');
-  const closeButton=document.getElementById('closeQrDialogBtn');
 
-  function closeQrDialogSafely(){
-    try{if(dialog?.open)dialog.close()}catch{}
-    document.body.style.overflow='';
-    document.documentElement.style.overflow='';
-  }
-
-  if(closeButton){
-    closeButton.addEventListener('click',event=>{
-      event.preventDefault();
-      event.stopPropagation();
-      closeQrDialogSafely();
-    });
-  }
-
-  if(dialog){
-    dialog.addEventListener('cancel',event=>{
-      event.preventDefault();
-      closeQrDialogSafely();
-    });
-    dialog.addEventListener('click',event=>{
-      if(event.target===dialog)closeQrDialogSafely();
-    });
-    dialog.addEventListener('close',()=>{
-      document.body.style.overflow='';
-      document.documentElement.style.overflow='';
-    });
-    
-  }
-})();
-
-(function(){
-  const dialog=document.getElementById('qrDialog');
-  const closeButton=document.getElementById('closeQrDialogBtn');
-
-  function closeQr(){
-    try{
-      if(dialog?.open) dialog.close();
-    }catch{}
-  }
-
-  if(closeButton){
-    closeButton.onclick=event=>{
-      event.preventDefault();
-      closeQr();
-    };
-  }
-
-  if(dialog){
-    dialog.addEventListener('cancel',event=>{
-      event.preventDefault();
-      closeQr();
-    });
-
-    dialog.addEventListener('click',event=>{
-      if(event.target===dialog) closeQr();
-    });
-  }
-})();
