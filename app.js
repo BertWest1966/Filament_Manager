@@ -467,8 +467,19 @@ printSelectedLabelsBtn.onclick=()=>{
     return raw?printableLabel({...raw,kind:el.dataset.kind}):null;
   }).filter(Boolean);
 
-  if(!selected.length)return alert('Selecteer eerst minstens één spoel of refill.');
-  openLabelPrintWindow(selected,'a4');
+  if(!selected.length){
+    alert('Selecteer eerst minstens één spoel of refill.');
+    return;
+  }
+
+  try{
+    sessionStorage.setItem('filament_manager_selected_labels',JSON.stringify(selected));
+  }catch(error){
+    alert(`De selectie kon niet worden voorbereid: ${error.message}`);
+    return;
+  }
+
+  window.location.href='stickers-geselecteerd.html';
 };
 
 function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderStock();renderOrderList();renderOrders();renderLibraries();renderLog()}

@@ -1,13 +1,12 @@
-FILAMENT MANAGER v7.5.11 — INDIVIDUELE QR-FUNCTIE VERWIJDERD
+FILAMENT MANAGER v7.5.12 — GESELECTEERDE STICKERS HERSTEL
 
 Aangepast:
-- QR-knop per afzonderlijke spoel verwijderd.
-- QR-knop per afzonderlijke refill verwijderd.
-- Individueel QR-venster verwijderd.
-- Aparte individuele stickerpagina verwijderd.
+- Individuele QR-knoppen blijven verwijderd.
+- Print geselecteerde stickers gebruikt geen pop-up meer.
+- De selectie wordt tijdelijk opgeslagen en opent stickers-geselecteerd.html.
+- Op die pagina staat een gewone knop Afdrukken.
+- Werkt op iPhone Safari en desktopbrowser.
+- Selectievakjes en Wijzig-knoppen blijven behouden.
 
-Behouden:
-- Selectievakjes bij spoelen en refills.
-- Print geselecteerde stickers.
-- Meerdere gekozen stickers samen afdrukken.
-- Alle overige functies en layout.
+Nieuw bestand:
+- stickers-geselecteerd.html
