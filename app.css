@@ -211,3 +211,18 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 .inventory-print-preview .print-footer{margin-top:5mm;border-top:.5px solid #999;padding-top:1mm;font-size:7.5pt;display:flex;justify-content:space-between}
 @media(max-width:900px){.inventory-print-preview{width:calc(100vw - 16px);min-height:auto;margin:8px;padding:16px;font-size:12px;box-shadow:none}.inventory-print-preview h1{font-size:20px}.inventory-print-preview th,.inventory-print-preview td{padding:6px 4px}}
 @media print{body>*{display:none!important}#inventoryPrintOverlay{display:block!important;position:static!important;background:#fff!important;overflow:visible!important}#inventoryPrintOverlay .no-print{display:none!important}#inventoryPrintPreview{display:block!important;width:auto!important;min-height:auto!important;margin:0!important;padding:0!important;box-shadow:none!important}@page{size:A4 portrait;margin:12mm 12mm 15mm}}
+
+.print-link-button{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:46px;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:#fff;
+  color:var(--text);
+  text-decoration:none;
+  font-weight:700;
+}
+.print-link-button:active{background:#f3f4f6}
