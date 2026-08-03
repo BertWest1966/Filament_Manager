@@ -400,11 +400,11 @@ function openLabelPrintWindow(items,format='a4'){
   }
 
   const single=items.length===1;
-  const pageCss=format==='label200x60'
-    ? `@page{size:200mm 60mm;margin:0}
-       body{margin:0;width:200mm;height:60mm}
+  const pageCss=format==='label62'
+    ? `@page{size:62mm 90mm;margin:0}
+       body{margin:0;width:62mm;height:90mm}
        .sheet{display:block}
-       .label{width:200mm;height:60mm;border:1px dashed #000;border-radius:0;padding:4mm;overflow:hidden}`
+       .label{width:62mm;height:90mm;border:none;border-radius:0;padding:4mm;overflow:hidden}`
     : `@page{size:A4 portrait;margin:10mm}
        body{margin:0}
        .sheet{display:grid;grid-template-columns:repeat(3,62mm);gap:5mm;align-items:start}
@@ -439,7 +439,7 @@ function openLabelPrintWindow(items,format='a4'){
       ${pageCss}
       @media screen{
         body{padding:10mm;background:#eee}
-        .sheet{background:#fff;padding:5mm;min-height:${format==='label200x60'?'90mm':'277mm'}}
+        .sheet{background:#fff;padding:5mm;min-height:${format==='label62'?'90mm':'277mm'}}
       }
       @media print{
         body{background:#fff}
@@ -461,31 +461,14 @@ function openLabelPrintWindow(items,format='a4'){
 }
 
 printQrBtn.onclick=()=>{
-  const selected=document.querySelector('input[name="qrPrintFormatChoice"]:checked');
-  const format=selected?.value||'label200x60';
-  localStorage.setItem('filament_manager_qr_print_format',format);
-
   const kind=qrKind.textContent.trim().toLowerCase();
   const number=qrNumber.textContent.trim();
   const raw=kind==='spoel'
     ?state.spools.find(x=>x.number===number)
     :state.refills.find(x=>x.number===number);
 
-  if(!raw){
-    alert('Stickergegevens niet gevonden.');
-    return;
-  }
-
-  if(window.qrDialog?.open)qrDialog.close();
-
-  requestAnimationFrame(()=>{
-    setTimeout(()=>{
-      openLabelPrintWindow(
-        [printableLabel({...raw,kind})],
-        format==='label200x60'?'label200x60':'a4'
-      );
-    },80);
-  });
+  if(!raw)return alert('Stickergegevens niet gevonden.');
+  openLabelPrintWindow([printableLabel({...raw,kind})],qrPrintFormat.value);
 };
 
 function printableLabel(item){
@@ -531,44 +514,3 @@ if(window.copyDiagnosisBtn){
     }
   };
 }
-
-(function(){
-  const dialog=document.getElementById('qrDialog');
-  const closeButton=document.getElementById('closeQrDialogBtn');
-
-  function closeQrDialogSafely(){
-    try{if(dialog?.open)dialog.close()}catch{}
-    document.body.style.overflow='';
-    document.documentElement.style.overflow='';
-  }
-
-  if(closeButton){
-    closeButton.addEventListener('click',event=>{
-      event.preventDefault();
-      event.stopPropagation();
-      closeQrDialogSafely();
-    });
-  }
-
-  if(dialog){
-    dialog.addEventListener('cancel',event=>{
-      event.preventDefault();
-      closeQrDialogSafely();
-    });
-    dialog.addEventListener('click',event=>{
-      if(event.target===dialog)closeQrDialogSafely();
-    });
-    dialog.addEventListener('close',()=>{
-      document.body.style.overflow='';
-      document.documentElement.style.overflow='';
-    });
-    const observer=new MutationObserver(()=>{
-      if(dialog.open){
-        const saved=localStorage.getItem('filament_manager_qr_print_format')||'label200x60';
-        const option=document.querySelector(`input[name="qrPrintFormatChoice"][value="${saved}"]`);
-        if(option)option.checked=true;
-      }
-    });
-    observer.observe(dialog,{attributes:true,attributeFilter:['open']});
-  }
-})();
