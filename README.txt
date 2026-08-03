@@ -1,12 +1,11 @@
-FILAMENT MANAGER v7.5.9 — QR-AFDRUK HERSTEL
+FILAMENT MANAGER v7.5.10 — EENVOUDIGE QR BUGFIX
 
-Opgelost:
-- Geen window.open of pop-up meer voor één QR-sticker.
-- Tik op Sticker afdrukken opent een gewone aparte pagina.
-- Op die pagina staat een duidelijke knop Afdrukken.
-- Werkt op iPhone Safari en desktopbrowsers.
-- Terugknop brengt je terug naar de app.
-- ZIP opgeschoond: alleen de werkelijk gebruikte bestanden zijn opgenomen.
-
-Nieuw bestand:
-- sticker-afdrukken.html
+Aangepast:
+- QR-venster volledig vereenvoudigd.
+- Alleen QR-code, gegevens, Sluiten en Sticker afdrukken.
+- Geen afdrukformaatkeuze meer in het QR-venster.
+- Sticker afdrukken gaat rechtstreeks naar sticker-afdrukken.html.
+- Foutieve absolute positionering verwijderd.
+- Geen lege rechterhelft meer.
+- Sluiten, tik buiten het venster en ESC werken.
+- Overige appfuncties zijn niet gewijzigd.

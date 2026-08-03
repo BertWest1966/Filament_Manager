@@ -461,10 +461,6 @@ function openLabelPrintWindow(items,format='a4'){
 }
 
 printQrBtn.onclick=()=>{
-  const selected=document.querySelector('input[name="qrPrintFormatChoice"]:checked');
-  const format=selected?.value||'label200x60';
-  localStorage.setItem('filament_manager_qr_print_format',format);
-
   const kind=qrKind.textContent.trim().toLowerCase();
   const number=qrNumber.textContent.trim();
 
@@ -476,7 +472,7 @@ printQrBtn.onclick=()=>{
   const url=new URL('sticker-afdrukken.html',window.location.href);
   url.searchParams.set('kind',kind);
   url.searchParams.set('number',number);
-  url.searchParams.set('format',format);
+  url.searchParams.set('format','label200x60');
 
   window.location.href=url.toString();
 };
@@ -555,13 +551,35 @@ if(window.copyDiagnosisBtn){
       document.body.style.overflow='';
       document.documentElement.style.overflow='';
     });
-    const observer=new MutationObserver(()=>{
-      if(dialog.open){
-        const saved=localStorage.getItem('filament_manager_qr_print_format')||'label200x60';
-        const option=document.querySelector(`input[name="qrPrintFormatChoice"][value="${saved}"]`);
-        if(option)option.checked=true;
-      }
+    
+  }
+})();
+
+(function(){
+  const dialog=document.getElementById('qrDialog');
+  const closeButton=document.getElementById('closeQrDialogBtn');
+
+  function closeQr(){
+    try{
+      if(dialog?.open) dialog.close();
+    }catch{}
+  }
+
+  if(closeButton){
+    closeButton.onclick=event=>{
+      event.preventDefault();
+      closeQr();
+    };
+  }
+
+  if(dialog){
+    dialog.addEventListener('cancel',event=>{
+      event.preventDefault();
+      closeQr();
     });
-    observer.observe(dialog,{attributes:true,attributeFilter:['open']});
+
+    dialog.addEventListener('click',event=>{
+      if(event.target===dialog) closeQr();
+    });
   }
 })();
