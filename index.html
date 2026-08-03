@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Filament">
-  <title>Filament Manager v7.5.5</title>
+  <title>Filament Manager v7.5.6</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=7.5.5">
+  <link rel="stylesheet" href="assets/app.css?v=7.5.6">
 </head>
 <body>
 <div class="app-shell">
@@ -18,7 +18,7 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 7.5.5 · Afdrukken</span>
+      <span>Versie 7.5.6 · Afdrukken</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active">Dashboard</button>
@@ -37,7 +37,7 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 7.5.5 · Afdrukken</span>
+        <span>Versie 7.5.6 · Afdrukken</span>
       </div>
     </header>
 
@@ -184,8 +184,8 @@
           <h2>Afdrukken</h2>
           <p class="note">Druk een compacte A4-voorraadlijst af.</p>
           <div class="menu-grid">
-            <button id="printSpoolInventoryBtn">Voorraad Spoelen (A4)</button>
-            <button id="printRefillInventoryBtn">Voorraad Refills (A4)</button>
+            <button type="button" id="printSpoolInventoryBtn" onclick="FMPrint.show('spools')">Voorraad Spoelen (A4)</button>
+            <button type="button" id="printRefillInventoryBtn" onclick="FMPrint.show('refills')">Voorraad Refills (A4)</button>
           </div>
         </div>
         <div class="panel">
@@ -341,8 +341,8 @@
     <div class="inventory-print-toolbar no-print">
       <strong id="inventoryPrintTitle">Afdrukvoorbeeld</strong>
       <div>
-        <button type="button" id="closeInventoryPrintBtn">Sluiten</button>
-        <button type="button" class="primary" id="confirmInventoryPrintBtn">Afdrukken</button>
+        <button type="button" id="closeInventoryPrintBtn" onclick="FMPrint.close()">Sluiten</button>
+        <button type="button" class="primary" id="confirmInventoryPrintBtn" onclick="FMPrint.print()">Afdrukken</button>
       </div>
     </div>
     <div id="inventoryPrintPreview" class="inventory-print-preview"></div>
@@ -350,8 +350,93 @@
 </div>
 
 
+<script>
+window.FMPrint = (() => {
+  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[char]));
+
+  const getState = () => {
+    const keys = ['filament_manager_v7_1','filament_manager','filament_manager_state'];
+    for (const key of keys) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) continue;
+        const data = JSON.parse(raw);
+        if (data && Array.isArray(data.catalog)) return data;
+      } catch (error) {}
+    }
+    return {catalog:[],spools:[],refills:[]};
+  };
+
+  const getRows = kind => {
+    const data = getState();
+    const byId = new Map((data.catalog || []).map(item => [item.id, item]));
+    const source = kind === 'spools' ? (data.spools || []) : (data.refills || []);
+    return source.map(item => {
+      const filament = byId.get(item.filamentId) || {};
+      return {
+        category: filament.category || '',
+        type: filament.type || '',
+        color: filament.color || '',
+        number: item.number || ''
+      };
+    }).sort((a,b) =>
+      a.category.localeCompare(b.category,'nl') ||
+      a.type.localeCompare(b.type,'nl') ||
+      a.color.localeCompare(b.color,'nl') ||
+      a.number.localeCompare(b.number,'nl',{numeric:true})
+    );
+  };
+
+  function show(kind) {
+    try {
+      const rows = getRows(kind);
+      const title = kind === 'spools' ? 'Voorraad Spoelen' : 'Voorraad Refills';
+      const overlay = document.getElementById('inventoryPrintOverlay');
+      const preview = document.getElementById('inventoryPrintPreview');
+      const titleElement = document.getElementById('inventoryPrintTitle');
+      if (!overlay || !preview || !titleElement) throw new Error('Afdrukonderdelen ontbreken.');
+
+      titleElement.textContent = title;
+      preview.innerHTML = `
+        <h1>Filament Manager – ${title}</h1>
+        <div class="print-meta">
+          <span>Afdrukdatum: ${escapeHtml(new Date().toLocaleString('nl-BE'))}</span>
+          <span>Aantal: ${rows.length}</span>
+        </div>
+        <table>
+          <thead><tr><th>Categorie</th><th>Type</th><th>Kleur</th><th>Nummer</th></tr></thead>
+          <tbody>${rows.length ? rows.map(row => `
+            <tr><td>${escapeHtml(row.category)}</td><td>${escapeHtml(row.type)}</td><td>${escapeHtml(row.color)}</td><td>${escapeHtml(row.number)}</td></tr>
+          `).join('') : '<tr><td colspan="4">Geen gegevens gevonden.</td></tr>'}</tbody>
+        </table>
+        <div class="print-footer"><span>${title}</span><span>Totaal: ${rows.length}</span></div>`;
+
+      overlay.classList.remove('hidden');
+      overlay.setAttribute('aria-hidden','false');
+      document.body.style.overflow = 'hidden';
+    } catch (error) {
+      alert('Afdrukvoorbeeld kon niet openen: ' + error.message);
+    }
+  }
+
+  function close() {
+    const overlay = document.getElementById('inventoryPrintOverlay');
+    if (overlay) {
+      overlay.classList.add('hidden');
+      overlay.setAttribute('aria-hidden','true');
+    }
+    document.body.style.overflow = '';
+  }
+
+  function print() { window.print(); }
+  return {show, close, print};
+})();
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="js/app.js?v=7.5.5"></script>
+<script src="js/app.js?v=7.5.6"></script>
 <script src="js/print-tools.js?v=7.5.5"></script>
 </body>
 </html>
