@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Filament">
-  <title>Filament Manager v7.4</title>
+  <title>Filament Manager v7.5</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=7.4">
+  <link rel="stylesheet" href="assets/app.css?v=7.5">
 </head>
 <body>
 <div class="app-shell">
@@ -18,7 +18,7 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 7.4 · QR</span>
+      <span>Versie 7.5 · Afdrukken</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active">Dashboard</button>
@@ -37,7 +37,7 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 7.4 · QR</span>
+        <span>Versie 7.5 · Afdrukken</span>
       </div>
     </header>
 
@@ -181,6 +181,14 @@
           </div>
         </div>
         <div class="panel">
+          <h2>Afdrukken</h2>
+          <p class="note">Druk een compacte A4-voorraadlijst af.</p>
+          <div class="menu-grid">
+            <button id="printSpoolInventoryBtn">Voorraad Spoelen (A4)</button>
+            <button id="printRefillInventoryBtn">Voorraad Refills (A4)</button>
+          </div>
+        </div>
+        <div class="panel">
           <h2>Back-up</h2>
           <div class="menu-grid">
             <button class="primary" id="createBackupBtn">Back-up maken</button>
@@ -315,8 +323,8 @@
     </div>
     <label class="qr-print-format">Afdrukformaat
       <select id="qrPrintFormat">
-        <option value="a4">A4 - enkele sticker</option>
-        <option value="label62">Label 62 x 90 mm</option>
+        <option value="roll200x60" selected>Doorlopende rol 200 x 60 mm</option>
+        <option value="a4">A4 - stickerproef</option>
       </select>
     </label>
     <div class="dialog-actions">
@@ -327,6 +335,6 @@
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="js/app.js?v=7.4"></script>
+<script src="js/app.js?v=7.5"></script>
 </body>
 </html>

@@ -1,17 +1,14 @@
-FILAMENT MANAGER v7.4 — COMPACT DASHBOARD
+FILAMENT MANAGER v7.5 — AFDRUKKEN
 
-Deze eerste versie wijzigt alleen het dashboard.
+Nieuw:
+- QR-label voor doorlopende rol: 200 x 60 mm.
+- Stippellijn rond het volledige label als kniplijn.
+- Stippellijn rond de QR-zone.
+- Groot spoel- of refillnummer.
+- Bestaande labelgegevens behouden: categorie, type, kleur, leverancier en referentie.
+- A4-overzicht Voorraad Spoelen.
+- A4-overzicht Voorraad Refills.
+- Beide A4-lijsten gesorteerd op categorie → type → kleur → nummer.
+- Kolommen: Categorie, Type, Kleur, Nummer.
 
-Aangepast:
-- kleinere samenvattingskaarten;
-- kleinere categorie- en typetitels;
-- compactere tabelregels;
-- kleinere knoppen voor spoelnummer en percentage;
-- meer filamentregels tegelijk zichtbaar;
-- gewone tekst, geen gekleurde blokjes.
-
-Bestaande functies uit v7.3 blijven behouden:
-- QR-stickers;
-- groter spoelnummer op sticker;
-- camerascanner;
-- back-up en importdiagnose.
+Upload alle bestanden naar GitHub en vervang de bestaande versie.
