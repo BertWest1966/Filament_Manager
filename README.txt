@@ -1,7 +1,11 @@
-FILAMENT MANAGER v7.5.1 — A4 PRINTFIX
+FILAMENT MANAGER v7.5.2 — IPHONE A4 PRINTFIX
 
 Opgelost:
-- A4-knoppen werken betrouwbaar in Safari op Mac en iPhone.
-- Knoppen worden expliciet met document.getElementById gekoppeld.
-- Duidelijke melding wanneer Safari pop-ups blokkeert.
-- Voorraad Spoelen en Voorraad Refills blijven gesorteerd op categorie → type → kleur → nummer.
+- Voorraad Spoelen (A4) opent geen pop-up meer.
+- Voorraad Refills (A4) opent geen pop-up meer.
+- De afdrukpagina wordt in een tijdelijk verborgen frame opgebouwd.
+- Daarna opent rechtstreeks het standaard iOS-afdrukvenster.
+- Sortering blijft categorie → type → kleur → nummer.
+
+Upload alle bestanden naar GitHub en vervang v7.5.1.
+Open daarna eerst de website in Safari en vernieuw de pagina.
