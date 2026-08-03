@@ -467,25 +467,18 @@ printQrBtn.onclick=()=>{
 
   const kind=qrKind.textContent.trim().toLowerCase();
   const number=qrNumber.textContent.trim();
-  const raw=kind==='spoel'
-    ?state.spools.find(x=>x.number===number)
-    :state.refills.find(x=>x.number===number);
 
-  if(!raw){
+  if(!number){
     alert('Stickergegevens niet gevonden.');
     return;
   }
 
-  if(window.qrDialog?.open)qrDialog.close();
+  const url=new URL('sticker-afdrukken.html',window.location.href);
+  url.searchParams.set('kind',kind);
+  url.searchParams.set('number',number);
+  url.searchParams.set('format',format);
 
-  requestAnimationFrame(()=>{
-    setTimeout(()=>{
-      openLabelPrintWindow(
-        [printableLabel({...raw,kind})],
-        format==='label200x60'?'label200x60':'a4'
-      );
-    },80);
-  });
+  window.location.href=url.toString();
 };
 
 function printableLabel(item){
