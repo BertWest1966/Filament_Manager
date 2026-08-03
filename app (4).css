@@ -191,3 +191,108 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     font-size:11px;
   }
 }
+
+/* v7.5 print menu */
+#meer .menu-grid button{font-weight:700}
+
+.inventory-print-dialog{
+  width:100vw;
+  max-width:none;
+  height:100vh;
+  max-height:none;
+  margin:0;
+  border-radius:0;
+  padding:0;
+}
+.inventory-print-shell{min-height:100%;background:#e5e7eb}
+.inventory-print-toolbar{
+  position:sticky;top:0;z-index:5;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:10px;background:#fff;border-bottom:1px solid var(--line)
+}
+.inventory-print-toolbar>div{display:flex;gap:8px}
+.inventory-print-preview{
+  width:210mm;min-height:297mm;margin:12px auto;padding:12mm 12mm 15mm;
+  background:#fff;color:#000;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  font-size:9pt;box-shadow:0 2px 14px rgba(0,0,0,.18)
+}
+.inventory-print-preview h1{font-size:17pt;margin:0 0 2mm}
+.inventory-print-preview .print-meta{display:flex;justify-content:space-between;gap:8mm;margin-bottom:5mm;font-size:8.5pt}
+.inventory-print-preview table{width:100%;border-collapse:collapse;table-layout:fixed}
+.inventory-print-preview thead{display:table-header-group}
+.inventory-print-preview th{font-size:8.5pt;text-align:left;border-bottom:1.5px solid #000;padding:1.7mm 1.5mm}
+.inventory-print-preview td{border-bottom:.5px solid #aaa;padding:1.45mm 1.5mm;line-height:1.1}
+.inventory-print-preview th:nth-child(1),.inventory-print-preview td:nth-child(1){width:18%}
+.inventory-print-preview th:nth-child(2),.inventory-print-preview td:nth-child(2){width:20%}
+.inventory-print-preview th:nth-child(3),.inventory-print-preview td:nth-child(3){width:44%}
+.inventory-print-preview th:nth-child(4),.inventory-print-preview td:nth-child(4){width:18%}
+.inventory-print-preview tr{break-inside:avoid;page-break-inside:avoid}
+.inventory-print-preview .print-footer{margin-top:5mm;border-top:.5px solid #999;padding-top:1mm;font-size:7.5pt;display:flex;justify-content:space-between}
+@media(max-width:900px){
+  .inventory-print-preview{transform-origin:top left;zoom:.48;margin:8px auto}
+}
+@media print{
+  body>*{display:none!important}
+  #inventoryPrintDialog{display:block!important;position:static!important;width:auto!important;height:auto!important}
+  #inventoryPrintDialog::backdrop{display:none}
+  #inventoryPrintDialog .inventory-print-shell{background:#fff}
+  .no-print{display:none!important}
+  #inventoryPrintPreview{
+    display:block!important;transform:none!important;zoom:1!important;
+    width:auto!important;min-height:auto!important;margin:0!important;padding:0!important;box-shadow:none!important
+  }
+  @page{size:A4 portrait;margin:12mm 12mm 15mm}
+}
+
+.inventory-print-overlay{
+  position:fixed;inset:0;z-index:1000;
+  overflow:auto;background:#e5e7eb;
+}
+.inventory-print-overlay.hidden{display:none!important}
+.inventory-print-shell{min-height:100%}
+.inventory-print-toolbar{
+  position:sticky;top:0;z-index:5;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:10px;background:#fff;border-bottom:1px solid var(--line)
+}
+.inventory-print-toolbar>div{display:flex;gap:8px}
+.inventory-print-preview{
+  width:210mm;min-height:297mm;margin:12px auto;padding:12mm 12mm 15mm;
+  background:#fff;color:#000;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  font-size:9pt;box-shadow:0 2px 14px rgba(0,0,0,.18)
+}
+.inventory-print-preview h1{font-size:17pt;margin:0 0 2mm}
+.inventory-print-preview .print-meta{display:flex;justify-content:space-between;gap:8mm;margin-bottom:5mm;font-size:8.5pt}
+.inventory-print-preview table{width:100%;border-collapse:collapse;table-layout:fixed}
+.inventory-print-preview thead{display:table-header-group}
+.inventory-print-preview th{font-size:8.5pt;text-align:left;border-bottom:1.5px solid #000;padding:1.7mm 1.5mm}
+.inventory-print-preview td{border-bottom:.5px solid #aaa;padding:1.45mm 1.5mm;line-height:1.1}
+.inventory-print-preview th:nth-child(1),.inventory-print-preview td:nth-child(1){width:18%}
+.inventory-print-preview th:nth-child(2),.inventory-print-preview td:nth-child(2){width:20%}
+.inventory-print-preview th:nth-child(3),.inventory-print-preview td:nth-child(3){width:44%}
+.inventory-print-preview th:nth-child(4),.inventory-print-preview td:nth-child(4){width:18%}
+.inventory-print-preview tr{break-inside:avoid;page-break-inside:avoid}
+.inventory-print-preview .print-footer{margin-top:5mm;border-top:.5px solid #999;padding-top:1mm;font-size:7.5pt;display:flex;justify-content:space-between}
+
+@media(max-width:900px){
+  .inventory-print-preview{
+    width:calc(100vw - 16px);min-height:auto;margin:8px;padding:16px;
+    font-size:12px;box-shadow:none
+  }
+  .inventory-print-preview h1{font-size:20px}
+  .inventory-print-preview th,.inventory-print-preview td{padding:6px 4px}
+}
+
+@media print{
+  body>*{display:none!important}
+  #inventoryPrintOverlay{
+    display:block!important;position:static!important;
+    background:#fff!important;overflow:visible!important
+  }
+  #inventoryPrintOverlay .no-print{display:none!important}
+  #inventoryPrintPreview{
+    display:block!important;width:auto!important;min-height:auto!important;
+    margin:0!important;padding:0!important;box-shadow:none!important
+  }
+  @page{size:A4 portrait;margin:12mm 12mm 15mm}
+}

@@ -381,73 +381,90 @@ function openQr(kind,id){
 
 function labelHtml(i){
   return `<div class="label">
-    <img src="${qrImageUrl(i.kind,i.number)}" alt="QR">
-    <div class="number">${esc(i.number)}</div>
-    <div class="divider"></div>
-    <div class="main">${esc(i.category)} ${esc(i.type)}</div>
-    <div class="line">${esc(i.color)}</div>
-    <div class="line">${esc(i.supplier)}</div>
-    <div class="small">${i.reference?`Ref. ${esc(i.reference)}`:''}</div>
-    <div class="kind">${esc(i.kind)}</div>
+    <div class="cut-line">
+      <div class="qr-zone">
+        <img src="${qrImageUrl(i.kind,i.number)}" alt="QR">
+      </div>
+      <div class="label-info">
+        <div class="kind">${esc(i.kind)}</div>
+        <div class="number">${esc(i.number)}</div>
+        <div class="divider"></div>
+        <div class="main">${esc(i.category)} ${esc(i.type)}</div>
+        <div class="line color">${esc(i.color)}</div>
+        <div class="line">${esc(i.supplier)}</div>
+        <div class="small">${i.reference?`Ref. ${esc(i.reference)}`:''}</div>
+      </div>
+    </div>
   </div>`;
 }
 
-function openLabelPrintWindow(items,format='a4'){
+function openLabelPrintWindow(items,format='roll200x60'){
   const win=window.open('','_blank');
   if(!win){
     alert('Sta pop-ups toe om stickers af te drukken.');
     return;
   }
 
-  const single=items.length===1;
-  const pageCss=format==='label62'
-    ? `@page{size:62mm 90mm;margin:0}
-       body{margin:0;width:62mm;height:90mm}
+  const roll=format==='roll200x60';
+  const pageCss=roll
+    ? `@page{size:200mm 60mm;margin:0}
+       html,body{margin:0;width:200mm;min-height:60mm}
        .sheet{display:block}
-       .label{width:62mm;height:90mm;border:none;border-radius:0;padding:4mm;overflow:hidden}`
+       .label{width:200mm;height:60mm;page-break-after:always;padding:2mm}
+       .label:last-child{page-break-after:auto}`
     : `@page{size:A4 portrait;margin:10mm}
        body{margin:0}
-       .sheet{display:grid;grid-template-columns:repeat(3,62mm);gap:5mm;align-items:start}
-       .label{width:62mm;min-height:88mm;padding:4mm}`;
+       .sheet{display:grid;grid-template-columns:1fr;gap:6mm}
+       .label{width:190mm;height:57mm;padding:2mm;break-inside:avoid}`;
 
-  const html=items.map(labelHtml).join('');
+  const labelMarkup=items.map(labelHtml).join('');
 
   win.document.write(`<!doctype html>
   <html lang="nl">
   <head>
     <meta charset="utf-8">
-    <title>Filamentstickers</title>
+    <title>Filamentlabels</title>
     <style>
       *{box-sizing:border-box}
       body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#000;background:#fff}
       .sheet{justify-content:start}
-      .label{
-        border:1.2px solid #000;
-        border-radius:4mm;
-        text-align:center;
-        break-inside:avoid;
-        page-break-inside:avoid;
-        background:#fff;
+      .label{background:#fff;break-inside:avoid;page-break-inside:avoid}
+      .cut-line{
+        width:100%;height:100%;
+        border:1.2px dashed #000;
+        display:grid;
+        grid-template-columns:54mm 1fr;
+        gap:6mm;
+        align-items:center;
+        padding:3mm 5mm;
+        overflow:hidden;
       }
-      .label img{display:block;width:36mm;height:36mm;margin:0 auto 1.5mm}
-      .number{font-size:30pt;font-weight:900;letter-spacing:1.2mm;line-height:1}
-      .divider{border-top:1px solid #000;margin:2mm 0}
-      .main{font-size:11pt;font-weight:800;line-height:1.15}
-      .line{font-size:9.5pt;font-weight:700;line-height:1.2;margin-top:.7mm}
-      .small{font-size:7.5pt;line-height:1.2;margin-top:.7mm;min-height:3mm}
-      .kind{font-size:8pt;font-weight:900;text-transform:uppercase;margin-top:2mm}
+      .qr-zone{
+        width:48mm;height:48mm;
+        border:1.2px dashed #000;
+        display:flex;align-items:center;justify-content:center;
+        padding:2mm;
+      }
+      .qr-zone img{display:block;width:42mm;height:42mm}
+      .label-info{min-width:0;text-align:left;align-self:center}
+      .kind{font-size:9pt;font-weight:800;text-transform:uppercase;letter-spacing:.5mm;margin-bottom:1mm}
+      .number{font-size:38pt;font-weight:900;letter-spacing:1.5mm;line-height:.95;white-space:nowrap}
+      .divider{border-top:1px solid #000;margin:2mm 0 1.5mm}
+      .main{font-size:16pt;font-weight:850;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .line{font-size:13pt;font-weight:700;line-height:1.15;margin-top:.8mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .color{font-size:15pt}
+      .small{font-size:10pt;line-height:1.15;margin-top:1mm;min-height:3mm}
       ${pageCss}
       @media screen{
-        body{padding:10mm;background:#eee}
-        .sheet{background:#fff;padding:5mm;min-height:${format==='label62'?'90mm':'277mm'}}
+        body{padding:8mm;background:#eee}
+        .sheet{background:#fff}
+        .label{margin-bottom:6mm;background:#fff}
       }
-      @media print{
-        body{background:#fff}
-      }
+      @media print{body{background:#fff}}
     </style>
   </head>
   <body>
-    <div class="sheet">${html}</div>
+    <div class="sheet">${labelMarkup}</div>
     <script>
       window.onload=()=>{
         const images=[...document.images];
@@ -491,8 +508,76 @@ printSelectedLabelsBtn.onclick=()=>{
   }).filter(Boolean);
 
   if(!selected.length)return alert('Selecteer eerst minstens één spoel of refill.');
-  openLabelPrintWindow(selected,'a4');
+  openLabelPrintWindow(selected,'roll200x60');
 };
+
+function inventoryRows(kind){
+  const source=kind==='spools' ? state.spools : state.refills;
+  return source.map(item=>{
+    const f=filament(item.filamentId);
+    return {
+      category:f?.category||'',
+      type:f?.type||'',
+      color:f?.color||'',
+      number:item.number||''
+    };
+  }).sort((a,b)=>
+    a.category.localeCompare(b.category,'nl') ||
+    a.type.localeCompare(b.type,'nl') ||
+    a.color.localeCompare(b.color,'nl') ||
+    a.number.localeCompare(b.number,'nl',{numeric:true})
+  );
+}
+
+function printInventoryA4(kind){
+  const rows=inventoryRows(kind);
+  const title=kind==='spools'?'Voorraad Spoelen':'Voorraad Refills';
+  const printedAt=new Date().toLocaleString('nl-BE');
+
+  inventoryPrintDialogTitle.textContent=title;
+  inventoryPrintPreview.innerHTML=`
+    <h1>Filament Manager – ${title}</h1>
+    <div class="print-meta">
+      <span>Afdrukdatum: ${esc(printedAt)}</span>
+      <span>Aantal: ${rows.length}</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Categorie</th><th>Type</th><th>Kleur</th><th>Nummer</th></tr>
+      </thead>
+      <tbody>
+        ${rows.map(row=>`<tr>
+          <td>${esc(row.category)}</td>
+          <td>${esc(row.type)}</td>
+          <td>${esc(row.color)}</td>
+          <td>${esc(row.number)}</td>
+        </tr>`).join('')||'<tr><td colspan="4">Geen gegevens.</td></tr>'}
+      </tbody>
+    </table>
+    <div class="print-footer">
+      <span>${title}</span>
+      <span>Totaal: ${rows.length}</span>
+    </div>`;
+
+  inventoryPrintDialog.showModal();
+}
+
+const printSpoolInventoryButton=document.getElementById('printSpoolInventoryBtn');
+const printRefillInventoryButton=document.getElementById('printRefillInventoryBtn');
+
+if(printSpoolInventoryButton){
+  printSpoolInventoryButton.addEventListener('click',event=>{
+    event.preventDefault();
+    printInventoryA4('spools');
+  });
+}
+
+if(printRefillInventoryButton){
+  printRefillInventoryButton.addEventListener('click',event=>{
+    event.preventDefault();
+    printInventoryA4('refills');
+  });
+}
 
 function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderStock();renderOrderList();renderOrders();renderLibraries();renderLog()}
 renderAll();
@@ -513,4 +598,19 @@ if(window.copyDiagnosisBtn){
       alert('Diagnose gekopieerd.');
     }
   };
+}
+
+const inventoryPrintDialogElement=document.getElementById('inventoryPrintDialog');
+const closeInventoryPrintButton=document.getElementById('closeInventoryPrintBtn');
+const confirmInventoryPrintButton=document.getElementById('confirmInventoryPrintBtn');
+
+if(closeInventoryPrintButton){
+  closeInventoryPrintButton.addEventListener('click',()=>{
+    if(inventoryPrintDialogElement?.open)inventoryPrintDialogElement.close();
+  });
+}
+if(confirmInventoryPrintButton){
+  confirmInventoryPrintButton.addEventListener('click',()=>{
+    window.print();
+  });
 }

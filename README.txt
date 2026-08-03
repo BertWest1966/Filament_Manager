@@ -1,13 +1,10 @@
-FILAMENT MANAGER v7.5.4 — ZELFSTANDIGE A4-PRINTMODULE
+FILAMENT MANAGER v7.5.5 — A4 PRINTMODULE HERSTEL
 
-Belangrijk:
-- De A4-knoppen zijn niet meer afhankelijk van app.js.
-- Een aparte print-tools.js leest de voorraad rechtstreeks uit localStorage.
-- Werkt ook wanneer een andere functie in de app een JavaScript-fout veroorzaakt.
-- Klik opent altijd eerst een zichtbaar voorbeeld.
-- Vanuit het voorbeeld klik je op Afdrukken.
+Opgelost:
+- print-tools.js staat nu werkelijk in de map js/.
+- index.html en service-worker.js verwijzen naar dezelfde locatie.
+- A4-knoppen laden hierdoor de printmodule correct.
+- Voorraad Spoelen en Voorraad Refills openen een zichtbaar afdrukvoorbeeld.
 
-Test:
-1. Meer > Afdrukken.
-2. Voorraad Spoelen of Voorraad Refills.
-3. Het voorbeeld moet direct zichtbaar worden.
+Upload alle bestanden en mappen opnieuw naar GitHub.
+Controleer vooral dat js/print-tools.js zichtbaar is.
