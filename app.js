@@ -532,8 +532,11 @@ function inventoryRows(kind){
 function printInventoryA4(kind){
   const rows=inventoryRows(kind);
   const title=kind==='spools'?'Voorraad Spoelen':'Voorraad Refills';
-  const win=window.open('','_blank');
-  if(!win){alert('Sta pop-ups toe om de voorraadlijst af te drukken.');return}
+  const win=window.open('about:blank','_blank');
+  if(!win){
+    alert('Safari blokkeert het afdrukvenster. Sta pop-ups toe voor deze website en probeer opnieuw.');
+    return;
+  }
 
   const printedAt=new Date().toLocaleString('nl-BE');
   const rowHtml=rows.map(row=>`<tr>
@@ -572,10 +575,25 @@ function printInventoryA4(kind){
     <script>window.onload=()=>setTimeout(()=>window.print(),150);<\/script>
   </body></html>`);
   win.document.close();
+  try{win.focus()}catch{}
 }
 
-printSpoolInventoryBtn.onclick=()=>printInventoryA4('spools');
-printRefillInventoryBtn.onclick=()=>printInventoryA4('refills');
+const printSpoolInventoryButton=document.getElementById('printSpoolInventoryBtn');
+const printRefillInventoryButton=document.getElementById('printRefillInventoryBtn');
+
+if(printSpoolInventoryButton){
+  printSpoolInventoryButton.addEventListener('click',event=>{
+    event.preventDefault();
+    printInventoryA4('spools');
+  });
+}
+
+if(printRefillInventoryButton){
+  printRefillInventoryButton.addEventListener('click',event=>{
+    event.preventDefault();
+    printInventoryA4('refills');
+  });
+}
 
 function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderStock();renderOrderList();renderOrders();renderLibraries();renderLog()}
 renderAll();
