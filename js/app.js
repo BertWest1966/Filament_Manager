@@ -55,7 +55,7 @@ function renderDashboard(){sumSpools.textContent=state.spools.filter(s=>s.status
 dashboardSearch.oninput=renderDashboard;
 function quickLevel(id){const s=state.spools.find(x=>x.id===id);const v=prompt(`Hoeveelheid op ${s.number}: 0, 25, 50, 75 of 100`,s.level);if(v===null)return;const n=Number(v);if(![0,25,50,75,100].includes(n))return alert('Kies 0, 25, 50, 75 of 100.');s.level=n;log(`Spoel ${s.number} aangepast naar ${n}%`,s.filamentId);save()}
 
-function renderCatalog(){const q=catalogSearch.value.toLowerCase();const items=state.catalog.filter(f=>!q||label(f).toLowerCase().includes(q)).sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));catalogList.innerHTML=items.map(f=>`<div class="item-row"><div><strong>${esc(label(f))}</strong><div class="item-meta">${esc(f.brand)} · min ${f.min} · gewenst ${f.target}</div></div><div class="item-actions"><button onclick="openDetail('${f.id}')">Open</button><button onclick="openFilament('${f.id}')">Wijzig</button></div></div>`).join('')||'<div class="note">Geen filamenten.</div>'}
+function renderCatalog(){const q=catalogSearch.value.toLowerCase();const items=state.catalog.filter(f=>!q||label(f).toLowerCase().includes(q)).sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));catalogList.innerHTML=items.map(f=>`<div class="item-row"><div><strong>${esc(label(f))}</strong><div class="item-meta">${esc(f.brand)} · min ${f.min} · gewenst ${f.target}</div></div><div class="item-actions"><button onclick="openDetail('${f.id}')">Open</button><button onclick="openFilament('${f.id}')">Wijzig</button><button class="danger-button" onclick="deleteFilament('${f.id}')">Verwijderen</button></div></div>`).join('')||'<div class="note">Geen filamenten.</div>'}
 catalogSearch.oninput=renderCatalog;
 function sortStock(items){if(stockSortMode==='number-asc')return items.sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));if(stockSortMode==='number-desc')return items.sort((a,b)=>b.number.localeCompare(a.number,'nl',{numeric:true}));return items.sort((a,b)=>{const fa=filament(a.filamentId),fb=filament(b.filamentId);return fa.category.localeCompare(fb.category,'nl')||fa.type.localeCompare(fb.type,'nl')||fa.color.localeCompare(fb.color,'nl')})}
 function renderStock(){
@@ -81,6 +81,37 @@ function createOrderFor(fid,qty){fillFilamentSelect(oFilament,fid);oQuantity.val
 function renderOrders(){const q=ordersSearch.value.toLowerCase();ordersList.innerHTML=state.orders.filter(o=>!q||o.supplier.toLowerCase().includes(q)).map(o=>`<div class="item-row"><div><strong>${esc(label(filament(o.filamentId)))}</strong><div class="item-meta">${esc(o.supplier)} · ${o.received}/${o.quantity} ontvangen</div></div><div class="item-actions">${o.received<o.quantity?`<button onclick="receiveOrder('${o.id}')">Ontvangen</button>`:''}</div></div>`).join('')||'<div class="note">Geen bestellingen.</div>'}
 ordersSearch.oninput=renderOrders;
 function receiveOrder(id){const o=state.orders.find(x=>x.id===id);const open=o.quantity-o.received;const n=Number(prompt(`Aantal ontvangen (max ${open})`,open));if(!n||n<1||n>open)return;o.received+=n;for(let i=0;i<n;i++)state.refills.push({id:uid(),number:nextNumber('R',state.refills),filamentId:o.filamentId});if(o.received===o.quantity)o.status='Geleverd';save()}
+
+
+function deleteFilament(id){
+  const f=filament(id);
+  if(!f)return;
+
+  const spoolCount=state.spools.filter(s=>s.filamentId===id).length;
+  const refillCount=state.refills.filter(r=>r.filamentId===id).length;
+
+  if(spoolCount>0 || refillCount>0){
+    const parts=[];
+    if(spoolCount>0)parts.push(`${spoolCount} spoel${spoolCount===1?'':'en'}`);
+    if(refillCount>0)parts.push(`${refillCount} refill${refillCount===1?'':'s'}`);
+
+    alert(`Dit filament kan niet verwijderd worden.\n\nHet wordt nog gebruikt door ${parts.join(' en ')}.`);
+    return;
+  }
+
+  const confirmed=confirm(`Filament verwijderen?\n\n${label(f)}\n\nDe kleur blijft beschikbaar in de bibliotheek.`);
+  if(!confirmed)return;
+
+  state.catalog=state.catalog.filter(item=>item.id!==id);
+  log(`${label(f)} verwijderd`,id);
+  save();
+
+  if(typeof showAppToast==='function'){
+    showAppToast(`✓ ${label(f)} is verwijderd.`);
+  }else{
+    alert(`${label(f)} is verwijderd.`);
+  }
+}
 
 function openDetail(id){previousView=currentView;currentView='detail';const f=filament(id);detailContent.innerHTML=`<div class="panel"><h2>${esc(label(f))}</h2><div class="summary-grid"><div class="summary-card"><span>Op spoel</span><strong>${Math.round(spoolStock(f.id)*100)}%</strong></div><div class="summary-card"><span>Refills</span><strong>${refillCount(f.id)}</strong></div><div class="summary-card"><span>Minimum</span><strong>${f.min}</strong></div><div class="summary-card"><span>Gewenst</span><strong>${f.target}</strong></div></div></div>`;setView('detail')}
 backFromDetail.onclick=()=>setView(previousView);

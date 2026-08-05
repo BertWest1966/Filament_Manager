@@ -1,7 +1,9 @@
-FILAMENT MANAGER v7.5.8 — SUCCESMELDING REFILLWISSEL
+FILAMENT MANAGER v7.5.9 — CATALOGUSITEM VERWIJDEREN
 
-Aangepast:
-- Na een geslaagde refillwissel verschijnt onderaan een groene bevestiging.
-- De melding bevat het spoelnummer en refillnummer.
-- De melding verdwijnt automatisch na ongeveer 2,6 seconden.
-- Verder zijn geen functies of layouts aangepast.
+Nieuw:
+- In Catalogus staat naast Open en Wijzig een knop Verwijderen.
+- Een filament kan alleen verwijderd worden wanneer er geen spoelen of refills aan gekoppeld zijn.
+- Bij gekoppelde voorraad toont de app hoeveel spoelen en refills het filament nog gebruiken.
+- Alleen het catalogusitem wordt verwijderd.
+- De kleur blijft behouden in de kleurenbibliotheek.
+- Alle overige functies en layouts zijn ongewijzigd.

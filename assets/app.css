@@ -243,3 +243,12 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 }
 .app-toast.show{opacity:1;transform:translate(-50%,0)}
 @media(min-width:900px){.app-toast{bottom:24px}}
+
+.danger-button{
+  border-color:#b91c1c;
+  color:#b91c1c;
+  background:#fff;
+}
+.danger-button:active{
+  background:#fee2e2;
+}
