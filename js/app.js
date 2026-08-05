@@ -188,7 +188,7 @@ startScannerBtn.onclick=startQrScanner;
 stopScannerBtn.onclick=stopQrScanner;
 
 manualScanBtn.onclick=()=>{const code=parseQrCode(manualScanCode.value);const s=state.spools.find(x=>x.number===code);if(s){setView('voorraad');openSpool(s.id);return}const r=state.refills.find(x=>x.number===code);if(r){setView('voorraad');openRefill(r.id);return}alert('Code niet gevonden.')}
-quickFillBtn.onclick=()=>{const s=state.spools.find(x=>x.number===quickFillSpool.value.trim().toUpperCase()),r=state.refills.find(x=>x.number===quickFillRefill.value.trim().toUpperCase());if(!s||!r)return alert('Spoel of refill niet gevonden.');if(Number(s.level)!==0)return alert('De spoel moet leeg zijn.');s.filamentId=r.filamentId;s.level=100;state.refills=state.refills.filter(x=>x.id!==r.id);log(`Refill ${r.number} gekoppeld aan ${s.number}`,s.filamentId);save()}
+quickFillBtn.onclick=()=>{const s=state.spools.find(x=>x.number===quickFillSpool.value.trim().toUpperCase()),r=state.refills.find(x=>x.number===quickFillRefill.value.trim().toUpperCase());if(!s||!r)return alert('Spoel of refill niet gevonden.');if(Number(s.level)!==0)return alert('De spoel moet leeg zijn.');s.filamentId=r.filamentId;s.level=100;state.refills=state.refills.filter(x=>x.id!==r.id);log(`Refill ${r.number} gekoppeld aan ${s.number}`,s.filamentId);save();showAppToast(`✓ Spoel ${s.number} is succesvol aangevuld met refill ${r.number}.`)}
 
 function libraryValues(kind){if(kind==='types'){const a=[];Object.values(state.libraries.types).forEach(v=>v.forEach(x=>pushUnique(a,x)));return a}return state.libraries[kind]||[]}
 function usage(kind,v){return state.catalog.filter(f=>kind==='colors'?f.color===v:kind==='types'?f.type===v:kind==='brands'?f.brand===v:kind==='suppliers'?f.supplier===v:f.category===v).length}
@@ -513,4 +513,14 @@ if(window.copyDiagnosisBtn){
       alert('Diagnose gekopieerd.');
     }
   };
+}
+
+let appToastTimer=null;
+function showAppToast(message){
+  const toast=document.getElementById('appToast');
+  if(!toast)return;
+  clearTimeout(appToastTimer);
+  toast.textContent=message;
+  toast.classList.add('show');
+  appToastTimer=setTimeout(()=>toast.classList.remove('show'),2600);
 }

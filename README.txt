@@ -1,9 +1,7 @@
-FILAMENT MANAGER v7.5.7 — LOSSE A4-PAGINA'S
+FILAMENT MANAGER v7.5.8 — SUCCESMELDING REFILLWISSEL
 
-- Voorraad Spoelen opent voorraad-spoelen.html
-- Voorraad Refills opent voorraad-refills.html
-- Geen pop-up, iframe of dialoog.
-- Elke pagina heeft een eigen knop Afdrukken.
-- Sortering: categorie → type → kleur → nummer.
-
-Upload alle bestanden, inclusief beide nieuwe HTML-pagina's.
+Aangepast:
+- Na een geslaagde refillwissel verschijnt onderaan een groene bevestiging.
+- De melding bevat het spoelnummer en refillnummer.
+- De melding verdwijnt automatisch na ongeveer 2,6 seconden.
+- Verder zijn geen functies of layouts aangepast.
