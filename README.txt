@@ -1,15 +1,11 @@
-FILAMENT MANAGER v7.5.13 — LOKALE NAS-SYNCHRONISATIE
+FILAMENT MANAGER v7.5.12 — CATEGORIEKLEUREN DOORGEGEVEN
 
-Nieuw:
-- Standaard NAS API: http://192.168.0.191:3000/data
-- Bij opstarten probeert de app de centrale JSON op de NAS te laden.
-- Als de NAS nog leeg is, worden de bestaande lokale gegevens als eerste centrale versie opgeslagen.
-- Na elke wijziging wordt eerst lokaal opgeslagen en daarna automatisch naar de NAS geschreven.
-- localStorage blijft als lokale reserve/fallback bestaan.
-- Als de NAS niet bereikbaar is, blijft de app lokaal bruikbaar.
-- Bij HTTP 409 conflict wordt niets automatisch overschreven.
-- Onder Meer > NAS-synchronisatie staat de verbindingsstatus en knop Nu synchroniseren.
+Correctie:
+- Dashboardcategorie is nu een echte groep.
+- Vanaf PETG blijven type, kolomtitels, kleuren, spoelnummers, percentages en refill-aantallen PETG-kleur tot de volgende categorie.
+- Vanaf PLA gebeurt hetzelfde met de PLA-kleur, enzovoort.
+- De scheidingslijn onder de categorietitel gebruikt eveneens de categoriekleur.
+- Catalogus, Voorraad, Bestellijst en Bestellingen krijgen per filamentrij expliciet de categoriekleur.
+- In Bibliotheken worden categoriewaarden zelf in hun vaste kleur weergegeven.
 
-Gebruik:
-- Werkt wanneer het toestel de NAS kan bereiken via het lokale netwerk/wifi.
-- Voor gebruik via internet is later HTTPS/reverse proxy nodig.
+Geen functionele logica aangepast.
