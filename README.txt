@@ -1,11 +1,11 @@
-FILAMENT MANAGER v7.5.10 — MINIMUMVOORRAAD & CATEGORIE-LAYOUT
+FILAMENT MANAGER v7.5.11 — CATEGORIEKLEUREN ALLE TABBLADEN
 
 Aangepast:
-- Minimumvoorraad uitgebreid naar:
-  0 / 0,25 / 0,50 / 0,75 / 1,00 / 1,50 / 2,00 / 3,00 / 4,00.
-- Dashboard toont duidelijkere hiërarchie:
-  categorie → type → kleur.
-- Elke categorie krijgt een vaste accentkleur.
-- Dezelfde categoriekleur wordt gebruikt op schermen waar categorie-elementen herkenbaar zijn.
+- Elke filamentcategorie behoudt één vaste kleur.
+- Niet alleen de categorietitel, maar ook type, kleur en bijbehorende gegevens
+  krijgen dezelfde categoriekleur.
+- Dit wordt toegepast op alle tabbladen waar filamentgegevens zichtbaar zijn.
+- Knoppen, invoervelden, keuzelijsten en algemene interface-elementen blijven neutraal.
+- De dashboard-inspringing en uitgebreidere minimumvoorraad uit v7.5.10 blijven behouden.
 
-Geen andere functionaliteit aangepast.
+Geen functionele logica aangepast.

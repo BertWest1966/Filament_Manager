@@ -573,16 +573,47 @@ function categoryColor(category){
 }
 
 function applyCategoryColors(){
-  document.querySelectorAll('.category-title,.category-heading').forEach(el=>{
-    const color=categoryColor(el.textContent.trim());
-    el.style.setProperty('--cat-color',color);
-    el.classList.add('category-accent');
+  const getCatFromText=(text)=>{
+    const t=String(text||'').toUpperCase();
+    const cats=['PETG','PLA','TPU','ASA','ABS','PA','NYLON','PC'];
+    return cats.find(c=>new RegExp(`(^|\\s|[-–—/])${c}(\\s|$|[-–—/])`,'i').test(t))||'';
+  };
+
+  /* expliciet gemarkeerde elementen */
+  document.querySelectorAll('[data-category]').forEach(el=>{
+    const cat=el.dataset.category;
+    el.style.setProperty('--cat-color',categoryColor(cat));
+    el.classList.add('category-colored-row');
   });
 
-  document.querySelectorAll('[data-category]').forEach(el=>{
-    const color=categoryColor(el.dataset.category);
-    el.style.setProperty('--cat-color',color);
-    el.classList.add('category-border');
+  /* categorietitels */
+  document.querySelectorAll('.category-title,.category-heading').forEach(el=>{
+    const cat=getCatFromText(el.textContent)||el.textContent.trim();
+    el.style.setProperty('--cat-color',categoryColor(cat));
+    el.classList.add('category-accent');
+    const container=el.closest('section,.card,.group,.category-group')||el.parentElement;
+    if(container){
+      container.style.setProperty('--cat-color',categoryColor(cat));
+      container.classList.add('category-colored-row');
+    }
+  });
+
+  /* Tabellen/lijsten op alle tabbladen:
+     bepaal categorie uit rijtekst en kleur de volledige gegevensrij. */
+  document.querySelectorAll('tr,.row,.list-row,.item-row,.filament-row,.catalog-row,.stock-row,.order-row').forEach(row=>{
+    if(row.closest('thead'))return;
+    const cat=getCatFromText(row.textContent);
+    if(!cat)return;
+    row.style.setProperty('--cat-color',categoryColor(cat));
+    row.classList.add('category-colored-row');
+  });
+
+  /* Kaarten/items met filamentinformatie */
+  document.querySelectorAll('.card,.item,.catalog-item,.stock-item,.order-item').forEach(item=>{
+    const cat=getCatFromText(item.textContent);
+    if(!cat)return;
+    item.style.setProperty('--cat-color',categoryColor(cat));
+    item.classList.add('category-colored-row');
   });
 }
 

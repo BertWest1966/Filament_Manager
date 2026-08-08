@@ -273,3 +273,29 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 }
 .category-accent{color:var(--cat-color,var(--cat-default))!important}
 .category-border{border-left:4px solid var(--cat-color,var(--cat-default))!important}
+
+/* v7.5.11 - categoriekleur voor ALLE filamentgegevens op ALLE tabbladen */
+.category-colored-row,
+.category-colored-row td,
+.category-colored-row th,
+.category-colored-row .filament-data,
+.category-colored-row .filament-name,
+.category-colored-row .filament-type,
+.category-colored-row .filament-color,
+.category-colored-row .spool-number,
+.category-colored-row .refill-number,
+.category-colored-row .stock-value,
+.category-colored-row .muted{
+  color:var(--cat-color,var(--cat-default)) !important;
+}
+.category-colored-row button,
+.category-colored-row input,
+.category-colored-row select,
+.category-colored-row textarea,
+.category-colored-row option,
+.category-colored-row label{
+  color:initial;
+}
+.category-colored-row{
+  border-left:4px solid var(--cat-color,var(--cat-default));
+}
