@@ -299,3 +299,36 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 .category-colored-row{
   border-left:4px solid var(--cat-color,var(--cat-default));
 }
+
+/* v7.5.12 - categoriekleur werkelijk doorgeven aan de volledige groep */
+.category-group,
+.category-data-row{
+  --cat-color:var(--cat-default);
+  color:var(--cat-color) !important;
+}
+.category-group .category-title{
+  color:var(--cat-color) !important;
+  border-bottom:2px solid var(--cat-color) !important;
+}
+.category-group .type-title,
+.category-group th,
+.category-group td,
+.category-group td *,
+.category-group button,
+.category-data-row,
+.category-data-row strong,
+.category-data-row .item-meta,
+.category-data-row .filament-data,
+.category-data-row button{
+  color:var(--cat-color) !important;
+}
+.category-group .type-title{padding-left:16px}
+.category-group .dashboard-table td:first-child{padding-left:32px}
+
+/* invoervelden/selectievakjes blijven normale bediening */
+.category-group input,
+.category-group select,
+.category-data-row input,
+.category-data-row select{
+  color:initial !important;
+}

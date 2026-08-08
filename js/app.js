@@ -51,11 +51,11 @@ newOrderBtn.onclick=()=>{if(!state.catalog.length)return alert('Maak eerst een f
 oFilament.onchange=()=>oSupplier.value=filament(oFilament.value)?.supplier||'';
 orderForm.onsubmit=e=>{e.preventDefault();state.orders.push({id:uid(),filamentId:oFilament.value,quantity:Number(oQuantity.value),received:0,supplier:oSupplier.value.trim(),status:'Besteld'});orderDialog.close();save()}
 
-function renderDashboard(){sumSpools.textContent=state.spools.filter(s=>s.status==='active').length;sumRefills.textContent=state.refills.length;sumEmpty.textContent=state.spools.filter(s=>s.status==='active'&&Number(s.level)===0).length;sumLow.textContent=state.catalog.filter(f=>totalStock(f.id)<Number(f.min)).length;const q=dashboardSearch.value.toLowerCase(),grouped={};state.catalog.slice().sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl')).forEach(f=>{if(q&&!`${f.category} ${f.type} ${f.color}`.toLowerCase().includes(q))return;grouped[f.category]??={};grouped[f.category][f.type]??=[];const active=state.spools.filter(s=>s.status==='active'&&s.filamentId===f.id).sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));if(!active.length)grouped[f.category][f.type].push({f,spool:null});else active.forEach(s=>grouped[f.category][f.type].push({f,spool:s}))});dashboardList.innerHTML=Object.keys(grouped).map(c=>`<div class="category-title">${esc(c)}</div>${Object.keys(grouped[c]).map(t=>`<div class="type-title">${esc(t)}</div><table class="dashboard-table"><thead><tr><th>Kleur</th><th>Spoel</th><th>Hoeveelh.</th><th>Refill</th></tr></thead><tbody>${grouped[c][t].map(r=>`<tr><td onclick="openDetail('${r.f.id}')">${esc(r.f.color)}</td><td>${r.spool?`<button onclick="openSpool('${r.spool.id}')">${r.spool.number}</button>`:'—'}</td><td>${r.spool?`<button class="level-btn" onclick="quickLevel('${r.spool.id}')">${r.spool.level}%</button>`:'—'}</td><td>${refillCount(r.f.id)}</td></tr>`).join('')}</tbody></table>`).join('')}`).join('')||'<div class="note">Nog geen filamenten.</div>'}
+function renderDashboard(){sumSpools.textContent=state.spools.filter(s=>s.status==='active').length;sumRefills.textContent=state.refills.length;sumEmpty.textContent=state.spools.filter(s=>s.status==='active'&&Number(s.level)===0).length;sumLow.textContent=state.catalog.filter(f=>totalStock(f.id)<Number(f.min)).length;const q=dashboardSearch.value.toLowerCase(),grouped={};state.catalog.slice().sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl')).forEach(f=>{if(q&&!`${f.category} ${f.type} ${f.color}`.toLowerCase().includes(q))return;grouped[f.category]??={};grouped[f.category][f.type]??=[];const active=state.spools.filter(s=>s.status==='active'&&s.filamentId===f.id).sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));if(!active.length)grouped[f.category][f.type].push({f,spool:null});else active.forEach(s=>grouped[f.category][f.type].push({f,spool:s}))});dashboardList.innerHTML=Object.keys(grouped).map(c=>`<div class="category-group" data-category="${esc(c)}"><div class="category-title">${esc(c)}</div>${Object.keys(grouped[c]).map(t=>`<div class="type-title">${esc(t)}</div><table class="dashboard-table"><thead><tr><th>Kleur</th><th>Spoel</th><th>Hoeveelh.</th><th>Refill</th></tr></thead><tbody>${grouped[c][t].map(r=>`<tr data-category="${esc(c)}"><td onclick="openDetail('${r.f.id}')">${esc(r.f.color)}</td><td>${r.spool?`<button onclick="openSpool('${r.spool.id}')">${r.spool.number}</button>`:'—'}</td><td>${r.spool?`<button class="level-btn" onclick="quickLevel('${r.spool.id}')">${r.spool.level}%</button>`:'—'}</td><td>${refillCount(r.f.id)}</td></tr>`).join('')}</tbody></table>`).join('')}</div>`).join('')||'<div class="note">Nog geen filamenten.</div>'}
 dashboardSearch.oninput=renderDashboard;
 function quickLevel(id){const s=state.spools.find(x=>x.id===id);const v=prompt(`Hoeveelheid op ${s.number}: 0, 25, 50, 75 of 100`,s.level);if(v===null)return;const n=Number(v);if(![0,25,50,75,100].includes(n))return alert('Kies 0, 25, 50, 75 of 100.');s.level=n;log(`Spoel ${s.number} aangepast naar ${n}%`,s.filamentId);save()}
 
-function renderCatalog(){const q=catalogSearch.value.toLowerCase();const items=state.catalog.filter(f=>!q||label(f).toLowerCase().includes(q)).sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));catalogList.innerHTML=items.map(f=>`<div class="item-row"><div><strong>${esc(label(f))}</strong><div class="item-meta">${esc(f.brand)} · min ${f.min} · gewenst ${f.target}</div></div><div class="item-actions"><button onclick="openDetail('${f.id}')">Open</button><button onclick="openFilament('${f.id}')">Wijzig</button><button class="danger-button" onclick="deleteFilament('${f.id}')">Verwijderen</button></div></div>`).join('')||'<div class="note">Geen filamenten.</div>'}
+function renderCatalog(){const q=catalogSearch.value.toLowerCase();const items=state.catalog.filter(f=>!q||label(f).toLowerCase().includes(q)).sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));catalogList.innerHTML=items.map(f=>`<div class="item-row category-data-row" data-category="${esc(f.category)}"><div><strong>${esc(label(f))}</strong><div class="item-meta">${esc(f.brand)} · min ${f.min} · gewenst ${f.target}</div></div><div class="item-actions"><button onclick="openDetail('${f.id}')">Open</button><button onclick="openFilament('${f.id}')">Wijzig</button><button class="danger-button" onclick="deleteFilament('${f.id}')">Verwijderen</button></div></div>`).join('')||'<div class="note">Geen filamenten.</div>'}
 catalogSearch.oninput=renderCatalog;
 function sortStock(items){if(stockSortMode==='number-asc')return items.sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));if(stockSortMode==='number-desc')return items.sort((a,b)=>b.number.localeCompare(a.number,'nl',{numeric:true}));return items.sort((a,b)=>{const fa=filament(a.filamentId),fb=filament(b.filamentId);return fa.category.localeCompare(fb.category,'nl')||fa.type.localeCompare(fb.type,'nl')||fa.color.localeCompare(fb.color,'nl')})}
 function renderStock(){
@@ -68,17 +68,17 @@ function renderStock(){
   stockList.innerHTML=items.map(x=>{
     const f=filament(x.filamentId);
     const kind=stockMode==='spools'?'spoel':'refill';
-    return `<div class="item-row"><div><strong>${esc(label(f))}</strong><div class="item-meta">${x.number} · ${stockMode==='spools'?x.level+'%':'Refill'}</div></div><div class="item-actions"><input class="label-select" type="checkbox" data-kind="${kind}" data-id="${x.id}" aria-label="Selecteer ${x.number}"><button onclick="${stockMode==='spools'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button><button onclick="openQr('${kind}','${x.id}')">QR</button></div></div>`;
+    return `<div class="item-row category-data-row" data-category="${esc(f.category)}"><div><strong>${esc(label(f))}</strong><div class="item-meta">${x.number} · ${stockMode==='spools'?x.level+'%':'Refill'}</div></div><div class="item-actions"><input class="label-select" type="checkbox" data-kind="${kind}" data-id="${x.id}" aria-label="Selecteer ${x.number}"><button onclick="${stockMode==='spools'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button><button onclick="openQr('${kind}','${x.id}')">QR</button></div></div>`;
   }).join('')||'<div class="note">Geen voorraad.</div>';
 }
 document.querySelectorAll('[data-stock-mode]').forEach(b=>b.onclick=()=>{stockMode=b.dataset.stockMode;renderStock()});
 stockSearch.oninput=renderStock;
 document.getElementById('stockSort').onchange=e=>{stockSortMode=e.target.value;renderStock()};
 
-function renderOrderList(){const q=orderListSearch.value.toLowerCase(),items=state.catalog.map(f=>({f,needed:toOrder(f)})).filter(x=>x.needed>0&&(!q||label(x.f).toLowerCase().includes(q))).sort((a,b)=>a.f.category.localeCompare(b.f.category,'nl')||a.f.type.localeCompare(b.f.type,'nl')||a.f.color.localeCompare(b.f.color,'nl'));orderList.innerHTML=items.map(x=>`<div class="item-row"><div><strong>${esc(label(x.f))}</strong><div class="item-meta">Nog bestellen: ${x.needed}</div></div><div class="item-actions"><button onclick="createOrderFor('${x.f.id}',${x.needed})">Bestellen</button></div></div>`).join('')||'<div class="note">Niets te bestellen.</div>'}
+function renderOrderList(){const q=orderListSearch.value.toLowerCase(),items=state.catalog.map(f=>({f,needed:toOrder(f)})).filter(x=>x.needed>0&&(!q||label(x.f).toLowerCase().includes(q))).sort((a,b)=>a.f.category.localeCompare(b.f.category,'nl')||a.f.type.localeCompare(b.f.type,'nl')||a.f.color.localeCompare(b.f.color,'nl'));orderList.innerHTML=items.map(x=>`<div class="item-row category-data-row" data-category="${esc(x.f.category)}"><div><strong>${esc(label(x.f))}</strong><div class="item-meta">Nog bestellen: ${x.needed}</div></div><div class="item-actions"><button onclick="createOrderFor('${x.f.id}',${x.needed})">Bestellen</button></div></div>`).join('')||'<div class="note">Niets te bestellen.</div>'}
 orderListSearch.oninput=renderOrderList;
 function createOrderFor(fid,qty){fillFilamentSelect(oFilament,fid);oQuantity.value=qty;oSupplier.value=filament(fid)?.supplier||'';orderDialog.showModal()}
-function renderOrders(){const q=ordersSearch.value.toLowerCase();ordersList.innerHTML=state.orders.filter(o=>!q||o.supplier.toLowerCase().includes(q)).map(o=>`<div class="item-row"><div><strong>${esc(label(filament(o.filamentId)))}</strong><div class="item-meta">${esc(o.supplier)} · ${o.received}/${o.quantity} ontvangen</div></div><div class="item-actions">${o.received<o.quantity?`<button onclick="receiveOrder('${o.id}')">Ontvangen</button>`:''}</div></div>`).join('')||'<div class="note">Geen bestellingen.</div>'}
+function renderOrders(){const q=ordersSearch.value.toLowerCase();ordersList.innerHTML=state.orders.filter(o=>!q||o.supplier.toLowerCase().includes(q)).map(o=>`<div class="item-row category-data-row" data-category="${esc(filament(o.filamentId)?.category||'')}"><div><strong>${esc(label(filament(o.filamentId)))}</strong><div class="item-meta">${esc(o.supplier)} · ${o.received}/${o.quantity} ontvangen</div></div><div class="item-actions">${o.received<o.quantity?`<button onclick="receiveOrder('${o.id}')">Ontvangen</button>`:''}</div></div>`).join('')||'<div class="note">Geen bestellingen.</div>'}
 ordersSearch.oninput=renderOrders;
 function receiveOrder(id){const o=state.orders.find(x=>x.id===id);const open=o.quantity-o.received;const n=Number(prompt(`Aantal ontvangen (max ${open})`,open));if(!n||n<1||n>open)return;o.received+=n;for(let i=0;i<n;i++)state.refills.push({id:uid(),number:nextNumber('R',state.refills),filamentId:o.filamentId});if(o.received===o.quantity)o.status='Geleverd';save()}
 
@@ -223,7 +223,7 @@ quickFillBtn.onclick=()=>{const s=state.spools.find(x=>x.number===quickFillSpool
 
 function libraryValues(kind){if(kind==='types'){const a=[];Object.values(state.libraries.types).forEach(v=>v.forEach(x=>pushUnique(a,x)));return a}return state.libraries[kind]||[]}
 function usage(kind,v){return state.catalog.filter(f=>kind==='colors'?f.color===v:kind==='types'?f.type===v:kind==='brands'?f.brand===v:kind==='suppliers'?f.supplier===v:f.category===v).length}
-function renderLibraries(){document.querySelectorAll('[data-library-kind]').forEach(b=>b.classList.toggle('active',b.dataset.libraryKind===activeLibraryKind));const q=librarySearch.value.toLowerCase(),vals=libraryValues(activeLibraryKind).filter(v=>!q||v.toLowerCase().includes(q)).sort((a,b)=>a.localeCompare(b,'nl'));libraryManagerList.innerHTML=vals.map(v=>`<div class="library-row"><div><strong>${esc(v)}</strong><div class="item-meta">${usage(activeLibraryKind,v)} filament(en)</div></div><div class="item-actions"><button onclick="editLibrary('${encodeURIComponent(v)}')">Wijzig</button><button onclick="deleteLibrary('${encodeURIComponent(v)}')">Verwijder</button></div></div>`).join('')||'<div class="note">Geen waarden.</div>'}
+function renderLibraries(){document.querySelectorAll('[data-library-kind]').forEach(b=>b.classList.toggle('active',b.dataset.libraryKind===activeLibraryKind));const q=librarySearch.value.toLowerCase(),vals=libraryValues(activeLibraryKind).filter(v=>!q||v.toLowerCase().includes(q)).sort((a,b)=>a.localeCompare(b,'nl'));libraryManagerList.innerHTML=vals.map(v=>`<div class="library-row ${activeLibraryKind==='categories'?'category-data-row':''}" ${activeLibraryKind==='categories'?`data-category="${esc(v)}"`:''}><div><strong>${esc(v)}</strong><div class="item-meta">${usage(activeLibraryKind,v)} filament(en)</div></div><div class="item-actions"><button onclick="editLibrary('${encodeURIComponent(v)}')">Wijzig</button><button onclick="deleteLibrary('${encodeURIComponent(v)}')">Verwijder</button></div></div>`).join('')||'<div class="note">Geen waarden.</div>'}
 document.querySelectorAll('[data-library-kind]').forEach(b=>b.onclick=()=>{activeLibraryKind=b.dataset.libraryKind;renderLibraries()});librarySearch.oninput=renderLibraries;
 addLibraryValueBtn.onclick=()=>{editingLibraryValue=null;libraryTitle.textContent='Nieuwe waarde';libraryValueInput.value='';libraryDialog.showModal()}
 function editLibrary(v){editingLibraryValue=decodeURIComponent(v);libraryTitle.textContent='Waarde wijzigen';libraryValueInput.value=editingLibraryValue;libraryDialog.showModal()}
@@ -573,47 +573,16 @@ function categoryColor(category){
 }
 
 function applyCategoryColors(){
-  const getCatFromText=(text)=>{
-    const t=String(text||'').toUpperCase();
-    const cats=['PETG','PLA','TPU','ASA','ABS','PA','NYLON','PC'];
-    return cats.find(c=>new RegExp(`(^|\\s|[-–—/])${c}(\\s|$|[-–—/])`,'i').test(t))||'';
-  };
-
-  /* expliciet gemarkeerde elementen */
   document.querySelectorAll('[data-category]').forEach(el=>{
-    const cat=el.dataset.category;
-    el.style.setProperty('--cat-color',categoryColor(cat));
-    el.classList.add('category-colored-row');
+    const color=categoryColor(el.dataset.category);
+    el.style.setProperty('--cat-color',color);
   });
 
-  /* categorietitels */
+  /* losse categorietitels, indien een scherm geen wrapper gebruikt */
   document.querySelectorAll('.category-title,.category-heading').forEach(el=>{
-    const cat=getCatFromText(el.textContent)||el.textContent.trim();
-    el.style.setProperty('--cat-color',categoryColor(cat));
+    if(el.closest('[data-category]'))return;
+    el.style.setProperty('--cat-color',categoryColor(el.textContent.trim()));
     el.classList.add('category-accent');
-    const container=el.closest('section,.card,.group,.category-group')||el.parentElement;
-    if(container){
-      container.style.setProperty('--cat-color',categoryColor(cat));
-      container.classList.add('category-colored-row');
-    }
-  });
-
-  /* Tabellen/lijsten op alle tabbladen:
-     bepaal categorie uit rijtekst en kleur de volledige gegevensrij. */
-  document.querySelectorAll('tr,.row,.list-row,.item-row,.filament-row,.catalog-row,.stock-row,.order-row').forEach(row=>{
-    if(row.closest('thead'))return;
-    const cat=getCatFromText(row.textContent);
-    if(!cat)return;
-    row.style.setProperty('--cat-color',categoryColor(cat));
-    row.classList.add('category-colored-row');
-  });
-
-  /* Kaarten/items met filamentinformatie */
-  document.querySelectorAll('.card,.item,.catalog-item,.stock-item,.order-item').forEach(item=>{
-    const cat=getCatFromText(item.textContent);
-    if(!cat)return;
-    item.style.setProperty('--cat-color',categoryColor(cat));
-    item.classList.add('category-colored-row');
   });
 }
 
