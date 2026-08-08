@@ -555,3 +555,40 @@ function showAppToast(message){
   toast.classList.add('show');
   appToastTimer=setTimeout(()=>toast.classList.remove('show'),2600);
 }
+
+
+function categoryColor(category){
+  const key=String(category||'').trim().toUpperCase();
+  const map={
+    PLA:'var(--cat-pla)',
+    PETG:'var(--cat-petg)',
+    TPU:'var(--cat-tpu)',
+    ASA:'var(--cat-asa)',
+    ABS:'var(--cat-abs)',
+    PA:'var(--cat-pa)',
+    NYLON:'var(--cat-pa)',
+    PC:'var(--cat-pc)'
+  };
+  return map[key]||'var(--cat-default)';
+}
+
+function applyCategoryColors(){
+  document.querySelectorAll('.category-title,.category-heading').forEach(el=>{
+    const color=categoryColor(el.textContent.trim());
+    el.style.setProperty('--cat-color',color);
+    el.classList.add('category-accent');
+  });
+
+  document.querySelectorAll('[data-category]').forEach(el=>{
+    const color=categoryColor(el.dataset.category);
+    el.style.setProperty('--cat-color',color);
+    el.classList.add('category-border');
+  });
+}
+
+document.addEventListener('DOMContentLoaded',()=>requestAnimationFrame(applyCategoryColors));
+
+const categoryColorObserver=new MutationObserver(()=>requestAnimationFrame(applyCategoryColors));
+document.addEventListener('DOMContentLoaded',()=>{
+  categoryColorObserver.observe(document.body,{childList:true,subtree:true});
+});

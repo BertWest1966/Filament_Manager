@@ -1,9 +1,11 @@
-FILAMENT MANAGER v7.5.9 — CATALOGUSITEM VERWIJDEREN
+FILAMENT MANAGER v7.5.10 — MINIMUMVOORRAAD & CATEGORIE-LAYOUT
 
-Nieuw:
-- In Catalogus staat naast Open en Wijzig een knop Verwijderen.
-- Een filament kan alleen verwijderd worden wanneer er geen spoelen of refills aan gekoppeld zijn.
-- Bij gekoppelde voorraad toont de app hoeveel spoelen en refills het filament nog gebruiken.
-- Alleen het catalogusitem wordt verwijderd.
-- De kleur blijft behouden in de kleurenbibliotheek.
-- Alle overige functies en layouts zijn ongewijzigd.
+Aangepast:
+- Minimumvoorraad uitgebreid naar:
+  0 / 0,25 / 0,50 / 0,75 / 1,00 / 1,50 / 2,00 / 3,00 / 4,00.
+- Dashboard toont duidelijkere hiërarchie:
+  categorie → type → kleur.
+- Elke categorie krijgt een vaste accentkleur.
+- Dezelfde categoriekleur wordt gebruikt op schermen waar categorie-elementen herkenbaar zijn.
+
+Geen andere functionaliteit aangepast.

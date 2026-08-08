@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Filament">
-  <title>Filament Manager v7.5.9</title>
+  <title>Filament Manager v7.5.10</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=7.5.9">
+  <link rel="stylesheet" href="assets/app.css?v=7.5.10">
 </head>
 <body>
 <div class="app-shell">
@@ -18,7 +18,7 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 7.5.9 · Afdrukken</span>
+      <span>Versie 7.5.10 · Afdrukken</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active">Dashboard</button>
@@ -37,7 +37,7 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 7.5.9 · Afdrukken</span>
+        <span>Versie 7.5.10 · Afdrukken</span>
       </div>
     </header>
 
@@ -230,12 +230,16 @@
       <label>Leverancier<input id="fSupplier" list="supplierOptions"><datalist id="supplierOptions"></datalist></label>
       <label>Minimumvoorraad
         <select id="fMinimum">
-          <option value="0">0%</option>
-          <option value="0.25">25%</option>
-          <option value="0.5">50%</option>
-          <option value="0.75">75%</option>
-          <option value="1">100%</option>
-        </select>
+<option value="0">0</option>
+<option value="0.25">0,25</option>
+<option value="0.5">0,50</option>
+<option value="0.75">0,75</option>
+<option value="1">1,00</option>
+<option value="1.5">1,50</option>
+<option value="2">2,00</option>
+<option value="3">3,00</option>
+<option value="4">4,00</option>
+</select>
       </label>
       <label>Gewenste voorraad<select id="fTarget">
         <option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option>
@@ -437,7 +441,7 @@ window.FMPrint = (() => {
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="js/app.js?v=7.5.9"></script>
+<script src="js/app.js?v=7.5.10"></script>
 <script src="js/print-tools.js?v=7.5.5"></script>
 </body>
 </html>

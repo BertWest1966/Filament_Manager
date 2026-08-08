@@ -252,3 +252,24 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 .danger-button:active{
   background:#fee2e2;
 }
+
+/* Compacte hiërarchie dashboard */
+#dashboard .category-title,
+#dashboard .category-heading{margin-left:0;font-weight:800}
+#dashboard .type-title,
+#dashboard .type-heading{margin-left:16px}
+#dashboard .dashboard-table td:first-child{padding-left:32px}
+
+/* Categoriekleuren */
+:root{
+  --cat-pla:#2563eb;
+  --cat-petg:#059669;
+  --cat-tpu:#7c3aed;
+  --cat-asa:#ea580c;
+  --cat-abs:#dc2626;
+  --cat-pa:#0f766e;
+  --cat-pc:#9333ea;
+  --cat-default:#475569;
+}
+.category-accent{color:var(--cat-color,var(--cat-default))!important}
+.category-border{border-left:4px solid var(--cat-color,var(--cat-default))!important}
