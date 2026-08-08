@@ -333,7 +333,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
   color:initial !important;
 }
 
-/* v7.5.13 NAS-basis */
+/* NAS synchronisatie */
 .nas-sync-row{
   display:flex;
   align-items:center;
