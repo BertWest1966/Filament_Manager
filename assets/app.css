@@ -332,3 +332,30 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 .category-data-row select{
   color:initial !important;
 }
+
+/* v7.5.13 NAS-basis */
+.nas-sync-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+.nas-status{
+  display:inline-flex;
+  align-items:center;
+  min-height:30px;
+  padding:5px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+  border:1px solid var(--line);
+}
+.nas-status-online{background:#dcfce7;color:#166534;border-color:#86efac}
+.nas-status-syncing{background:#dbeafe;color:#1d4ed8;border-color:#93c5fd}
+.nas-status-local{background:#f3f4f6;color:#4b5563}
+.nas-status-warning{background:#fef3c7;color:#92400e;border-color:#fcd34d}
+.nas-status-error{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
+.nas-api-label{display:grid;gap:6px;font-size:12px;font-weight:700}
+.nas-api-label input{width:100%}
+.nas-settings-actions{margin-top:8px}

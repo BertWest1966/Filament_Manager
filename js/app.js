@@ -8,7 +8,207 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
 function fresh(){return{appVersion:'7.2',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS)}}
 function load(){try{return {...fresh(),...JSON.parse(localStorage.getItem(KEY)||'null')}}catch{return fresh()}}
-function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
+
+const NAS_API_DEFAULT='http://192.168.0.191:3000/data';
+const NAS_API_KEY='filament_manager_nas_api';
+const NAS_LAST_KEY='filament_manager_nas_last_modified';
+const NAS_DIRTY_KEY='filament_manager_nas_dirty';
+
+let nasLastModified=localStorage.getItem(NAS_LAST_KEY)||null;
+let nasSaveTimer=null;
+let nasSyncBusy=false;
+
+function getNasApiUrl(){
+  return localStorage.getItem(NAS_API_KEY)||NAS_API_DEFAULT;
+}
+
+function setNasStatus(kind,text,detail=''){
+  const el=document.getElementById('nasSyncStatus');
+  const info=document.getElementById('nasSyncDetail');
+  if(el){
+    el.className=`nas-status nas-status-${kind}`;
+    el.textContent=text;
+  }
+  if(info && detail)info.textContent=detail;
+}
+
+function nasBlockedByMixedContent(){
+  const url=getNasApiUrl();
+  return location.protocol==='https:' && /^http:\/\//i.test(url);
+}
+
+function hasUsefulLocalData(){
+  return Boolean(
+    state.catalog?.length ||
+    state.spools?.length ||
+    state.refills?.length ||
+    state.orders?.length ||
+    state.history?.length
+  );
+}
+
+function isRemoteState(data){
+  return Boolean(
+    data &&
+    typeof data==='object' &&
+    (
+      Array.isArray(data.catalog) ||
+      Array.isArray(data.spools) ||
+      Array.isArray(data.refills) ||
+      data.libraries
+    )
+  );
+}
+
+function markNasDirty(){
+  localStorage.setItem(NAS_DIRTY_KEY,'1');
+}
+
+function clearNasDirty(){
+  localStorage.removeItem(NAS_DIRTY_KEY);
+}
+
+function queueNasSave(){
+  markNasDirty();
+  clearTimeout(nasSaveTimer);
+  nasSaveTimer=setTimeout(()=>saveToNas(false),500);
+}
+
+async function postStateToNas(showSuccess=false){
+  if(nasBlockedByMixedContent()){
+    setNasStatus(
+      'warning',
+      'HTTPS nodig',
+      'De app draait via HTTPS maar de NAS-API gebruikt HTTP. Stel eerst een HTTPS-adres voor de NAS-API in.'
+    );
+    return false;
+  }
+
+  setNasStatus('syncing','Synchroniseren…','Gegevens worden naar de NAS geschreven.');
+
+  const response=await fetch(getNasApiUrl(),{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      version:1,
+      lastModified:nasLastModified,
+      data:state
+    })
+  });
+
+  if(response.status===409){
+    const conflict=await response.json().catch(()=>({}));
+    setNasStatus(
+      'warning',
+      'Conflict',
+      `De NAS bevat nieuwere gegevens${conflict.currentLastModified?` (${conflict.currentLastModified})`:''}. Er is niets overschreven.`
+    );
+    return false;
+  }
+
+  if(!response.ok){
+    throw new Error(`NAS antwoordde met HTTP ${response.status}`);
+  }
+
+  const result=await response.json();
+  nasLastModified=result.lastModified||nasLastModified;
+  if(nasLastModified)localStorage.setItem(NAS_LAST_KEY,nasLastModified);
+  clearNasDirty();
+  setNasStatus(
+    'online',
+    'NAS gesynchroniseerd',
+    showSuccess ? 'Lokale wijzigingen zijn succesvol op de NAS opgeslagen.' : 'Gegevens zijn synchroon met de NAS.'
+  );
+  return true;
+}
+
+async function saveToNas(showSuccess=false){
+  if(nasSyncBusy)return false;
+  nasSyncBusy=true;
+  try{
+    return await postStateToNas(showSuccess);
+  }catch(error){
+    setNasStatus(
+      'error',
+      'Alleen lokaal',
+      `NAS niet bereikbaar. De wijziging is lokaal bewaard. ${error.message}`
+    );
+    return false;
+  }finally{
+    nasSyncBusy=false;
+  }
+}
+
+async function loadFromNas(){
+  if(nasSyncBusy)return;
+  nasSyncBusy=true;
+
+  try{
+    if(nasBlockedByMixedContent()){
+      setNasStatus(
+        'warning',
+        'HTTPS nodig',
+        'De huidige NAS-API is bereikbaar via HTTP. Een GitHub Pages-app via HTTPS mag daar niet rechtstreeks mee verbinden.'
+      );
+      return;
+    }
+
+    setNasStatus('syncing','Verbinden…','Centrale gegevens op de NAS worden gecontroleerd.');
+
+    /* Als dit toestel nog niet gesynchroniseerde wijzigingen heeft,
+       probeer die eerst veilig naar de NAS te sturen. */
+    if(localStorage.getItem(NAS_DIRTY_KEY)==='1'){
+      nasSyncBusy=false;
+      const ok=await saveToNas(true);
+      if(ok)return;
+      return;
+    }
+
+    const response=await fetch(getNasApiUrl(),{cache:'no-store'});
+    if(!response.ok)throw new Error(`NAS antwoordde met HTTP ${response.status}`);
+
+    const remote=await response.json();
+    nasLastModified=remote.lastModified||null;
+    if(nasLastModified)localStorage.setItem(NAS_LAST_KEY,nasLastModified);
+
+    if(isRemoteState(remote.data)){
+      state={...fresh(),...remote.data};
+      localStorage.setItem(KEY,JSON.stringify(state));
+      clearNasDirty();
+      renderAll();
+      setNasStatus('online','NAS geladen','De centrale NAS-gegevens zijn ingelezen.');
+      return;
+    }
+
+    /* Nieuwe/lege NAS: bestaande lokale gegevens worden de eerste centrale versie. */
+    if(hasUsefulLocalData()){
+      nasSyncBusy=false;
+      const initialized=await saveToNas(true);
+      if(initialized){
+        setNasStatus('online','NAS geïnitialiseerd','De huidige lokale gegevens zijn als eerste centrale versie op de NAS opgeslagen.');
+      }
+      return;
+    }
+
+    clearNasDirty();
+    setNasStatus('online','NAS verbonden','NAS en lokaal zijn leeg en klaar voor gebruik.');
+  }catch(error){
+    setNasStatus(
+      'error',
+      'Alleen lokaal',
+      `NAS niet bereikbaar. De app blijft lokaal werken. ${error.message}`
+    );
+  }finally{
+    nasSyncBusy=false;
+  }
+}
+
+function save(){
+  localStorage.setItem(KEY,JSON.stringify(state));
+  renderAll();
+  queueNasSave();
+}
+
 function pushUnique(arr,v){v=String(v||'').trim();if(v&&!arr.some(x=>x.toLowerCase()===v.toLowerCase()))arr.push(v)}
 function filament(id){return state.catalog.find(f=>f.id===id)}
 function label(f){return f?`${f.category} · ${f.type} · ${f.color}`:''}
@@ -591,4 +791,33 @@ document.addEventListener('DOMContentLoaded',()=>requestAnimationFrame(applyCate
 const categoryColorObserver=new MutationObserver(()=>requestAnimationFrame(applyCategoryColors));
 document.addEventListener('DOMContentLoaded',()=>{
   categoryColorObserver.observe(document.body,{childList:true,subtree:true});
+});
+
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const apiInput=document.getElementById('nasApiUrl');
+  const saveSettings=document.getElementById('saveNasSettingsBtn');
+  const syncNow=document.getElementById('nasSyncNowBtn');
+
+  if(apiInput)apiInput.value=getNasApiUrl();
+
+  if(saveSettings){
+    saveSettings.onclick=()=>{
+      const value=String(apiInput?.value||'').trim();
+      if(!/^https?:\/\//i.test(value)){
+        alert('Vul een volledig API-adres in dat begint met http:// of https://');
+        return;
+      }
+      localStorage.setItem(NAS_API_KEY,value);
+      nasLastModified=null;
+      localStorage.removeItem(NAS_LAST_KEY);
+      setNasStatus('local','API-adres bewaard','Tik op Nu synchroniseren om de verbinding te testen.');
+    };
+  }
+
+  if(syncNow){
+    syncNow.onclick=()=>loadFromNas();
+  }
+
+  setTimeout(loadFromNas,300);
 });
