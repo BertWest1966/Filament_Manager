@@ -332,3 +332,37 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 .category-data-row select{
   color:initial !important;
 }
+
+
+/* v7.5.13 — uitsluitend vaste labelmaat 90 x 55 mm */
+@media print {
+  @page {
+    size: 90mm 55mm;
+    margin: 0;
+  }
+
+  .label {
+    box-sizing: border-box !important;
+    width: 90mm !important;
+    min-width: 90mm !important;
+    max-width: 90mm !important;
+    height: 55mm !important;
+    min-height: 55mm !important;
+    max-height: 55mm !important;
+    margin: 0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .labels {
+    width: 90mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+
+  .label + .label {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+}
