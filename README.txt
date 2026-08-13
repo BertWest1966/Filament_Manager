@@ -1,10 +1,9 @@
-Filament Manager v7.5.13
+FILAMENT MANAGER v7.5.14 — DIAGNOSE KOPIËREN FIX
 
-Wijzigingen:
-- QR-stickers hebben altijd exact hetzelfde documentformaat: 90 x 55 mm.
-- Eén sticker en meerdere stickers gebruiken dezelfde vaste afmetingen.
-- 'Print geselecteerde stickers' gebruikt een geïntegreerd afdrukvoorbeeld met Sluiten en Afdrukken.
-- Na afdrukken/annuleren keert de app terug uit het afdrukvoorbeeld.
-- Bij 'Ontvangen' van een openstaande bestelling worden QR-stickers voor de nieuw aangemaakte refills automatisch klaargezet.
-- Bij meerdere ontvangen rollen/refills worden alle nieuwe QR-stickers samen in één voorbeeld getoond.
-- Lokale opslag en handmatige JSON-back-up/import blijven ongewijzigd.
+Aangepast:
+- 'Diagnose kopiëren' probeert eerst de moderne Clipboard API.
+- Als Safari/macOS/iOS dat blokkeert, volgt een klassieke kopieerfallback.
+- Als ook dat niet lukt, opent een tekstvak met de diagnose automatisch geselecteerd.
+- Er wordt alleen 'Diagnose gekopieerd' getoond als kopiëren werkelijk gelukt is.
+
+Overige functies zijn niet aangepast.

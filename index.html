@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Filament">
-  <title>Filament Manager v7.5.13</title>
+  <title>Filament Manager v7.5.14</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=7.5.13">
+  <link rel="stylesheet" href="assets/app.css?v=7.5.14">
 </head>
 <body>
 <div class="app-shell">
@@ -18,7 +18,7 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 7.5.13 · Afdrukken</span>
+      <span>Versie 7.5.14 · Afdrukken</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active">Dashboard</button>
@@ -37,7 +37,7 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 7.5.13 · Afdrukken</span>
+        <span>Versie 7.5.14 · Afdrukken</span>
       </div>
     </header>
 
@@ -435,7 +435,7 @@ window.FMPrint = (() => {
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="js/app.js?v=7.5.13"></script>
+<script src="js/app.js?v=7.5.14"></script>
 
   <div id="labelPrintOverlay" class="label-print-overlay hidden" aria-hidden="true">
     <div class="label-print-shell">
@@ -451,5 +451,18 @@ window.FMPrint = (() => {
   </div>
 
 <script src="js/print-tools.js?v=7.5.5"></script>
+
+<dialog id="diagnosisCopyDialog" class="diagnosis-copy-dialog">
+  <div class="dialog-card">
+    <h2>Importdiagnose</h2>
+    <p class="note">Automatisch kopiëren werd door de browser geblokkeerd. De tekst hieronder is geselecteerd; kies Kopieer.</p>
+    <textarea id="diagnosisCopyText" readonly></textarea>
+    <div class="dialog-actions">
+      <button type="button" id="closeDiagnosisCopyBtn">Sluiten</button>
+      <button type="button" class="primary" id="retryDiagnosisCopyBtn">Opnieuw kopiëren</button>
+    </div>
+  </div>
+</dialog>
+
 </body>
 </html>
