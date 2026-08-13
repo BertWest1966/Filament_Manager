@@ -334,7 +334,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 }
 
 
-/* v7.5.13 — vaste QR-labels 90 x 55 mm */
+/* v7.5.13 — QR printvoorbeeld, vaste labelmaat 90 x 55 mm */
 .label-print-overlay{
   position:fixed;
   inset:0;
@@ -349,20 +349,19 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
   top:0;
   z-index:5;
   display:flex;
-  align-items:center;
   justify-content:space-between;
+  align-items:center;
   gap:8px;
   padding:10px;
   background:#fff;
   border-bottom:1px solid var(--line);
 }
-.label-print-toolbar>div{display:flex;gap:8px}
+.label-print-actions{display:flex;gap:8px}
 .label-print-preview{
   display:flex;
   flex-wrap:wrap;
-  align-items:flex-start;
-  justify-content:flex-start;
   gap:6mm;
+  align-items:flex-start;
   padding:10mm;
 }
 .label-print-preview .label{
@@ -370,56 +369,14 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
   flex:0 0 90mm;
   width:90mm;
   height:55mm;
-  padding:3mm;
   overflow:hidden;
-  border:1px solid #000;
-  border-radius:3mm;
-  text-align:center;
+  padding:3mm;
   background:#fff;
   color:#000;
+  border:1px dashed #000;
+  border-radius:0;
   break-inside:avoid;
   page-break-inside:avoid;
-}
-.label-print-preview .label img{
-  float:left;
-  display:block;
-  width:43mm;
-  height:43mm;
-  margin:3mm 3mm 0 0;
-}
-.label-print-preview .label .number{
-  font-size:22pt;
-  font-weight:900;
-  letter-spacing:.6mm;
-  line-height:1;
-  padding-top:3mm;
-}
-.label-print-preview .label .divider{
-  border-top:1px solid #000;
-  margin:2mm 0;
-}
-.label-print-preview .label .main{
-  font-size:10pt;
-  font-weight:800;
-  line-height:1.1;
-}
-.label-print-preview .label .line{
-  font-size:8.5pt;
-  font-weight:700;
-  line-height:1.15;
-  margin-top:.6mm;
-}
-.label-print-preview .label .small{
-  font-size:7pt;
-  line-height:1.1;
-  margin-top:.6mm;
-  min-height:2.5mm;
-}
-.label-print-preview .label .kind{
-  font-size:7.5pt;
-  font-weight:900;
-  text-transform:uppercase;
-  margin-top:1mm;
 }
 body.label-preview-open{overflow:hidden}
 
@@ -429,22 +386,23 @@ body.label-preview-open{overflow:hidden}
   #labelPrintOverlay{
     display:block!important;
     position:static!important;
-    overflow:visible!important;
     background:#fff!important;
+    overflow:visible!important;
   }
   #labelPrintOverlay .label-print-toolbar{display:none!important}
   #labelPrintOverlay .label-print-preview{
     display:block!important;
-    padding:0!important;
     margin:0!important;
+    padding:0!important;
   }
   #labelPrintOverlay .label{
     display:block!important;
+    box-sizing:border-box!important;
     width:90mm!important;
     height:55mm!important;
     margin:0!important;
+    padding:3mm!important;
     border:none!important;
-    border-radius:0!important;
     page-break-after:always;
     break-after:page;
   }
@@ -452,88 +410,4 @@ body.label-preview-open{overflow:hidden}
     page-break-after:auto;
     break-after:auto;
   }
-}
-
-/* Categoriekleuren — hersteld */
-:root{
-  --cat-pla:#2563eb;
-  --cat-petg:#059669;
-  --cat-tpu:#7c3aed;
-  --cat-asa:#ea580c;
-  --cat-abs:#dc2626;
-  --cat-pa:#0f766e;
-  --cat-pc:#9333ea;
-  --cat-default:#475569;
-}
-
-[data-category]{
-  --cat-color:var(--cat-default);
-}
-
-.category-group,
-.category-data-row,
-.category-colored-row{
-  color:var(--cat-color) !important;
-}
-
-.category-group .category-title,
-.category-group .type-title,
-.category-group th,
-.category-group td,
-.category-group td *,
-.category-data-row,
-.category-data-row strong,
-.category-data-row .item-meta,
-.category-data-row button,
-.category-colored-row,
-.category-colored-row strong,
-.category-colored-row .item-meta,
-.category-colored-row button{
-  color:var(--cat-color) !important;
-}
-
-.category-group .category-title{
-  border-bottom:2px solid var(--cat-color) !important;
-}
-
-/* Dashboard-hiërarchie */
-.category-group .type-title{
-  padding-left:16px;
-}
-.category-group .dashboard-table td:first-child{
-  padding-left:32px;
-}
-
-/* Bediening blijft neutraal */
-.category-group input,
-.category-group select,
-.category-data-row input,
-.category-data-row select,
-.category-colored-row input,
-.category-colored-row select{
-  color:initial !important;
-}
-
-/* v7.5.15 - categoriekleuren renderfix */
-.category-group,
-.category-group .category-title,
-.category-group .type-title,
-.category-group table,
-.category-group th,
-.category-group td,
-.category-group button,
-.category-data-row,
-.category-data-row strong,
-.category-data-row .item-meta,
-.category-data-row button{
-  color:var(--cat-color) !important;
-}
-.category-group .category-title{
-  border-bottom-color:var(--cat-color) !important;
-}
-.category-group input,
-.category-group select,
-.category-data-row input,
-.category-data-row select{
-  color:#111827 !important;
 }
