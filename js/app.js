@@ -80,33 +80,7 @@ orderListSearch.oninput=renderOrderList;
 function createOrderFor(fid,qty){fillFilamentSelect(oFilament,fid);oQuantity.value=qty;oSupplier.value=filament(fid)?.supplier||'';orderDialog.showModal()}
 function renderOrders(){const q=ordersSearch.value.toLowerCase();ordersList.innerHTML=state.orders.filter(o=>!q||o.supplier.toLowerCase().includes(q)).map(o=>`<div class="item-row category-data-row" data-category="${esc(filament(o.filamentId)?.category||'')}"><div><strong>${esc(label(filament(o.filamentId)))}</strong><div class="item-meta">${esc(o.supplier)} · ${o.received}/${o.quantity} ontvangen</div></div><div class="item-actions">${o.received<o.quantity?`<button onclick="receiveOrder('${o.id}')">Ontvangen</button>`:''}</div></div>`).join('')||'<div class="note">Geen bestellingen.</div>'}
 ordersSearch.oninput=renderOrders;
-function receiveOrder(id){
-  const o=state.orders.find(x=>x.id===id);
-  if(!o)return;
-  const open=o.quantity-o.received;
-  const n=Number(prompt(`Aantal ontvangen (max ${open})`,open));
-  if(!n||n<1||n>open)return;
-
-  const receivedLabels=[];
-  o.received+=n;
-
-  for(let i=0;i<n;i++){
-    const refill={
-      id:uid(),
-      number:nextNumber('R',state.refills),
-      filamentId:o.filamentId
-    };
-    state.refills.push(refill);
-    receivedLabels.push(printableLabel({...refill,kind:'refill'}));
-  }
-
-  if(o.received===o.quantity)o.status='Geleverd';
-  save();
-
-  if(receivedLabels.length){
-    openLabelPrintWindow(receivedLabels,'label90x55');
-  }
-}
+function receiveOrder(id){const o=state.orders.find(x=>x.id===id);const open=o.quantity-o.received;const n=Number(prompt(`Aantal ontvangen (max ${open})`,open));if(!n||n<1||n>open)return;o.received+=n;for(let i=0;i<n;i++)state.refills.push({id:uid(),number:nextNumber('R',state.refills),filamentId:o.filamentId});if(o.received===o.quantity)o.status='Geleverd';save()}
 
 
 function deleteFilament(id){
@@ -449,25 +423,73 @@ function labelHtml(i){
   </div>`;
 }
 
-function openLabelPrintWindow(items,format='label90x55'){
-  if(!items?.length)return;
-  labelPrintPreview.innerHTML=items.map(labelHtml).join('');
-  labelPrintOverlay.classList.remove('hidden');
-  labelPrintOverlay.setAttribute('aria-hidden','false');
-  document.body.classList.add('label-preview-open');
+function openLabelPrintWindow(items,format='a4'){
+  const win=window.open('','_blank');
+  if(!win){
+    alert('Sta pop-ups toe om stickers af te drukken.');
+    return;
+  }
+
+  const single=items.length===1;
+  const pageCss=format==='label62'
+    ? `@page{size:62mm 90mm;margin:0}
+       body{margin:0;width:62mm;height:90mm}
+       .sheet{display:block}
+       .label{width:62mm;height:90mm;border:none;border-radius:0;padding:4mm;overflow:hidden}`
+    : `@page{size:A4 portrait;margin:10mm}
+       body{margin:0}
+       .sheet{display:grid;grid-template-columns:repeat(3,62mm);gap:5mm;align-items:start}
+       .label{width:62mm;min-height:88mm;padding:4mm}`;
+
+  const html=items.map(labelHtml).join('');
+
+  win.document.write(`<!doctype html>
+  <html lang="nl">
+  <head>
+    <meta charset="utf-8">
+    <title>Filamentstickers</title>
+    <style>
+      *{box-sizing:border-box}
+      body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#000;background:#fff}
+      .sheet{justify-content:start}
+      .label{
+        border:1.2px solid #000;
+        border-radius:4mm;
+        text-align:center;
+        break-inside:avoid;
+        page-break-inside:avoid;
+        background:#fff;
+      }
+      .label img{display:block;width:36mm;height:36mm;margin:0 auto 1.5mm}
+      .number{font-size:30pt;font-weight:900;letter-spacing:1.2mm;line-height:1}
+      .divider{border-top:1px solid #000;margin:2mm 0}
+      .main{font-size:11pt;font-weight:800;line-height:1.15}
+      .line{font-size:9.5pt;font-weight:700;line-height:1.2;margin-top:.7mm}
+      .small{font-size:7.5pt;line-height:1.2;margin-top:.7mm;min-height:3mm}
+      .kind{font-size:8pt;font-weight:900;text-transform:uppercase;margin-top:2mm}
+      ${pageCss}
+      @media screen{
+        body{padding:10mm;background:#eee}
+        .sheet{background:#fff;padding:5mm;min-height:${format==='label62'?'90mm':'277mm'}}
+      }
+      @media print{
+        body{background:#fff}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sheet">${html}</div>
+    <script>
+      window.onload=()=>{
+        const images=[...document.images];
+        Promise.all(images.map(img=>img.complete?Promise.resolve():new Promise(r=>{img.onload=r;img.onerror=r})))
+          .then(()=>setTimeout(()=>window.print(),250));
+      };
+    <\/script>
+  </body>
+  </html>`);
+  win.document.close();
 }
-
-function closeLabelPrintPreview(){
-  labelPrintOverlay.classList.add('hidden');
-  labelPrintOverlay.setAttribute('aria-hidden','true');
-  document.body.classList.remove('label-preview-open');
-}
-
-closeLabelPrintBtn.onclick=closeLabelPrintPreview;
-doLabelPrintBtn.onclick=()=>window.print();
-
-window.addEventListener('afterprint',closeLabelPrintPreview);
-
 
 printQrBtn.onclick=()=>{
   const kind=qrKind.textContent.trim().toLowerCase();
@@ -477,7 +499,7 @@ printQrBtn.onclick=()=>{
     :state.refills.find(x=>x.number===number);
 
   if(!raw)return alert('Stickergegevens niet gevonden.');
-  openLabelPrintWindow([printableLabel({...raw,kind})],'label90x55');
+  openLabelPrintWindow([printableLabel({...raw,kind})],qrPrintFormat.value);
 };
 
 function printableLabel(item){
@@ -500,7 +522,7 @@ printSelectedLabelsBtn.onclick=()=>{
   }).filter(Boolean);
 
   if(!selected.length)return alert('Selecteer eerst minstens één spoel of refill.');
-  openLabelPrintWindow(selected,'label90x55');
+  openLabelPrintWindow(selected,'a4');
 };
 
 function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderStock();renderOrderList();renderOrders();renderLibraries();renderLog()}

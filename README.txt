@@ -1,19 +1,11 @@
-FILAMENT MANAGER v7.5.13 — QR/PRINT AANPASSING
+FILAMENT MANAGER v7.5.12 — CATEGORIEKLEUREN DOORGEGEVEN
 
-Basis:
-- originele GitHub-versie 7.5.12
+Correctie:
+- Dashboardcategorie is nu een echte groep.
+- Vanaf PETG blijven type, kolomtitels, kleuren, spoelnummers, percentages en refill-aantallen PETG-kleur tot de volgende categorie.
+- Vanaf PLA gebeurt hetzelfde met de PLA-kleur, enzovoort.
+- De scheidingslijn onder de categorietitel gebruikt eveneens de categoriekleur.
+- Catalogus, Voorraad, Bestellijst en Bestellingen krijgen per filamentrij expliciet de categoriekleur.
+- In Bibliotheken worden categoriewaarden zelf in hun vaste kleur weergegeven.
 
-Alleen aangepast:
-- QR-labels vast op 90 × 55 mm.
-- Eén en meerdere labels gebruiken exact dezelfde maat.
-- Print geselecteerde stickers opent een intern afdrukvoorbeeld met Sluiten en Afdrukken.
-- Na printen/annuleren wordt het afdrukvoorbeeld gesloten.
-- Bij Ontvangen van een bestelling worden QR-labels van de nieuw aangemaakte refills automatisch klaargezet.
-- Meerdere ontvangen refills verschijnen samen in één afdrukvoorbeeld.
-
-Niet aangepast:
-- categoriekleuren
-- localStorage
-- JSON import/export
-- back-up/herstel
-- overige appfunctionaliteit
+Geen functionele logica aangepast.
