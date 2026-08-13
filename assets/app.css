@@ -513,3 +513,27 @@ body.label-preview-open{overflow:hidden}
 .category-colored-row select{
   color:initial !important;
 }
+
+/* v7.5.15 - categoriekleuren renderfix */
+.category-group,
+.category-group .category-title,
+.category-group .type-title,
+.category-group table,
+.category-group th,
+.category-group td,
+.category-group button,
+.category-data-row,
+.category-data-row strong,
+.category-data-row .item-meta,
+.category-data-row button{
+  color:var(--cat-color) !important;
+}
+.category-group .category-title{
+  border-bottom-color:var(--cat-color) !important;
+}
+.category-group input,
+.category-group select,
+.category-data-row input,
+.category-data-row select{
+  color:#111827 !important;
+}

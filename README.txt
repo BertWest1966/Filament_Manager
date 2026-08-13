@@ -1,8 +1,6 @@
-FILAMENT MANAGER v7.5.14 — CATEGORIEKLEUREN HERSTELD
+FILAMENT MANAGER v7.5.15 — CATEGORIEKLEUREN RENDERFIX
 
-Aangepast:
-- Vaste kleur per filamentcategorie opnieuw actief.
-- Categorie, type, kleur en bijbehorende filamentgegevens erven dezelfde categoriekleur.
-- Dashboard-inspringing categorie → type → kleur blijft actief.
-- Kleurtoepassing op Dashboard, Voorraad, Catalogus, Bestellen en Bestellingen.
-- JSON import/export en back-upfunctionaliteit NIET aangepast.
+- Categoriekleur wordt rechtstreeks aan de gerenderde groep/rij gekoppeld.
+- Categorie, type, kleur, kolomkoppen, spoelnummers, hoeveelheid en refill volgen dezelfde kleur.
+- Ook andere tabbladen gebruiken dezelfde categoriekleur.
+- JSON import/export en back-up niet aangepast.
