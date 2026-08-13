@@ -516,62 +516,21 @@ function renderAll(){refreshDatalists();renderDashboard();renderCatalog();render
 renderAll();
 
 if(window.copyDiagnosisBtn){
-  async function copyDiagnosisText(){
+  copyDiagnosisBtn.onclick=async()=>{
     const text=backupDiagnosis?.textContent||'';
-    if(!text.trim()){
-      alert('Er is nog geen diagnose om te kopiëren.');
-      return false;
-    }
-
     try{
-      if(navigator.clipboard && window.isSecureContext){
-        await navigator.clipboard.writeText(text);
-        alert('Diagnose gekopieerd.');
-        return true;
-      }
-    }catch{}
-
-    try{
+      await navigator.clipboard.writeText(text);
+      alert('Diagnose gekopieerd.');
+    }catch{
       const area=document.createElement('textarea');
       area.value=text;
-      area.setAttribute('readonly','');
-      area.style.position='fixed';
-      area.style.left='-9999px';
-      area.style.top='0';
       document.body.appendChild(area);
-      area.focus();
       area.select();
-      area.setSelectionRange(0,area.value.length);
-      const ok=document.execCommand && document.execCommand('copy');
+      document.execCommand('copy');
       area.remove();
-      if(ok){
-        alert('Diagnose gekopieerd.');
-        return true;
-      }
-    }catch{}
-
-    const dlg=document.getElementById('diagnosisCopyDialog');
-    const txt=document.getElementById('diagnosisCopyText');
-    if(txt){
-      txt.value=text;
-      if(dlg && !dlg.open)dlg.showModal();
-      setTimeout(()=>{
-        txt.focus();
-        txt.select();
-        txt.setSelectionRange(0,txt.value.length);
-      },50);
+      alert('Diagnose gekopieerd.');
     }
-    return false;
-  }
-
-  copyDiagnosisBtn.onclick=copyDiagnosisText;
-
-  const retry=document.getElementById('retryDiagnosisCopyBtn');
-  const close=document.getElementById('closeDiagnosisCopyBtn');
-  const dlg=document.getElementById('diagnosisCopyDialog');
-
-  if(retry)retry.onclick=copyDiagnosisText;
-  if(close)close.onclick=()=>dlg?.close();
+  };
 }
 
 let appToastTimer=null;

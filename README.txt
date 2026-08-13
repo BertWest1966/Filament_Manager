@@ -1,9 +1,8 @@
-FILAMENT MANAGER v7.5.14 — DIAGNOSE KOPIËREN FIX
+FILAMENT MANAGER v7.5.14 — CATEGORIEKLEUREN HERSTELD
 
 Aangepast:
-- 'Diagnose kopiëren' probeert eerst de moderne Clipboard API.
-- Als Safari/macOS/iOS dat blokkeert, volgt een klassieke kopieerfallback.
-- Als ook dat niet lukt, opent een tekstvak met de diagnose automatisch geselecteerd.
-- Er wordt alleen 'Diagnose gekopieerd' getoond als kopiëren werkelijk gelukt is.
-
-Overige functies zijn niet aangepast.
+- Vaste kleur per filamentcategorie opnieuw actief.
+- Categorie, type, kleur en bijbehorende filamentgegevens erven dezelfde categoriekleur.
+- Dashboard-inspringing categorie → type → kleur blijft actief.
+- Kleurtoepassing op Dashboard, Voorraad, Catalogus, Bestellen en Bestellingen.
+- JSON import/export en back-upfunctionaliteit NIET aangepast.

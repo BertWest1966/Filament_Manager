@@ -454,14 +454,62 @@ body.label-preview-open{overflow:hidden}
   }
 }
 
-.diagnosis-copy-dialog{
-  width:min(92vw,620px);
+/* Categoriekleuren — hersteld */
+:root{
+  --cat-pla:#2563eb;
+  --cat-petg:#059669;
+  --cat-tpu:#7c3aed;
+  --cat-asa:#ea580c;
+  --cat-abs:#dc2626;
+  --cat-pa:#0f766e;
+  --cat-pc:#9333ea;
+  --cat-default:#475569;
 }
-#diagnosisCopyText{
-  width:100%;
-  min-height:260px;
-  resize:vertical;
-  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-  font-size:12px;
-  line-height:1.35;
+
+[data-category]{
+  --cat-color:var(--cat-default);
+}
+
+.category-group,
+.category-data-row,
+.category-colored-row{
+  color:var(--cat-color) !important;
+}
+
+.category-group .category-title,
+.category-group .type-title,
+.category-group th,
+.category-group td,
+.category-group td *,
+.category-data-row,
+.category-data-row strong,
+.category-data-row .item-meta,
+.category-data-row button,
+.category-colored-row,
+.category-colored-row strong,
+.category-colored-row .item-meta,
+.category-colored-row button{
+  color:var(--cat-color) !important;
+}
+
+.category-group .category-title{
+  border-bottom:2px solid var(--cat-color) !important;
+}
+
+/* Dashboard-hiërarchie */
+.category-group .type-title{
+  padding-left:16px;
+}
+.category-group .dashboard-table td:first-child{
+  padding-left:32px;
+}
+
+/* Bediening blijft neutraal */
+.category-group input,
+.category-group select,
+.category-data-row input,
+.category-data-row select,
+.category-colored-row input,
+.category-colored-row select{
+  color:initial !important;
 }
