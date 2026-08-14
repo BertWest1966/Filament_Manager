@@ -1,11 +1,13 @@
-FILAMENT MANAGER v7.5.12 — CATEGORIEKLEUREN DOORGEGEVEN
+FILAMENT MANAGER v7.5.15 — OPENSTAANDE BESTELLINGEN
 
-Correctie:
-- Dashboardcategorie is nu een echte groep.
-- Vanaf PETG blijven type, kolomtitels, kleuren, spoelnummers, percentages en refill-aantallen PETG-kleur tot de volgende categorie.
-- Vanaf PLA gebeurt hetzelfde met de PLA-kleur, enzovoort.
-- De scheidingslijn onder de categorietitel gebruikt eveneens de categoriekleur.
-- Catalogus, Voorraad, Bestellijst en Bestellingen krijgen per filamentrij expliciet de categoriekleur.
-- In Bibliotheken worden categoriewaarden zelf in hun vaste kleur weergegeven.
+Aangepast:
+- In Bestellingen worden alleen nog openstaande bestellingen getoond.
+- Een bestelling blijft zichtbaar zolang received < quantity.
+- Zodra alle rollen/refills ontvangen zijn, verdwijnt de bestelling automatisch uit de openstaande lijst.
+- De bestelling wordt NIET gewist; ze blijft intern bewaard met status Geleverd.
 
-Geen functionele logica aangepast.
+Niet aangepast:
+- QR/printgedrag
+- labelmaat 55 x 90 mm
+- JSON import/export
+- localStorage/opslag

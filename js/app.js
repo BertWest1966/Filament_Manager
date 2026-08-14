@@ -78,7 +78,16 @@ document.getElementById('stockSort').onchange=e=>{stockSortMode=e.target.value;r
 function renderOrderList(){const q=orderListSearch.value.toLowerCase(),items=state.catalog.map(f=>({f,needed:toOrder(f)})).filter(x=>x.needed>0&&(!q||label(x.f).toLowerCase().includes(q))).sort((a,b)=>a.f.category.localeCompare(b.f.category,'nl')||a.f.type.localeCompare(b.f.type,'nl')||a.f.color.localeCompare(b.f.color,'nl'));orderList.innerHTML=items.map(x=>`<div class="item-row category-data-row" data-category="${esc(x.f.category)}"><div><strong>${esc(label(x.f))}</strong><div class="item-meta">Nog bestellen: ${x.needed}</div></div><div class="item-actions"><button onclick="createOrderFor('${x.f.id}',${x.needed})">Bestellen</button></div></div>`).join('')||'<div class="note">Niets te bestellen.</div>'}
 orderListSearch.oninput=renderOrderList;
 function createOrderFor(fid,qty){fillFilamentSelect(oFilament,fid);oQuantity.value=qty;oSupplier.value=filament(fid)?.supplier||'';orderDialog.showModal()}
-function renderOrders(){const q=ordersSearch.value.toLowerCase();ordersList.innerHTML=state.orders.filter(o=>!q||o.supplier.toLowerCase().includes(q)).map(o=>`<div class="item-row category-data-row" data-category="${esc(filament(o.filamentId)?.category||'')}"><div><strong>${esc(label(filament(o.filamentId)))}</strong><div class="item-meta">${esc(o.supplier)} · ${o.received}/${o.quantity} ontvangen</div></div><div class="item-actions">${o.received<o.quantity?`<button onclick="receiveOrder('${o.id}')">Ontvangen</button>`:''}</div></div>`).join('')||'<div class="note">Geen bestellingen.</div>'}
+function renderOrders(){
+  const q=ordersSearch.value.toLowerCase();
+  const openOrders=state.orders.filter(o=>{
+    const fullyDelivered=o.received>=o.quantity || o.status==='Geleverd';
+    if(fullyDelivered)return false;
+    return !q || o.supplier.toLowerCase().includes(q);
+  });
+
+  ordersList.innerHTML=openOrders.map(o=>`<div class="item-row"><div><strong>${esc(label(filament(o.filamentId)))}</strong><div class="item-meta">${esc(o.supplier)} · ${o.received}/${o.quantity} ontvangen</div></div><div class="item-actions">${o.received<o.quantity?`<button onclick="receiveOrder('${o.id}')">Ontvangen</button>`:''}</div></div>`).join('')||'<div class="note">Geen openstaande bestellingen.</div>';
+}
 ordersSearch.oninput=renderOrders;
 function receiveOrder(id){const o=state.orders.find(x=>x.id===id);const open=o.quantity-o.received;const n=Number(prompt(`Aantal ontvangen (max ${open})`,open));if(!n||n<1||n>open)return;o.received+=n;for(let i=0;i<n;i++)state.refills.push({id:uid(),number:nextNumber('R',state.refills),filamentId:o.filamentId});if(o.received===o.quantity)o.status='Geleverd';save()}
 
