@@ -430,16 +430,13 @@ function openLabelPrintWindow(items,format='a4'){
     return;
   }
 
-  const single=items.length===1;
-  const pageCss=format==='label62'
-    ? `@page{size:62mm 90mm;margin:0}
-       body{margin:0;width:62mm;height:90mm}
-       .sheet{display:block}
-       .label{width:62mm;height:90mm;border:none;border-radius:0;padding:4mm;overflow:hidden}`
-    : `@page{size:A4 portrait;margin:10mm}
-       body{margin:0}
-       .sheet{display:grid;grid-template-columns:repeat(3,62mm);gap:5mm;align-items:start}
-       .label{width:62mm;min-height:88mm;padding:4mm}`;
+  const ua=navigator.userAgent||'';
+  const isIOS=/iPhone|iPad|iPod/i.test(ua);
+  const isMac=/Macintosh/i.test(ua) && !isIOS;
+
+  // Kalibratie op basis van gemeten fysieke output.
+  const labelW=isIOS?81:(isMac?88:90);
+  const labelH=isIOS?43.2:(isMac?46.5:55);
 
   const html=items.map(labelHtml).join('');
 
@@ -447,33 +444,107 @@ function openLabelPrintWindow(items,format='a4'){
   <html lang="nl">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Filamentstickers</title>
     <style>
       *{box-sizing:border-box}
-      body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#000;background:#fff}
-      .sheet{justify-content:start}
+      @page{size:A4 portrait;margin:10mm}
+      html,body{margin:0;padding:0;background:#fff}
+      body{
+        font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+        color:#000;
+      }
+      .sheet{
+        display:grid;
+        grid-template-columns:${labelW}mm ${labelW}mm;
+        grid-auto-rows:${labelH}mm;
+        gap:0;
+        width:${labelW*2}mm;
+        align-items:start;
+        justify-content:start;
+      }
       .label{
-        border:1.2px solid #000;
-        border-radius:4mm;
-        text-align:center;
+        width:${labelW}mm;
+        height:${labelH}mm;
+        min-width:${labelW}mm;
+        min-height:${labelH}mm;
+        max-width:${labelW}mm;
+        max-height:${labelH}mm;
+        padding:3mm;
+        border:1px solid #000;
+        border-radius:2mm;
+        background:#fff;
+        overflow:hidden;
         break-inside:avoid;
         page-break-inside:avoid;
-        background:#fff;
+        display:grid;
+        grid-template-columns:42mm 1fr;
+        grid-template-rows:auto 1fr;
+        column-gap:3mm;
+        text-align:left;
       }
-      .label img{display:block;width:36mm;height:36mm;margin:0 auto 1.5mm}
-      .number{font-size:30pt;font-weight:900;letter-spacing:1.2mm;line-height:1}
-      .divider{border-top:1px solid #000;margin:2mm 0}
-      .main{font-size:11pt;font-weight:800;line-height:1.15}
-      .line{font-size:9.5pt;font-weight:700;line-height:1.2;margin-top:.7mm}
-      .small{font-size:7.5pt;line-height:1.2;margin-top:.7mm;min-height:3mm}
-      .kind{font-size:8pt;font-weight:900;text-transform:uppercase;margin-top:2mm}
-      ${pageCss}
+      .label img{
+        grid-column:1;
+        grid-row:1 / span 2;
+        display:block;
+        width:40mm;
+        height:40mm;
+        margin:4mm 0 0 1mm;
+      }
+      .number{
+        grid-column:2;
+        font-size:22pt;
+        font-weight:900;
+        letter-spacing:.8mm;
+        line-height:1;
+        margin-top:2mm;
+        text-align:center;
+      }
+      .divider{
+        display:none;
+      }
+      .main{
+        grid-column:2;
+        font-size:10pt;
+        font-weight:800;
+        line-height:1.15;
+        margin-top:1.5mm;
+        text-align:center;
+      }
+      .line{
+        grid-column:2;
+        font-size:8.5pt;
+        font-weight:700;
+        line-height:1.15;
+        margin-top:.6mm;
+        text-align:center;
+      }
+      .small{
+        grid-column:2;
+        font-size:7pt;
+        line-height:1.1;
+        margin-top:.5mm;
+        text-align:center;
+      }
+      .kind{
+        grid-column:2;
+        font-size:7pt;
+        font-weight:900;
+        text-transform:uppercase;
+        margin-top:.8mm;
+        text-align:center;
+      }
       @media screen{
         body{padding:10mm;background:#eee}
-        .sheet{background:#fff;padding:5mm;min-height:${format==='label62'?'90mm':'277mm'}}
+        .sheet{
+          background:#fff;
+          padding:0;
+          min-height:277mm;
+        }
       }
       @media print{
         body{background:#fff}
+        .sheet{padding:0;margin:0}
       }
     </style>
   </head>
@@ -499,7 +570,7 @@ printQrBtn.onclick=()=>{
     :state.refills.find(x=>x.number===number);
 
   if(!raw)return alert('Stickergegevens niet gevonden.');
-  openLabelPrintWindow([printableLabel({...raw,kind})],qrPrintFormat.value);
+  openLabelPrintWindow([printableLabel({...raw,kind})],'a4');
 };
 
 function printableLabel(item){
