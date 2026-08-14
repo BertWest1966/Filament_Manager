@@ -528,7 +528,21 @@ function openLabelPrintWindow(items,format='a4'){
       window.onload=()=>{
         const images=[...document.images];
         Promise.all(images.map(img=>img.complete?Promise.resolve():new Promise(r=>{img.onload=r;img.onerror=r})))
-          .then(()=>setTimeout(()=>window.print(),250));
+          .then(()=>{
+            setTimeout(()=>{
+              window.print();
+              // iPhone/iPad Safari geeft niet altijd een bruikbaar afterprint-event.
+              // Zodra het printvenster opnieuw zichtbaar wordt, sluiten we het.
+              const closeWhenBack=()=>{
+                setTimeout(()=>{ try{ window.close(); }catch(e){} },150);
+              };
+              window.addEventListener('afterprint',closeWhenBack,{once:true});
+              document.addEventListener('visibilitychange',()=>{
+                if(document.visibilityState==='visible')closeWhenBack();
+              },{once:true});
+              window.addEventListener('focus',closeWhenBack,{once:true});
+            },250);
+          });
       };
     <\/script>
   </body>
