@@ -430,14 +430,6 @@ function openLabelPrintWindow(items,format='a4'){
     return;
   }
 
-  const ua=navigator.userAgent||'';
-  const isIOS=/iPhone|iPad|iPod/i.test(ua);
-  const isMac=/Macintosh/i.test(ua) && !isIOS;
-
-  // Kalibratie op basis van gemeten fysieke output.
-  const labelW=isIOS?81:(isMac?88:90);
-  const labelH=isIOS?43.2:(isMac?46.5:55);
-
   const html=items.map(labelHtml).join('');
 
   win.document.write(`<!doctype html>
@@ -456,95 +448,77 @@ function openLabelPrintWindow(items,format='a4'){
       }
       .sheet{
         display:grid;
-        grid-template-columns:${labelW}mm ${labelW}mm;
-        grid-auto-rows:${labelH}mm;
+        grid-template-columns:55mm 55mm 55mm;
+        grid-auto-rows:90mm;
         gap:0;
-        width:${labelW*2}mm;
+        width:165mm;
         align-items:start;
         justify-content:start;
       }
       .label{
-        width:${labelW}mm;
-        height:${labelH}mm;
-        min-width:${labelW}mm;
-        min-height:${labelH}mm;
-        max-width:${labelW}mm;
-        max-height:${labelH}mm;
+        box-sizing:border-box;
+        width:55mm;
+        min-width:55mm;
+        max-width:55mm;
+        height:90mm;
+        min-height:90mm;
+        max-height:90mm;
         padding:3mm;
         border:1px solid #000;
         border-radius:2mm;
         background:#fff;
+        color:#000;
         overflow:hidden;
         break-inside:avoid;
         page-break-inside:avoid;
-        display:grid;
-        grid-template-columns:42mm 1fr;
-        grid-template-rows:auto 1fr;
-        column-gap:3mm;
-        text-align:left;
+        text-align:center;
       }
       .label img{
-        grid-column:1;
-        grid-row:1 / span 2;
         display:block;
-        width:40mm;
-        height:40mm;
-        margin:4mm 0 0 1mm;
+        width:43mm;
+        height:43mm;
+        margin:0 auto 2mm;
       }
       .number{
-        grid-column:2;
         font-size:22pt;
         font-weight:900;
         letter-spacing:.8mm;
         line-height:1;
-        margin-top:2mm;
-        text-align:center;
       }
       .divider{
-        display:none;
+        border-top:1px solid #000;
+        margin:2mm 0;
       }
       .main{
-        grid-column:2;
         font-size:10pt;
         font-weight:800;
-        line-height:1.15;
-        margin-top:1.5mm;
-        text-align:center;
+        line-height:1.1;
       }
       .line{
-        grid-column:2;
         font-size:8.5pt;
         font-weight:700;
         line-height:1.15;
-        margin-top:.6mm;
-        text-align:center;
+        margin-top:.7mm;
       }
       .small{
-        grid-column:2;
         font-size:7pt;
         line-height:1.1;
-        margin-top:.5mm;
-        text-align:center;
+        margin-top:.6mm;
+        min-height:2.5mm;
       }
       .kind{
-        grid-column:2;
-        font-size:7pt;
+        font-size:7.5pt;
         font-weight:900;
         text-transform:uppercase;
-        margin-top:.8mm;
-        text-align:center;
+        margin-top:1mm;
       }
       @media screen{
         body{padding:10mm;background:#eee}
-        .sheet{
-          background:#fff;
-          padding:0;
-          min-height:277mm;
-        }
+        .sheet{background:#fff;min-height:277mm}
       }
       @media print{
         body{background:#fff}
-        .sheet{padding:0;margin:0}
+        .sheet{margin:0;padding:0}
       }
     </style>
   </head>
