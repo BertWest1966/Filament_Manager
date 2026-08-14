@@ -1,13 +1,15 @@
-FILAMENT MANAGER v7.5.15 — OPENSTAANDE BESTELLINGEN
+FILAMENT MANAGER v7.5.16 — VOORRAADITEM VERWIJDEREN
 
-Aangepast:
-- In Bestellingen worden alleen nog openstaande bestellingen getoond.
-- Een bestelling blijft zichtbaar zolang received < quantity.
-- Zodra alle rollen/refills ontvangen zijn, verdwijnt de bestelling automatisch uit de openstaande lijst.
-- De bestelling wordt NIET gewist; ze blijft intern bewaard met status Geleverd.
+Nieuw:
+- Bij spoelen in Voorraad staat een knop Verwijderen.
+- Bij refills in Voorraad staat een knop Verwijderen.
+- Voor verwijderen volgt één bevestiging.
+- Alleen het voorraaditem wordt verwijderd.
+- Het filament in de Catalogus blijft bestaan.
 
 Niet aangepast:
-- QR/printgedrag
-- labelmaat 55 x 90 mm
 - JSON import/export
-- localStorage/opslag
+- localStorage-structuur
+- QR/printfunctionaliteit
+- labelmaat 55 x 90 mm
+- bestellingenlogica
