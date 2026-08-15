@@ -18,7 +18,7 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 7.5.17b · Afdrukken</span>
+      <span>Versie 7.5.18 · Afdrukken</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active">Dashboard</button>
@@ -37,7 +37,7 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 7.5.17b · Afdrukken</span>
+        <span>Versie 7.5.18 · Afdrukken</span>
       </div>
     </header>
 
@@ -95,6 +95,7 @@
           <div class="panel-head">
             <h2>Automatische bestellijst</h2>
             <input id="orderListSearch" placeholder="Zoek type of kleur">
+            <button type="button" id="manualOrderAddBtn">Handmatig toevoegen</button>
           </div>
           <div id="orderList"></div>
         </div>
@@ -441,7 +442,24 @@ window.FMPrint = (() => {
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="js/app.js?v=7.5.17b"></script>
+<script src="js/app.js?v=7.5.18"></script>
 <script src="js/print-tools.js?v=7.5.5"></script>
+
+<dialog id="manualOrderDialog">
+  <form id="manualOrderForm">
+    <h3>Handmatig toevoegen aan bestellijst</h3>
+    <label>Filament
+      <select id="manualOrderFilament" required></select>
+    </label>
+    <label>Aantal
+      <input id="manualOrderQty" type="number" min="1" step="1" value="1" required>
+    </label>
+    <div class="dialog-actions">
+      <button type="button" data-close="manualOrderDialog">Annuleren</button>
+      <button type="submit" class="primary">Toevoegen</button>
+    </div>
+  </form>
+</dialog>
+
 </body>
 </html>

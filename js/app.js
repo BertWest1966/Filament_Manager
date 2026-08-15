@@ -47,9 +47,9 @@ function openRefill(id=null){if(!state.catalog.length)return alert('Maak eerst e
 newRefillBtn.onclick=()=>openRefill();
 refillForm.onsubmit=e=>{e.preventDefault();const o={id:editRefillId||uid(),number:rNumber.value.trim().toUpperCase(),filamentId:rFilament.value};state.refills=editRefillId?state.refills.map(r=>r.id===editRefillId?o:r):[...state.refills,o];log(`Refill ${o.number} ${editRefillId?'gewijzigd':'aangemaakt'}`,o.filamentId);refillDialog.close();save()}
 
-newOrderBtn.onclick=()=>{if(!state.catalog.length)return alert('Maak eerst een filament aan.');fillFilamentSelect(oFilament,state.catalog[0].id);oQuantity.value=1;oSupplier.value=filament(oFilament.value)?.supplier||'';orderDialog.showModal()}
+newOrderBtn.onclick=()=>{manualOrderPendingId=null;if(!state.catalog.length)return alert('Maak eerst een filament aan.');fillFilamentSelect(oFilament,state.catalog[0].id);oQuantity.value=1;oSupplier.value=filament(oFilament.value)?.supplier||'';orderDialog.showModal()}
 oFilament.onchange=()=>oSupplier.value=filament(oFilament.value)?.supplier||'';
-orderForm.onsubmit=e=>{e.preventDefault();state.orders.push({id:uid(),filamentId:oFilament.value,quantity:Number(oQuantity.value),received:0,supplier:oSupplier.value.trim(),status:'Besteld'});orderDialog.close();save()}
+orderForm.onsubmit=e=>{e.preventDefault();state.orders.push({id:uid(),filamentId:oFilament.value,quantity:Number(oQuantity.value),received:0,supplier:oSupplier.value.trim(),status:'Besteld'});if(manualOrderPendingId){ensureManualOrderList();state.manualOrderList=state.manualOrderList.filter(x=>x.id!==manualOrderPendingId);manualOrderPendingId=null;}orderDialog.close();save()}
 
 function renderDashboard(){sumSpools.textContent=state.spools.filter(s=>s.status==='active').length;sumRefills.textContent=state.refills.length;sumEmpty.textContent=state.spools.filter(s=>s.status==='active'&&Number(s.level)===0).length;sumLow.textContent=state.catalog.filter(f=>totalStock(f.id)<Number(f.min)).length;const q=dashboardSearch.value.toLowerCase(),grouped={};state.catalog.slice().sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl')).forEach(f=>{if(q&&!`${f.category} ${f.type} ${f.color}`.toLowerCase().includes(q))return;grouped[f.category]??={};grouped[f.category][f.type]??=[];const active=state.spools.filter(s=>s.status==='active'&&s.filamentId===f.id).sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));if(!active.length)grouped[f.category][f.type].push({f,spool:null});else active.forEach(s=>grouped[f.category][f.type].push({f,spool:s}))});dashboardList.innerHTML=Object.keys(grouped).map(c=>`<div class="category-group" data-category="${esc(c)}"><div class="category-title">${esc(c)}</div>${Object.keys(grouped[c]).map(t=>`<div class="type-title">${esc(t)}</div><table class="dashboard-table"><thead><tr><th>Kleur</th><th>Spoel</th><th>Hoeveelh.</th><th>Refill</th></tr></thead><tbody>${grouped[c][t].map(r=>`<tr data-category="${esc(c)}"><td onclick="openDetail('${r.f.id}')">${esc(r.f.color)}</td><td>${r.spool?`<button onclick="openSpool('${r.spool.id}')">${r.spool.number}</button>`:'—'}</td><td>${r.spool?`<button class="level-btn" onclick="quickLevel('${r.spool.id}')">${r.spool.level}%</button>`:'—'}</td><td>${refillCount(r.f.id)}</td></tr>`).join('')}</tbody></table>`).join('')}</div>`).join('')||'<div class="note">Nog geen filamenten.</div>'}
 dashboardSearch.oninput=renderDashboard;
@@ -93,9 +93,98 @@ document.querySelectorAll('[data-stock-mode]').forEach(b=>b.onclick=()=>{stockMo
 stockSearch.oninput=renderStock;
 document.getElementById('stockSort').onchange=e=>{stockSortMode=e.target.value;renderStock()};
 
-function renderOrderList(){const q=orderListSearch.value.toLowerCase(),items=state.catalog.map(f=>({f,needed:toOrder(f)})).filter(x=>x.needed>0&&(!q||label(x.f).toLowerCase().includes(q))).sort((a,b)=>a.f.category.localeCompare(b.f.category,'nl')||a.f.type.localeCompare(b.f.type,'nl')||a.f.color.localeCompare(b.f.color,'nl'));orderList.innerHTML=items.map(x=>`<div class="item-row category-data-row" data-category="${esc(x.f.category)}"><div><strong>${esc(label(x.f))}</strong><div class="item-meta">Leverancier: ${esc(x.f.supplier||'—')} · Ref.: ${esc(x.f.supplierRef||'—')}<br>Nog bestellen: ${x.needed}</div></div><div class="item-actions"><button onclick="createOrderFor('${x.f.id}',${x.needed})">Bestellen</button></div></div>`).join('')||'<div class="note">Niets te bestellen.</div>'}
+
+let manualOrderPendingId=null;
+
+function ensureManualOrderList(){
+  if(!Array.isArray(state.manualOrderList))state.manualOrderList=[];
+}
+
+manualOrderAddBtn.onclick=()=>{
+  if(!state.catalog.length)return alert('Maak eerst een filament aan.');
+  ensureManualOrderList();
+  fillFilamentSelect(manualOrderFilament,state.catalog[0].id);
+  manualOrderQty.value='1';
+  manualOrderDialog.showModal();
+};
+
+manualOrderForm.onsubmit=e=>{
+  e.preventDefault();
+  ensureManualOrderList();
+
+  const filamentId=manualOrderFilament.value;
+  const quantity=Math.max(1,Math.floor(Number(manualOrderQty.value)||1));
+  if(!filamentId)return;
+
+  const existing=state.manualOrderList.find(x=>x.filamentId===filamentId);
+  if(existing){
+    existing.quantity=Number(existing.quantity||0)+quantity;
+  }else{
+    state.manualOrderList.push({id:uid(),filamentId,quantity});
+  }
+
+  manualOrderDialog.close();
+  save();
+};
+
+function removeManualOrderItem(id){
+  ensureManualOrderList();
+  state.manualOrderList=state.manualOrderList.filter(x=>x.id!==id);
+  save();
+}
+
+function createManualOrderFor(entryId,fid,qty){
+  manualOrderPendingId=entryId;
+  fillFilamentSelect(oFilament,fid);
+  oQuantity.value=qty;
+  oSupplier.value=filament(fid)?.supplier||'';
+  orderDialog.showModal();
+}
+
+function renderOrderList(){
+  ensureManualOrderList();
+  const q=orderListSearch.value.toLowerCase();
+
+  const automatic=state.catalog
+    .map(f=>({kind:'auto',f,needed:toOrder(f)}))
+    .filter(x=>x.needed>0&&(!q||label(x.f).toLowerCase().includes(q)));
+
+  const manual=state.manualOrderList
+    .map(entry=>({kind:'manual',entry,f:filament(entry.filamentId),needed:Number(entry.quantity||0)}))
+    .filter(x=>x.f&&x.needed>0&&(!q||label(x.f).toLowerCase().includes(q)));
+
+  const items=[...automatic,...manual].sort((a,b)=>
+    a.f.category.localeCompare(b.f.category,'nl')||
+    a.f.type.localeCompare(b.f.type,'nl')||
+    a.f.color.localeCompare(b.f.color,'nl')||
+    a.kind.localeCompare(b.kind,'nl')
+  );
+
+  orderList.innerHTML=items.map(x=>{
+    if(x.kind==='manual'){
+      return `<div class="item-row category-data-row" data-category="${esc(x.f.category)}">
+        <div>
+          <strong>${esc(label(x.f))}</strong>
+          <div class="item-meta">Leverancier: ${esc(x.f.supplier||'—')} · Ref.: ${esc(x.f.supplierRef||'—')}<br>Handmatig toegevoegd · Aantal: ${x.needed}</div>
+        </div>
+        <div class="item-actions">
+          <button onclick="createManualOrderFor('${x.entry.id}','${x.f.id}',${x.needed})">Bestellen</button>
+          <button class="danger-button" onclick="removeManualOrderItem('${x.entry.id}')">Verwijderen</button>
+        </div>
+      </div>`;
+    }
+
+    return `<div class="item-row category-data-row" data-category="${esc(x.f.category)}">
+      <div>
+        <strong>${esc(label(x.f))}</strong>
+        <div class="item-meta">Leverancier: ${esc(x.f.supplier||'—')} · Ref.: ${esc(x.f.supplierRef||'—')}<br>Nog bestellen: ${x.needed}</div>
+      </div>
+      <div class="item-actions"><button onclick="createOrderFor('${x.f.id}',${x.needed})">Bestellen</button></div>
+    </div>`;
+  }).join('')||'<div class="note">Niets te bestellen.</div>';
+}
 orderListSearch.oninput=renderOrderList;
-function createOrderFor(fid,qty){fillFilamentSelect(oFilament,fid);oQuantity.value=qty;oSupplier.value=filament(fid)?.supplier||'';orderDialog.showModal()}
+function createOrderFor(fid,qty){manualOrderPendingId=null;fillFilamentSelect(oFilament,fid);oQuantity.value=qty;oSupplier.value=filament(fid)?.supplier||'';orderDialog.showModal()}
 function renderOrders(){
   const q=ordersSearch.value.toLowerCase();
   const openOrders=state.orders.filter(o=>{

@@ -1,15 +1,22 @@
-FILAMENT MANAGER v7.5.16 — VOORRAADITEM VERWIJDEREN
+FILAMENT MANAGER v7.5.18 — HANDMATIG TOEVOEGEN AAN BESTELLIJST
 
 Nieuw:
-- Bij spoelen in Voorraad staat een knop Verwijderen.
-- Bij refills in Voorraad staat een knop Verwijderen.
-- Voor verwijderen volgt één bevestiging.
-- Alleen het voorraaditem wordt verwijderd.
-- Het filament in de Catalogus blijft bestaan.
+- In Bestellijst staat 'Handmatig toevoegen'.
+- Kies een filament uit de Catalogus en geef het gewenste aantal in.
+- Handmatig toegevoegde regels blijven op de Bestellijst staan, ook als de voorraad niet onder het minimum zit.
+- Leverancier en leveranciersreferentie worden getoond.
+- Een handmatige regel kan verwijderd worden.
+- Wanneer je op 'Bestellen' drukt en de bestelling bevestigt, verhuist die naar Lopende bestellingen.
 
-Niet aangepast:
-- JSON import/export
-- localStorage-structuur
-- QR/printfunctionaliteit
-- labelmaat 55 x 90 mm
-- bestellingenlogica
+Bestaande werking behouden:
+- Automatische bestellijst: alleen wanneer voorraad < minimumvoorraad.
+- Automatisch aanvullen tot de gewenste voorraad.
+- Lopende bestellingen.
+- Voorraaditem verwijderen.
+- Labelmaat 55 x 90 mm.
+- QR/printfunctionaliteit.
+
+Niet gewijzigd:
+- JSON import/exportfuncties.
+- localStorage-sleutel.
+- bestaande voorraad- en catalogusgegevens.
