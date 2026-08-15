@@ -1,21 +1,23 @@
-FILAMENT MANAGER v7.5.18a — HANDMATIG TOEVOEGEN AAN BESTELLIJST
-
-Herstel:
-- Probleem in v7.5.18 opgelost waarbij de app niet volledig opstartte.
-- Bestaande localStorage-gegevens worden opnieuw normaal geladen.
-- Back-up import werkt opnieuw.
+FILAMENT MANAGER v7.5.19 — SPOELWISSEL / REFILL KOPPELEN
 
 Nieuw:
+- Bij Spoelwissel / refill koppelen zijn er 2 opties: Manueel en Scan.
+- Manueel: spoelnummer en refillnummer zelf invullen.
+- Scan: camera starten, eerst de te wisselen spoel scannen, daarna de refill.
+- Na beide scans gebeurt nog niets totdat je op Koppelen drukt.
+- Een spoel hoeft niet leeg te zijn. Als er nog filament op staat, volgt eerst een waarschuwing met het huidige percentage.
+- Na bevestigen wordt de gekozen spoel op 100% gezet en de refill uit de refillvoorraad verwijderd.
+- Het bestaande spoelnummer blijft behouden.
+
+Bestaand behouden:
 - Handmatig toevoegen aan Bestellijst.
-- Kies filament en aantal.
-- Handmatige regels blijven staan onafhankelijk van minimumvoorraad.
-- Leverancier en leveranciersreferentie zichtbaar.
-- Handmatige regel kan verwijderd worden.
-- Na bevestigen van Bestellen verhuist de regel naar Lopende bestellingen.
+- Leverancier + leveranciersreferentie in Bestellijst.
+- Lopende bestellingen.
+- Voorraaditem verwijderen.
+- Labelmaat 55 x 90 mm.
+- QR/printfunctionaliteit.
 
 Niet gewijzigd:
 - JSON import/exportfuncties.
 - localStorage-sleutel.
-- automatische bestellogica.
-- labelmaat 55 x 90 mm.
-- QR/printfunctionaliteit.
+- bestaande opslagstructuur.

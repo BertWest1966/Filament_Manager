@@ -241,6 +241,8 @@ backFromDetail.onclick=()=>setView(previousView);
 
 let qrScanner=null;
 let qrScannerRunning=false;
+let refillLinkMode='manual';
+let refillScanPhase=null;
 
 function parseQrCode(value){
   const text=String(value||'').trim();
@@ -255,25 +257,42 @@ function handleScannedCode(value){
   const spool=state.spools.find(x=>String(x.number).toUpperCase()===code);
   const refill=state.refills.find(x=>String(x.number).toUpperCase()===code);
 
-  if(spool){
-    if(Number(spool.level)===0 && !quickFillSpool.value){
+  if(refillLinkMode==='scan' && refillScanPhase){
+    if(refillScanPhase==='spool'){
+      if(!spool){
+        fillModeStatus.textContent='Dit is geen geldige spoel. Scan de QR-code van de te wisselen spoel.';
+        setTimeout(()=>startQrScanner(),250);
+        return;
+      }
       quickFillSpool.value=spool.number;
-      scannerStatus.textContent=`Lege spoel ${spool.number} gekozen. Scan nu een refill.`;
+      refillScanPhase='refill';
+      fillModeStatus.textContent=`Spoel ${spool.number} gekozen (${Number(spool.level)||0}%). Scan nu de QR-code van de refill.`;
+      scannerStatus.textContent=`Spoel ${spool.number} gekozen. Scan nu een refill.`;
+      setTimeout(()=>startQrScanner(),250);
       return;
     }
 
+    if(refillScanPhase==='refill'){
+      if(!refill){
+        fillModeStatus.textContent='Dit is geen geldige refill. Scan de QR-code van de refill.';
+        setTimeout(()=>startQrScanner(),250);
+        return;
+      }
+      quickFillRefill.value=refill.number;
+      refillScanPhase=null;
+      fillModeStatus.textContent=`Spoel ${quickFillSpool.value} en refill ${refill.number} gekozen. Tik op Koppelen om te bevestigen.`;
+      scannerStatus.textContent=`Refill ${refill.number} gekozen. Tik op Koppelen.`;
+      return;
+    }
+  }
+
+  if(spool){
     setView('voorraad');
     openSpool(spool.id);
     return;
   }
 
   if(refill){
-    if(quickFillSpool.value && !quickFillRefill.value){
-      quickFillRefill.value=refill.number;
-      scannerStatus.textContent=`Refill ${refill.number} gekozen. Tik op Koppelen.`;
-      return;
-    }
-
     setView('voorraad');
     openRefill(refill.id);
     return;
@@ -341,7 +360,59 @@ startScannerBtn.onclick=startQrScanner;
 stopScannerBtn.onclick=stopQrScanner;
 
 manualScanBtn.onclick=()=>{const code=parseQrCode(manualScanCode.value);const s=state.spools.find(x=>x.number===code);if(s){setView('voorraad');openSpool(s.id);return}const r=state.refills.find(x=>x.number===code);if(r){setView('voorraad');openRefill(r.id);return}alert('Code niet gevonden.')}
-quickFillBtn.onclick=()=>{const s=state.spools.find(x=>x.number===quickFillSpool.value.trim().toUpperCase()),r=state.refills.find(x=>x.number===quickFillRefill.value.trim().toUpperCase());if(!s||!r)return alert('Spoel of refill niet gevonden.');if(Number(s.level)!==0)return alert('De spoel moet leeg zijn.');s.filamentId=r.filamentId;s.level=100;state.refills=state.refills.filter(x=>x.id!==r.id);log(`Refill ${r.number} gekoppeld aan ${s.number}`,s.filamentId);save();showAppToast(`✓ Spoel ${s.number} is succesvol aangevuld met refill ${r.number}.`)}
+function setRefillLinkMode(mode){
+  refillLinkMode=mode;
+  refillScanPhase=null;
+  fillManualModeBtn.classList.toggle('active',mode==='manual');
+  fillScanModeBtn.classList.toggle('active',mode==='scan');
+  fillStartScanBtn.classList.toggle('hidden',mode!=='scan');
+  quickFillSpool.readOnly=mode==='scan';
+  quickFillRefill.readOnly=mode==='scan';
+
+  if(mode==='manual'){
+    fillModeStatus.textContent='Vul de spoel en refill manueel in.';
+  }else{
+    quickFillSpool.value='';
+    quickFillRefill.value='';
+    fillModeStatus.textContent='Tik op Start scan. Scan eerst de te wisselen spoel en daarna de refill.';
+  }
+}
+
+fillManualModeBtn.onclick=()=>setRefillLinkMode('manual');
+fillScanModeBtn.onclick=()=>setRefillLinkMode('scan');
+
+fillStartScanBtn.onclick=async()=>{
+  quickFillSpool.value='';
+  quickFillRefill.value='';
+  refillScanPhase='spool';
+  fillModeStatus.textContent='Scan de QR-code van de te wisselen spoel.';
+  scannerStatus.textContent='Scan de QR-code van de te wisselen spoel.';
+  await startQrScanner();
+};
+
+quickFillBtn.onclick=()=>{
+  const s=state.spools.find(x=>x.number===quickFillSpool.value.trim().toUpperCase());
+  const r=state.refills.find(x=>x.number===quickFillRefill.value.trim().toUpperCase());
+  if(!s||!r)return alert('Spoel of refill niet gevonden.');
+
+  if(Number(s.level)!==0){
+    const ok=confirm(`Spoel ${s.number} staat nog op ${Number(s.level)||0}%. Toch deze refill koppelen?`);
+    if(!ok)return;
+  }
+
+  s.filamentId=r.filamentId;
+  s.level=100;
+  state.refills=state.refills.filter(x=>x.id!==r.id);
+  log(`Refill ${r.number} gekoppeld aan ${s.number}`,s.filamentId);
+  quickFillSpool.value='';
+  quickFillRefill.value='';
+  refillScanPhase=null;
+  save();
+  fillModeStatus.textContent=refillLinkMode==='scan'
+    ? 'Koppeling voltooid. Tik op Start scan voor een volgende wissel.'
+    : 'Koppeling voltooid. Vul de volgende spoel en refill manueel in.';
+  showAppToast(`✓ Spoel ${s.number} is succesvol aangevuld met refill ${r.number}.`);
+}
 
 function libraryValues(kind){if(kind==='types'){const a=[];Object.values(state.libraries.types).forEach(v=>v.forEach(x=>pushUnique(a,x)));return a}return state.libraries[kind]||[]}
 function usage(kind,v){return state.catalog.filter(f=>kind==='colors'?f.color===v:kind==='types'?f.type===v:kind==='brands'?f.brand===v:kind==='suppliers'?f.supplier===v:f.category===v).length}
