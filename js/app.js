@@ -96,24 +96,30 @@ document.getElementById('stockSort').onchange=e=>{stockSortMode=e.target.value;r
 
 let manualOrderPendingId=null;
 
+const manualOrderAddBtnEl=$('manualOrderAddBtn');
+const manualOrderDialogEl=$('manualOrderDialog');
+const manualOrderFormEl=$('manualOrderForm');
+const manualOrderFilamentEl=$('manualOrderFilament');
+const manualOrderQtyEl=$('manualOrderQty');
+
 function ensureManualOrderList(){
   if(!Array.isArray(state.manualOrderList))state.manualOrderList=[];
 }
 
-manualOrderAddBtn.onclick=()=>{
+manualOrderAddBtnEl.onclick=()=>{
   if(!state.catalog.length)return alert('Maak eerst een filament aan.');
   ensureManualOrderList();
-  fillFilamentSelect(manualOrderFilament,state.catalog[0].id);
-  manualOrderQty.value='1';
-  manualOrderDialog.showModal();
+  fillFilamentSelect(manualOrderFilamentEl,state.catalog[0].id);
+  manualOrderQtyEl.value='1';
+  manualOrderDialogEl.showModal();
 };
 
-manualOrderForm.onsubmit=e=>{
+manualOrderFormEl.onsubmit=e=>{
   e.preventDefault();
   ensureManualOrderList();
 
-  const filamentId=manualOrderFilament.value;
-  const quantity=Math.max(1,Math.floor(Number(manualOrderQty.value)||1));
+  const filamentId=manualOrderFilamentEl.value;
+  const quantity=Math.max(1,Math.floor(Number(manualOrderQtyEl.value)||1));
   if(!filamentId)return;
 
   const existing=state.manualOrderList.find(x=>x.filamentId===filamentId);
@@ -123,7 +129,7 @@ manualOrderForm.onsubmit=e=>{
     state.manualOrderList.push({id:uid(),filamentId,quantity});
   }
 
-  manualOrderDialog.close();
+  manualOrderDialogEl.close();
   save();
 };
 
