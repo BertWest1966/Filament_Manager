@@ -395,6 +395,21 @@ quickFillBtn.onclick=()=>{
   const r=state.refills.find(x=>x.number===quickFillRefill.value.trim().toUpperCase());
   if(!s||!r)return alert('Spoel of refill niet gevonden.');
 
+  const spoolFilament=filament(s.filamentId);
+  const refillFilament=filament(r.filamentId);
+  if(!spoolFilament||!refillFilament)return alert('Filamentgegevens van spoel of refill ontbreken.');
+
+  if(s.filamentId!==r.filamentId){
+    alert(
+      `Verkeerde refill.\n\n`+
+      `Spoel ${s.number}: ${label(spoolFilament)}\n`+
+      `Refill ${r.number}: ${label(refillFilament)}\n\n`+
+      `De refill moet exact hetzelfde filament zijn als het filament op de spoel.\n`+
+      `Gebruik voor een ander filament een nieuw spoelnummer.`
+    );
+    return;
+  }
+
   if(Number(s.level)!==0){
     const ok=confirm(`Spoel ${s.number} staat nog op ${Number(s.level)||0}%. Toch deze refill koppelen?`);
     if(!ok)return;
