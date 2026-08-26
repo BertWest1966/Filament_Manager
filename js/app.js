@@ -623,8 +623,8 @@ function labelHtml(i){
     <img src="${qrImageUrl(i.kind,i.number)}" alt="QR">
     <div class="number ${String(i.kind).toLowerCase()==='refill'?'refill-number':'spool-number'}">${esc(i.number)}</div>
     <div class="divider"></div>
-    <div class="main">${esc(i.category)} ${esc(i.type)}</div>
-    <div class="line">${esc(i.color)}</div>
+    <div class="main filament-main">${esc(i.category)} ${esc(i.type)}</div>
+    <div class="line filament-color">${esc(i.color)}</div>
     <div class="line">${esc(i.supplier)}</div>
     <div class="small">${i.reference?`Ref. ${esc(i.reference)}`:''}</div>
     <div class="kind">${esc(i.kind)}</div>
@@ -740,6 +740,30 @@ function openLabelPrintWindow(items,format='a4'){
       .line{line-height:1.05;margin:0 0 .25mm}
       .small{line-height:1;margin-top:.25mm}
       .kind{line-height:1;margin-top:.35mm}
+
+      /* Grotere filamentnaam en kleur op 50 x 75 mm label */
+      .filament-main{
+        font-size:13pt;
+        font-weight:900;
+        line-height:1.02;
+        margin:0 0 .45mm;
+        white-space:normal;
+        overflow-wrap:anywhere;
+      }
+      .filament-color{
+        font-size:12pt;
+        font-weight:900;
+        line-height:1.02;
+        margin:0 0 .35mm;
+        white-space:normal;
+        overflow-wrap:anywhere;
+        display:-webkit-box;
+        -webkit-box-orient:vertical;
+        -webkit-line-clamp:2;
+        overflow:hidden;
+        min-height:0;
+        max-height:2.1em;
+      }
 </style>
   </head>
   <body>

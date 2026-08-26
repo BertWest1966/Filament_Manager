@@ -1,8 +1,11 @@
-FILAMENT MANAGER v7.5.24 — COMPACT LABEL 50 x 75 MM
+FILAMENT MANAGER v7.5.25 — GROTERE FILAMENTTEKST OP LABEL
 
+Wijziging:
 - Label blijft 50 x 75 mm, rechtop.
-- QR-code en groot nummer blijven prominent.
-- Verticale tussenruimtes verkleind.
-- Referentie past binnen de onderrand.
-- Spoelnummer zwart; refillnummer rood.
-- Overige functionaliteit ongewijzigd.
+- Categorie + type (bv. PETG Basic) groter en vetter.
+- Kleur groter en vetter.
+- Lange kleurnamen mogen automatisch over maximaal 2 regels lopen.
+- QR-code en groot spoel-/refillnummer blijven ongewijzigd.
+- Leverancier, referentie en SPOEL/REFILL blijven ongewijzigd.
+- Spoelnummer blijft zwart; refillnummer blijft rood.
+- Overige appfunctionaliteit is niet gewijzigd.
