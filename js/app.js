@@ -621,7 +621,7 @@ function openQr(kind,id){
 function labelHtml(i){
   return `<div class="label">
     <img src="${qrImageUrl(i.kind,i.number)}" alt="QR">
-    <div class="number">${esc(i.number)}</div>
+    <div class="number ${String(i.kind).toLowerCase()==='refill'?'refill-number':'spool-number'}">${esc(i.number)}</div>
     <div class="divider"></div>
     <div class="main">${esc(i.category)} ${esc(i.type)}</div>
     <div class="line">${esc(i.color)}</div>
@@ -656,21 +656,21 @@ function openLabelPrintWindow(items,format='a4'){
       }
       .sheet{
         display:grid;
-        grid-template-columns:55mm 55mm 55mm;
-        grid-auto-rows:90mm;
+        grid-template-columns:50mm 50mm 50mm;
+        grid-auto-rows:75mm;
         gap:0;
-        width:165mm;
+        width:150mm;
         align-items:start;
         justify-content:start;
       }
       .label{
         box-sizing:border-box;
-        width:55mm;
-        min-width:55mm;
-        max-width:55mm;
-        height:90mm;
-        min-height:90mm;
-        max-height:90mm;
+        width:50mm;
+        min-width:50mm;
+        max-width:50mm;
+        height:75mm;
+        min-height:75mm;
+        max-height:75mm;
         padding:3mm;
         border:1px solid #000;
         border-radius:2mm;
@@ -693,6 +693,8 @@ function openLabelPrintWindow(items,format='a4'){
         letter-spacing:.8mm;
         line-height:1;
       }
+      .spool-number{color:#000}
+      .refill-number{color:#c00}
       .divider{
         border-top:1px solid #000;
         margin:2mm 0;
