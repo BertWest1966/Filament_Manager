@@ -730,7 +730,17 @@ function openLabelPrintWindow(items,format='a4'){
         body{background:#fff}
         .sheet{margin:0;padding:0}
       }
-    </style>
+    
+      /* Compacte opmaak voor 50 x 75 mm */
+      .label{padding:2mm 2.5mm 1.5mm;overflow:hidden}
+      .label img{width:32mm;height:32mm;margin:0 auto .8mm}
+      .number{margin:.2mm 0 .7mm;line-height:1}
+      .divider{margin:.5mm 0 .8mm}
+      .main{line-height:1.05;margin:0 0 .4mm}
+      .line{line-height:1.05;margin:0 0 .25mm}
+      .small{line-height:1;margin-top:.25mm}
+      .kind{line-height:1;margin-top:.35mm}
+</style>
   </head>
   <body>
     <div class="sheet">${html}</div>
