@@ -418,3 +418,10 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     margin-left:32px !important;
   }
 }
+
+/* v7.5.35 — definitieve hiërarchie en categoriekleur */
+[data-category] .inventory-type-title,
+[data-category] .stock-type-title,
+[data-category] .type-title{
+  color:inherit !important;
+}
