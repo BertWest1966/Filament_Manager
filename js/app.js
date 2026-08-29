@@ -113,6 +113,10 @@ function renderSpools(){spoolList.innerHTML=stockHtml(state.spools,'spool',(spoo
 function renderRefills(){refillList.innerHTML=stockHtml(state.refills,'refill',(refillSearch?.value||'').toLowerCase())}
 spoolSearch.oninput=renderSpools; refillSearch.oninput=renderRefills;
 
+function ensureManualOrderList(){
+  if(!Array.isArray(state.manualOrderList))state.manualOrderList=[];
+}
+
 function renderOrderList(){
   ensureManualOrderList();
   const q=orderListSearch.value.toLowerCase();
