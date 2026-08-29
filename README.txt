@@ -1,9 +1,10 @@
-FILAMENT MANAGER v7.5.36 — VOORRAAD VOLGT DASHBOARD-INDELING
+FILAMENT MANAGER v7.5.37 — KLEUR OP ELKE REGEL
 
-- Spoelen en Refills gebruiken dezelfde systematiek als het Dashboard:
-  categorie > type > kleur.
-- Zelfde visuele inspringing en categoriekleur.
-- Compacte tabelopbouw met Spoel/Refill en Hoeveelh.
-- Het woord 'Kleur' blijft verwijderd.
-- Mobiele/iPhone-weergave behoudt dezelfde hiërarchie.
-- JSON, localStorage en voorraadlogica zijn niet gewijzigd.
+- In Spoelen en Refills wordt de filamentkleur nu op elke regel herhaald.
+- Voorbeeld:
+  Gray   R0006
+  Gray   R0062
+  Gray   R0064
+- De bestaande indeling categorie > type > kleur blijft behouden.
+- De categoriekleuren blijven behouden.
+- Dashboard, JSON, localStorage, bestellingen, scan, QR en labels zijn niet gewijzigd.
