@@ -51,7 +51,7 @@ newOrderBtn.onclick=()=>{manualOrderPendingId=null;if(!state.catalog.length)retu
 oFilament.onchange=()=>oSupplier.value=filament(oFilament.value)?.supplier||'';
 orderForm.onsubmit=e=>{e.preventDefault();state.orders.push({id:uid(),filamentId:oFilament.value,quantity:Number(oQuantity.value),received:0,supplier:oSupplier.value.trim(),status:'Besteld'});if(manualOrderPendingId){ensureManualOrderList();state.manualOrderList=state.manualOrderList.filter(x=>x.id!==manualOrderPendingId);manualOrderPendingId=null;}orderDialog.close();save()}
 
-function renderDashboard(){sumSpools.textContent=state.spools.filter(s=>s.status==='active').length;sumRefills.textContent=state.refills.length;sumEmpty.textContent=state.spools.filter(s=>s.status==='active'&&Number(s.level)===0).length;sumLow.textContent=state.catalog.filter(f=>totalStock(f.id)<Number(f.min)).length;const q=dashboardSearch.value.toLowerCase(),grouped={};state.catalog.slice().sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl')).forEach(f=>{if(q&&!`${f.category} ${f.type} ${f.color}`.toLowerCase().includes(q))return;grouped[f.category]??={};grouped[f.category][f.type]??=[];const active=state.spools.filter(s=>s.status==='active'&&s.filamentId===f.id).sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));if(!active.length)grouped[f.category][f.type].push({f,spool:null});else active.forEach(s=>grouped[f.category][f.type].push({f,spool:s}))});dashboardList.innerHTML=Object.keys(grouped).map(c=>`<div class="category-group" data-category="${esc(c)}"><div class="category-title">${esc(c)}</div>${Object.keys(grouped[c]).map(t=>`<div class="type-title">${esc(t)}</div><table class="dashboard-table"><thead><tr><th></th><th>Spoel</th><th>Hoeveelh.</th><th>Refill</th></tr></thead><tbody>${grouped[c][t].map(r=>`<tr data-category="${esc(c)}"><td onclick="openDetail('${r.f.id}')">${esc(r.f.color)}</td><td>${r.spool?`<button onclick="openSpool('${r.spool.id}')">${r.spool.number}</button>`:'—'}</td><td>${r.spool?`<button class="level-btn" onclick="quickLevel('${r.spool.id}')">${r.spool.level}%</button>`:'—'}</td><td>${refillCount(r.f.id)}</td></tr>`).join('')}</tbody></table>`).join('')}</div>`).join('')||'<div class="note">Nog geen filamenten.</div>'}
+function renderDashboard(){sumSpools.textContent=state.spools.filter(s=>s.status==='active').length;sumRefills.textContent=state.refills.length;sumEmpty.textContent=state.spools.filter(s=>s.status==='active'&&Number(s.level)===0).length;sumLow.textContent=state.catalog.filter(f=>totalStock(f.id)<Number(f.min)).length;const q=dashboardSearch.value.toLowerCase(),grouped={};state.catalog.slice().sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl')).forEach(f=>{if(q&&!`${f.category} ${f.type} ${f.color}`.toLowerCase().includes(q))return;grouped[f.category]??={};grouped[f.category][f.type]??=[];const active=state.spools.filter(s=>s.status==='active'&&s.filamentId===f.id).sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));if(!active.length)grouped[f.category][f.type].push({f,spool:null});else active.forEach(s=>grouped[f.category][f.type].push({f,spool:s}))});dashboardList.innerHTML=Object.keys(grouped).map(c=>`<div class="category-group" data-category="${esc(c)}"><div class="category-title">${esc(c)}</div>${Object.keys(grouped[c]).map(t=>`<div class="type-title">${esc(t)}</div><table class="dashboard-table"><thead><tr><th>Kleur</th><th>Spoel</th><th>Hoeveelh.</th><th>Refill</th></tr></thead><tbody>${grouped[c][t].map(r=>`<tr data-category="${esc(c)}"><td onclick="openDetail('${r.f.id}')">${esc(r.f.color)}</td><td>${r.spool?`<button onclick="openSpool('${r.spool.id}')">${r.spool.number}</button>`:'—'}</td><td>${r.spool?`<button class="level-btn" onclick="quickLevel('${r.spool.id}')">${r.spool.level}%</button>`:'—'}</td><td>${refillCount(r.f.id)}</td></tr>`).join('')}</tbody></table>`).join('')}</div>`).join('')||'<div class="note">Nog geen filamenten.</div>'}
 dashboardSearch.oninput=renderDashboard;
 let quickLevelSpoolId=null;
 function quickLevel(id){
@@ -74,45 +74,8 @@ quickLevelForm.onsubmit=e=>{
   save();
 }
 
-function renderCatalog(){
-const q=catalogSearch.value.toLowerCase();const items=state.catalog.filter(f=>!q||label(f).toLowerCase().includes(q)).sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));
-  const catalogRoot=document.getElementById('catalogList');
-
-  const catalogItems=items;
-  const grouped={};
-  catalogItems.forEach(f=>{
-    const category=f.category||'Overig';
-    const type=f.type||'Overig';
-    (grouped[category]??={});
-    (grouped[category][type]??=[]).push(f);
-  });
-
-  const categories=Object.keys(grouped).sort((a,b)=>a.localeCompare(b,'nl'));
-  if(!categories.length){
-    catalogRoot.innerHTML='<div class="note">Geen filament gevonden.</div>';
-    return;
-  }
-
-  catalogRoot.innerHTML=categories.map(category=>`
-    <div class="catalog-dashboard-group" data-category="${esc(category)}">
-      <div class="catalog-dashboard-category">${esc(category)}</div>
-      ${Object.keys(grouped[category]).sort((a,b)=>a.localeCompare(b,'nl')).map(type=>`
-        <div class="catalog-dashboard-type">${esc(type)}</div>
-        ${grouped[category][type].slice().sort((a,b)=>(a.color||'').localeCompare(b.color||'','nl')).map(f=>`
-          <div class="catalog-dashboard-row">
-            <div class="catalog-dashboard-color">${esc(f.color||'')}</div>
-            <div class="catalog-dashboard-meta">${esc(f.brand||'')} · min ${f.min??0} · gewenst ${f.target??f.desired??0}</div>
-            <div class="catalog-dashboard-actions">
-              <button onclick="openFilament('${f.id}')">Open</button>
-              <button onclick="editFilament('${f.id}')">Wijzig</button>
-              <button class="danger-button" onclick="deleteFilament('${f.id}')">Verwijderen</button>
-            </div>
-          </div>
-        `).join('')}
-      `).join('')}
-    </div>
-  `).join('');
-}
+function renderCatalog(){const q=catalogSearch.value.toLowerCase();const items=state.catalog.filter(f=>!q||label(f).toLowerCase().includes(q)).sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));catalogList.innerHTML=items.map(f=>`<div class="item-row category-data-row" data-category="${esc(f.category)}"><div><strong>${esc(label(f))}</strong><div class="item-meta">${esc(f.brand)} · min ${f.min} · gewenst ${f.target}</div></div><div class="item-actions"><button onclick="openDetail('${f.id}')">Open</button><button onclick="openFilament('${f.id}')">Wijzig</button><button class="danger-button" onclick="deleteFilament('${f.id}')">Verwijderen</button></div></div>`).join('')||'<div class="note">Geen filamenten.</div>'}
+catalogSearch.oninput=renderCatalog;
 function sortStock(items){if(stockSortMode==='number-asc')return items.sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));if(stockSortMode==='number-desc')return items.sort((a,b)=>b.number.localeCompare(a.number,'nl',{numeric:true}));return items.sort((a,b)=>{const fa=filament(a.filamentId),fb=filament(b.filamentId);return fa.category.localeCompare(fb.category,'nl')||fa.type.localeCompare(fb.type,'nl')||fa.color.localeCompare(fb.color,'nl')})}
 
 function removeStockItem(kind,id){
@@ -133,125 +96,128 @@ function removeStockItem(kind,id){
 }
 
 
-
-function stockGroups(items){
-  const groups={};
-  items.forEach(x=>{
-    const f=filament(x.filamentId); if(!f)return;
-    const category=f.category||'Overig', type=f.type||'', color=f.color||'';
-    groups[category]??={}; groups[category][type]??={}; groups[category][type][color]??=[];
-    groups[category][type][color].push(x);
+function sortStockItems(items,mode){
+  return [...items].sort((a,b)=>{
+    if(mode==='number')return String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true});
+    const fa=filament(a.filamentId),fb=filament(b.filamentId);
+    return (fa?.category||'').localeCompare(fb?.category||'','nl')||
+           (fa?.type||'').localeCompare(fb?.type||'','nl')||
+           (fa?.color||'').localeCompare(fb?.color||'','nl')||
+           String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true});
   });
-  return groups;
-}
-
-function stockPageHtml(items,kind,query){
-  const q=(query||'').trim().toLowerCase();
-  const filtered=items.filter(x=>{
-    const f=filament(x.filamentId);
-    const hay=`${x.number||''} ${f?.category||''} ${f?.type||''} ${f?.color||''}`.toLowerCase();
-    return !q||hay.includes(q);
-  });
-
-  const groups=stockGroups(filtered);
-  const categories=Object.keys(groups).sort((a,b)=>a.localeCompare(b,'nl'));
-
-  if(!categories.length){
-    return `<div class="note">Geen ${kind==='spool'?'spoelen':'refills'} gevonden.</div>`;
-  }
-
-  return categories.map(category=>`
-    <div class="dashboard-stock-group inventory-category" data-category="${esc(category)}">
-      <div class="dashboard-stock-category">${esc(category)}</div>
-
-      ${Object.keys(groups[category]).sort((a,b)=>a.localeCompare(b,'nl')).map(type=>`
-        <div class="dashboard-stock-type">${esc(type)}</div>
-
-        <div class="dashboard-stock-header ${kind==='refill'?'refill-header':''}">
-          <div></div>
-          <div>${kind==='spool'?'Spoel':'Refill'}</div>
-          ${kind==='spool'?'<div>Hoeveelh.</div>':''}
-          <div></div>
-        </div>
-
-        ${Object.keys(groups[category][type]).sort((a,b)=>a.localeCompare(b,'nl')).flatMap(color=>
-          groups[category][type][color]
-            .sort((a,b)=>String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true}))
-            .map((x,idx)=>`
-              <div class="dashboard-stock-row ${kind==='refill'?'refill-row':''}">
-                <div class="dashboard-stock-color">${esc(color)}</div>
-                <div class="dashboard-stock-number"><strong>${esc(x.number)}</strong></div>
-                ${kind==='spool'?`<div class="dashboard-stock-level"><span class="level-badge">${Number(x.level)||0}%</span></div>`:''}
-                <div class="dashboard-stock-actions">
-                  ${kind==='spool'
-                    ? `<button onclick="quickLevel('${x.id}')">Hoeveelheid</button><button onclick="openSpool('${x.id}')">Open</button>`
-                    : `<button onclick="openRefill('${x.id}')">Open</button>`}
-                  <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
-                </div>
-              </div>
-            `)
-        ).join('')}
-      `).join('')}
-    </div>
-  `).join('');
-}
-
-function stockNumberPageHtml(items,kind,query,mode){
-  const q=(query||'').trim().toLowerCase();
-  const filtered=items.filter(x=>{
-    const f=filament(x.filamentId);
-    const hay=`${x.number||''} ${f?.category||''} ${f?.type||''} ${f?.color||''}`.toLowerCase();
-    return !q||hay.includes(q);
-  });
-
-  const sorted=[...filtered].sort((a,b)=>{
-    const cmp=String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true});
-    return mode==='number-desc'?-cmp:cmp;
-  });
-
-  if(!sorted.length){
-    return `<div class="note">Geen ${kind==='spool'?'spoelen':'refills'} gevonden.</div>`;
-  }
-
-  return sorted.map(x=>{
-    const f=filament(x.filamentId);
-    const category=f?.category||'';
-    const type=f?.type||'';
-    const color=f?.color||'';
-    return `
-      <div class="number-stock-row category-data-row" data-category="${esc(category)}">
-        <div class="number-stock-info">
-          <strong class="number-stock-number">${esc(x.number)}</strong>
-          <div class="number-stock-filament">${esc(category)} · ${esc(type)} · ${esc(color)}</div>
-          ${kind==='spool'?`<div class="number-stock-level">${Number(x.level)||0}%</div>`:''}
-        </div>
-        <div class="number-stock-actions">
-          ${kind==='spool'
-            ? `<button onclick="quickLevel('${x.id}')">Hoeveelheid</button><button onclick="openSpool('${x.id}')">Open</button>`
-            : `<button onclick="openRefill('${x.id}')">Open</button>`}
-          <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
-        </div>
-      </div>`;
-  }).join('');
 }
 
 function renderSpools(){
-  const mode=document.getElementById('spoolSort')?.value||'filament';
-  spoolList.innerHTML=mode==='filament'
-    ? stockPageHtml(state.spools,'spool',spoolSearch?.value||'')
-    : stockNumberPageHtml(state.spools,'spool',spoolSearch?.value||'',mode);
+  const q=(spoolSearch?.value||'').toLowerCase();
+  const mode=spoolSort?.value||'filament';
+  const items=sortStockItems(
+    state.spools.filter(s=>{
+      const f=filament(s.filamentId);
+      const hay=`${s.number} ${label(f)}`.toLowerCase();
+      return !q||hay.includes(q);
+    }),
+    mode
+  );
+
+  spoolList.innerHTML=items.map(s=>{
+    const f=filament(s.filamentId);
+    return `<div class="item-row category-data-row" data-category="${esc(f?.category||'')}">
+      <div>
+        <strong>${esc(s.number)} · ${esc(label(f))}</strong>
+        <div class="item-meta">Resterend: ${Number(s.level)||0}%</div>
+      </div>
+      <div class="item-actions">
+        <button onclick="quickLevel('${s.id}')">Hoeveelheid</button>
+        <button onclick="openSpool('${s.id}')">Open</button>
+        <button class="danger-button" onclick="removeStockItem('spool','${s.id}')">Verwijderen</button>
+      </div>
+    </div>`;
+  }).join('')||'<div class="note">Geen spoelen gevonden.</div>';
 }
+
 function renderRefills(){
-  const mode=document.getElementById('refillSort')?.value||'filament';
-  refillList.innerHTML=mode==='filament'
-    ? stockPageHtml(state.refills,'refill',refillSearch?.value||'')
-    : stockNumberPageHtml(state.refills,'refill',refillSearch?.value||'',mode);
+  const q=(refillSearch?.value||'').toLowerCase();
+  const mode=refillSort?.value||'filament';
+  const items=sortStockItems(
+    state.refills.filter(r=>{
+      const f=filament(r.filamentId);
+      const hay=`${r.number} ${label(f)}`.toLowerCase();
+      return !q||hay.includes(q);
+    }),
+    mode
+  );
+
+  refillList.innerHTML=items.map(r=>{
+    const f=filament(r.filamentId);
+    return `<div class="item-row category-data-row" data-category="${esc(f?.category||'')}">
+      <div>
+        <strong>${esc(r.number)} · ${esc(label(f))}</strong>
+      </div>
+      <div class="item-actions">
+        <button onclick="openRefill('${r.id}')">Open</button>
+        <button class="danger-button" onclick="removeStockItem('refill','${r.id}')">Verwijderen</button>
+      </div>
+    </div>`;
+  }).join('')||'<div class="note">Geen refills gevonden.</div>';
 }
+
 spoolSearch.oninput=renderSpools;
+spoolSort.onchange=renderSpools;
 refillSearch.oninput=renderRefills;
+refillSort.onchange=renderRefills;
+
+
+let manualOrderPendingId=null;
+
+const manualOrderAddBtnEl=$('manualOrderAddBtn');
+const manualOrderDialogEl=$('manualOrderDialog');
+const manualOrderFormEl=$('manualOrderForm');
+const manualOrderFilamentEl=$('manualOrderFilament');
+const manualOrderQtyEl=$('manualOrderQty');
 
 function ensureManualOrderList(){
   if(!Array.isArray(state.manualOrderList))state.manualOrderList=[];
+}
+
+manualOrderAddBtnEl.onclick=()=>{
+  if(!state.catalog.length)return alert('Maak eerst een filament aan.');
+  ensureManualOrderList();
+  fillFilamentSelect(manualOrderFilamentEl,state.catalog[0].id);
+  manualOrderQtyEl.value='1';
+  manualOrderDialogEl.showModal();
+};
+
+manualOrderFormEl.onsubmit=e=>{
+  e.preventDefault();
+  ensureManualOrderList();
+
+  const filamentId=manualOrderFilamentEl.value;
+  const quantity=Math.max(1,Math.floor(Number(manualOrderQtyEl.value)||1));
+  if(!filamentId)return;
+
+  const existing=state.manualOrderList.find(x=>x.filamentId===filamentId);
+  if(existing){
+    existing.quantity=Number(existing.quantity||0)+quantity;
+  }else{
+    state.manualOrderList.push({id:uid(),filamentId,quantity});
+  }
+
+  manualOrderDialogEl.close();
+  save();
+};
+
+function removeManualOrderItem(id){
+  ensureManualOrderList();
+  state.manualOrderList=state.manualOrderList.filter(x=>x.id!==id);
+  save();
+}
+
+function createManualOrderFor(entryId,fid,qty){
+  manualOrderPendingId=entryId;
+  fillFilamentSelect(oFilament,fid);
+  oQuantity.value=qty;
+  oSupplier.value=filament(fid)?.supplier||'';
+  orderDialog.showModal();
 }
 
 function renderOrderList(){
@@ -934,11 +900,6 @@ printSelectedLabelsBtn.onclick=()=>{
   if(!selected.length)return alert('Selecteer eerst minstens één spoel of refill.');
   openLabelPrintWindow(selected,'a4');
 };
-
-const spoolSortEl=document.getElementById('spoolSort');
-const refillSortEl=document.getElementById('refillSort');
-if(spoolSortEl)spoolSortEl.onchange=renderSpools;
-if(refillSortEl)refillSortEl.onchange=renderRefills;
 
 function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderSpools();renderRefills();renderOrderList();renderOrders();renderLibraries();renderLog()}
 renderAll();
