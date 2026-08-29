@@ -74,8 +74,63 @@ quickLevelForm.onsubmit=e=>{
   save();
 }
 
-function renderCatalog(){const q=catalogSearch.value.toLowerCase();const items=state.catalog.filter(f=>!q||label(f).toLowerCase().includes(q)).sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));catalogList.innerHTML=items.map(f=>`<div class="item-row category-data-row" data-category="${esc(f.category)}"><div><strong>${esc(label(f))}</strong><div class="item-meta">${esc(f.brand)} · min ${f.min} · gewenst ${f.target}</div></div><div class="item-actions"><button onclick="openDetail('${f.id}')">Open</button><button onclick="openFilament('${f.id}')">Wijzig</button><button class="danger-button" onclick="deleteFilament('${f.id}')">Verwijderen</button></div></div>`).join('')||'<div class="note">Geen filamenten.</div>'}
-catalogSearch.oninput=renderCatalog;
+function renderCatalog(){
+  const q=(document.getElementById('catalogSearch')?.value||'').trim().toLowerCase();
+  const list=(state.filaments||[]).filter(f=>{
+    const hay=`${f.category||''} ${f.type||''} ${f.color||''} ${f.brand||''} ${f.supplier||''} ${f.supplierRef||''}`.toLowerCase();
+    return !q||hay.includes(q);
+  });
+
+  const grouped={};
+  list.forEach(f=>{
+    const category=f.category||'Overig';
+    const type=f.type||'Overig';
+    (grouped[category]??={});
+    (grouped[category][type]??=[]).push(f);
+  });
+
+  const root=document.getElementById('catalogList');
+  if(!root) return;
+  const categories=Object.keys(grouped).sort((a,b)=>a.localeCompare(b,'nl'));
+  if(!categories.length){
+    root.innerHTML='<div class="note">Geen filament gevonden.</div>';
+    return;
+  }
+
+  root.innerHTML=categories.map(category=>`
+    <div class="catalog-dashboard-group" data-category="${esc(category)}">
+      <div class="catalog-dashboard-category">${esc(category)}</div>
+
+      ${Object.keys(grouped[category]).sort((a,b)=>a.localeCompare(b,'nl')).map(type=>`
+        <div class="catalog-dashboard-type">${esc(type)}</div>
+        <div class="catalog-dashboard-header">
+          <div></div>
+          <div>Fabrikant</div>
+          <div>Min.</div>
+          <div>Gewenst</div>
+          <div></div>
+        </div>
+
+        ${grouped[category][type]
+          .slice()
+          .sort((a,b)=>(a.color||'').localeCompare(b.color||'','nl'))
+          .map(f=>`
+            <div class="catalog-dashboard-row">
+              <div class="catalog-dashboard-color">${esc(f.color||'')}</div>
+              <div>${esc(f.brand||'')}</div>
+              <div>${f.minStock??f.min??0}</div>
+              <div>${f.targetStock??f.target??f.desiredStock??0}</div>
+              <div class="catalog-dashboard-actions">
+                <button onclick="openFilament('${f.id}')">Open</button>
+                <button onclick="editFilament('${f.id}')">Wijzig</button>
+                <button class="danger-button" onclick="deleteFilament('${f.id}')">Verwijderen</button>
+              </div>
+            </div>
+          `).join('')}
+      `).join('')}
+    </div>
+  `).join('');
+}
 function sortStock(items){if(stockSortMode==='number-asc')return items.sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));if(stockSortMode==='number-desc')return items.sort((a,b)=>b.number.localeCompare(a.number,'nl',{numeric:true}));return items.sort((a,b)=>{const fa=filament(a.filamentId),fb=filament(b.filamentId);return fa.category.localeCompare(fb.category,'nl')||fa.type.localeCompare(fb.type,'nl')||fa.color.localeCompare(fb.color,'nl')})}
 
 function removeStockItem(kind,id){

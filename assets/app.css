@@ -503,3 +503,72 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     padding-left:32px;
   }
 }
+
+
+/* v7.5.38 — Catalogus volgt Dashboard: categorie > type > kleur */
+.catalog-dashboard-group{
+  margin:0 0 14px;
+  padding:0;
+  color:inherit;
+}
+.catalog-dashboard-category{
+  font-size:1.15rem;
+  font-weight:800;
+  color:inherit;
+  border-bottom:2px solid currentColor;
+  padding:4px 0 3px;
+}
+.catalog-dashboard-type{
+  margin-left:28px;
+  padding:6px 0 3px;
+  font-weight:800;
+  color:inherit;
+}
+.catalog-dashboard-header,
+.catalog-dashboard-row{
+  display:grid;
+  grid-template-columns:minmax(180px,1fr) 160px 90px 100px minmax(260px,auto);
+  align-items:center;
+  gap:10px;
+  border-bottom:1px solid var(--border,#e5e7eb);
+  padding:5px 4px;
+  color:inherit;
+}
+.catalog-dashboard-header{
+  font-size:.78rem;
+  font-weight:700;
+}
+.catalog-dashboard-color{
+  padding-left:52px;
+  color:inherit;
+}
+.catalog-dashboard-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.catalog-dashboard-group button{
+  color:var(--text,#1f2937)!important;
+}
+.catalog-dashboard-group .danger-button{
+  color:#b91c1c!important;
+}
+@media(max-width:700px){
+  .catalog-dashboard-type{margin-left:16px}
+  .catalog-dashboard-header{display:none}
+  .catalog-dashboard-row{
+    grid-template-columns:1fr auto;
+    gap:4px 10px;
+    padding:8px 4px;
+  }
+  .catalog-dashboard-color{
+    padding-left:32px;
+    font-weight:700;
+  }
+  .catalog-dashboard-actions{
+    grid-column:1 / -1;
+    justify-content:flex-start;
+    padding-left:32px;
+  }
+}
