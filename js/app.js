@@ -53,26 +53,7 @@ orderForm.onsubmit=e=>{e.preventDefault();state.orders.push({id:uid(),filamentId
 
 function renderDashboard(){sumSpools.textContent=state.spools.filter(s=>s.status==='active').length;sumRefills.textContent=state.refills.length;sumEmpty.textContent=state.spools.filter(s=>s.status==='active'&&Number(s.level)===0).length;sumLow.textContent=state.catalog.filter(f=>totalStock(f.id)<Number(f.min)).length;const q=dashboardSearch.value.toLowerCase(),grouped={};state.catalog.slice().sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl')).forEach(f=>{if(q&&!`${f.category} ${f.type} ${f.color}`.toLowerCase().includes(q))return;grouped[f.category]??={};grouped[f.category][f.type]??=[];const active=state.spools.filter(s=>s.status==='active'&&s.filamentId===f.id).sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));if(!active.length)grouped[f.category][f.type].push({f,spool:null});else active.forEach(s=>grouped[f.category][f.type].push({f,spool:s}))});dashboardList.innerHTML=Object.keys(grouped).map(c=>`<div class="category-group" data-category="${esc(c)}"><div class="category-title">${esc(c)}</div>${Object.keys(grouped[c]).map(t=>`<div class="type-title">${esc(t)}</div><table class="dashboard-table"><thead><tr><th>Kleur</th><th>Spoel</th><th>Hoeveelh.</th><th>Refill</th></tr></thead><tbody>${grouped[c][t].map(r=>`<tr data-category="${esc(c)}"><td onclick="openDetail('${r.f.id}')">${esc(r.f.color)}</td><td>${r.spool?`<button onclick="openSpool('${r.spool.id}')">${r.spool.number}</button>`:'—'}</td><td>${r.spool?`<button class="level-btn" onclick="quickLevel('${r.spool.id}')">${r.spool.level}%</button>`:'—'}</td><td>${refillCount(r.f.id)}</td></tr>`).join('')}</tbody></table>`).join('')}</div>`).join('')||'<div class="note">Nog geen filamenten.</div>'}
 dashboardSearch.oninput=renderDashboard;
-let quickLevelSpoolId=null;
-function quickLevel(id){
-  const s=state.spools.find(x=>x.id===id);
-  if(!s)return;
-  quickLevelSpoolId=id;
-  quickLevelTitle.textContent=`Resterende hoeveelheid ${s.number}`;
-  quickLevelValue.value=String(s.level);
-  quickLevelDialog.showModal();
-}
-quickLevelForm.onsubmit=e=>{
-  e.preventDefault();
-  const s=state.spools.find(x=>x.id===quickLevelSpoolId);
-  if(!s)return quickLevelDialog.close();
-  const n=Number(quickLevelValue.value);
-  s.level=n;
-  log(`Spoel ${s.number} aangepast naar ${n}%`,s.filamentId);
-  quickLevelDialog.close();
-  quickLevelSpoolId=null;
-  save();
-}
+function quickLevel(id){const s=state.spools.find(x=>x.id===id);const v=prompt(`Hoeveelheid op ${s.number}: 0, 25, 50, 75 of 100`,s.level);if(v===null)return;const n=Number(v);if(![0,25,50,75,100].includes(n))return alert('Kies 0, 25, 50, 75 of 100.');s.level=n;log(`Spoel ${s.number} aangepast naar ${n}%`,s.filamentId);save()}
 
 function renderCatalog(){const q=catalogSearch.value.toLowerCase();const items=state.catalog.filter(f=>!q||label(f).toLowerCase().includes(q)).sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));catalogList.innerHTML=items.map(f=>`<div class="item-row category-data-row" data-category="${esc(f.category)}"><div><strong>${esc(label(f))}</strong><div class="item-meta">${esc(f.brand)} · min ${f.min} · gewenst ${f.target}</div></div><div class="item-actions"><button onclick="openDetail('${f.id}')">Open</button><button onclick="openFilament('${f.id}')">Wijzig</button><button class="danger-button" onclick="deleteFilament('${f.id}')">Verwijderen</button></div></div>`).join('')||'<div class="note">Geen filamenten.</div>'}
 catalogSearch.oninput=renderCatalog;
@@ -95,76 +76,22 @@ function removeStockItem(kind,id){
   save();
 }
 
-
-function sortStockItems(items,mode){
-  return [...items].sort((a,b)=>{
-    if(mode==='number')return String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true});
-    const fa=filament(a.filamentId),fb=filament(b.filamentId);
-    return (fa?.category||'').localeCompare(fb?.category||'','nl')||
-           (fa?.type||'').localeCompare(fb?.type||'','nl')||
-           (fa?.color||'').localeCompare(fb?.color||'','nl')||
-           String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true});
-  });
+function renderStock(){
+  document.querySelectorAll('[data-stock-mode]').forEach(b=>b.classList.toggle('active',b.dataset.stockMode===stockMode));
+  const q=stockSearch.value.toLowerCase();
+  const items=sortStock((stockMode==='spools'?state.spools:state.refills).filter(x=>{
+    const f=filament(x.filamentId);
+    return !q||`${x.number} ${label(f)}`.toLowerCase().includes(q);
+  }));
+  stockList.innerHTML=items.map(x=>{
+    const f=filament(x.filamentId);
+    const kind=stockMode==='spools'?'spoel':'refill';
+    return `<div class="item-row category-data-row" data-category="${esc(f.category)}"><div><strong>${esc(label(f))}</strong><div class="item-meta">${x.number} · ${stockMode==='spools'?x.level+'%':'Refill'}</div></div><div class="item-actions"><input class="label-select" type="checkbox" data-kind="${kind}" data-id="${x.id}" aria-label="Selecteer ${x.number}"><button onclick="${stockMode==='spools'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button><button onclick="openQr('${kind}','${x.id}')">QR</button><button class="danger-button" onclick="removeStockItem('${stockMode==='spools'?'spool':'refill'}','${x.id}')">Verwijderen</button></div></div>`;
+  }).join('')||'<div class="note">Geen voorraad.</div>';
 }
-
-function renderSpools(){
-  const q=(spoolSearch?.value||'').toLowerCase();
-  const mode=spoolSort?.value||'filament';
-  const items=sortStockItems(
-    state.spools.filter(s=>{
-      const f=filament(s.filamentId);
-      const hay=`${s.number} ${label(f)}`.toLowerCase();
-      return !q||hay.includes(q);
-    }),
-    mode
-  );
-
-  spoolList.innerHTML=items.map(s=>{
-    const f=filament(s.filamentId);
-    return `<div class="item-row category-data-row" data-category="${esc(f?.category||'')}">
-      <div>
-        <strong>${esc(s.number)} · ${esc(label(f))}</strong>
-        <div class="item-meta">Resterend: ${Number(s.level)||0}%</div>
-      </div>
-      <div class="item-actions">
-        <button onclick="quickLevel('${s.id}')">Hoeveelheid</button>
-        <button onclick="openSpool('${s.id}')">Open</button>
-        <button class="danger-button" onclick="removeStockItem('spool','${s.id}')">Verwijderen</button>
-      </div>
-    </div>`;
-  }).join('')||'<div class="note">Geen spoelen gevonden.</div>';
-}
-
-function renderRefills(){
-  const q=(refillSearch?.value||'').toLowerCase();
-  const mode=refillSort?.value||'filament';
-  const items=sortStockItems(
-    state.refills.filter(r=>{
-      const f=filament(r.filamentId);
-      const hay=`${r.number} ${label(f)}`.toLowerCase();
-      return !q||hay.includes(q);
-    }),
-    mode
-  );
-
-  refillList.innerHTML=items.map(r=>{
-    const f=filament(r.filamentId);
-    return `<div class="item-row category-data-row" data-category="${esc(f?.category||'')}">
-      <div>
-        <strong>${esc(r.number)} · ${esc(label(f))}</strong>
-      </div>
-      <div class="item-actions">
-        <button onclick="openRefill('${r.id}')">Open</button>
-        <button class="danger-button" onclick="removeStockItem('refill','${r.id}')">Verwijderen</button>
-      </div>
-    </div>`;
-  }).join('')||'<div class="note">Geen refills gevonden.</div>';
-}
-
-spoolSearch.oninput=renderSpools;
-spoolSort.onchange=renderSpools;
-refillSearch.oninput=renderRefills;
-refillSort.onchange=renderRefills;
+document.querySelectorAll('[data-stock-mode]').forEach(b=>b.onclick=()=>{stockMode=b.dataset.stockMode;renderStock()});
+stockSearch.oninput=renderStock;
+document.getElementById('stockSort').onchange=e=>{stockSortMode=e.target.value;renderStock()};
 
 
 let manualOrderPendingId=null;
@@ -360,13 +287,13 @@ function handleScannedCode(value){
   }
 
   if(spool){
-    setView('spoelen');
+    setView('voorraad');
     openSpool(spool.id);
     return;
   }
 
   if(refill){
-    setView('refills');
+    setView('voorraad');
     openRefill(refill.id);
     return;
   }
@@ -432,7 +359,7 @@ async function stopQrScanner(){
 startScannerBtn.onclick=startQrScanner;
 stopScannerBtn.onclick=stopQrScanner;
 
-manualScanBtn.onclick=()=>{const code=parseQrCode(manualScanCode.value);const s=state.spools.find(x=>x.number===code);if(s){setView('spoelen');openSpool(s.id);return}const r=state.refills.find(x=>x.number===code);if(r){setView('spoelen');openRefill(r.id);return}alert('Code niet gevonden.')}
+manualScanBtn.onclick=()=>{const code=parseQrCode(manualScanCode.value);const s=state.spools.find(x=>x.number===code);if(s){setView('voorraad');openSpool(s.id);return}const r=state.refills.find(x=>x.number===code);if(r){setView('voorraad');openRefill(r.id);return}alert('Code niet gevonden.')}
 function setRefillLinkMode(mode){
   refillLinkMode=mode;
   refillScanPhase=null;
@@ -694,10 +621,10 @@ function openQr(kind,id){
 function labelHtml(i){
   return `<div class="label">
     <img src="${qrImageUrl(i.kind,i.number)}" alt="QR">
-    <div class="number ${String(i.kind).toLowerCase()==='refill'?'refill-number':'spool-number'}">${esc(i.number)}</div>
+    <div class="number">${esc(i.number)}</div>
     <div class="divider"></div>
-    <div class="main filament-main">${esc(i.category)} ${esc(i.type)}</div>
-    <div class="line filament-color">${esc(i.color)}</div>
+    <div class="main">${esc(i.category)} ${esc(i.type)}</div>
+    <div class="line">${esc(i.color)}</div>
     <div class="line">${esc(i.supplier)}</div>
     <div class="small">${i.reference?`Ref. ${esc(i.reference)}`:''}</div>
     <div class="kind">${esc(i.kind)}</div>
@@ -729,21 +656,21 @@ function openLabelPrintWindow(items,format='a4'){
       }
       .sheet{
         display:grid;
-        grid-template-columns:50mm 50mm 50mm;
-        grid-auto-rows:75mm;
+        grid-template-columns:55mm 55mm 55mm;
+        grid-auto-rows:90mm;
         gap:0;
-        width:150mm;
+        width:165mm;
         align-items:start;
         justify-content:start;
       }
       .label{
         box-sizing:border-box;
-        width:50mm;
-        min-width:50mm;
-        max-width:50mm;
-        height:75mm;
-        min-height:75mm;
-        max-height:75mm;
+        width:55mm;
+        min-width:55mm;
+        max-width:55mm;
+        height:90mm;
+        min-height:90mm;
+        max-height:90mm;
         padding:3mm;
         border:1px solid #000;
         border-radius:2mm;
@@ -766,8 +693,6 @@ function openLabelPrintWindow(items,format='a4'){
         letter-spacing:.8mm;
         line-height:1;
       }
-      .spool-number{color:#000}
-      .refill-number{color:#c00}
       .divider{
         border-top:1px solid #000;
         margin:2mm 0;
@@ -803,41 +728,7 @@ function openLabelPrintWindow(items,format='a4'){
         body{background:#fff}
         .sheet{margin:0;padding:0}
       }
-    
-      /* Compacte opmaak voor 50 x 75 mm */
-      .label{padding:2mm 2.5mm 1.5mm;overflow:hidden}
-      .label img{width:32mm;height:32mm;margin:0 auto .8mm}
-      .number{margin:.2mm 0 .7mm;line-height:1}
-      .divider{margin:.5mm 0 .8mm}
-      .main{line-height:1.05;margin:0 0 .4mm}
-      .line{line-height:1.05;margin:0 0 .25mm}
-      .small{line-height:1;margin-top:.25mm}
-      .kind{line-height:1;margin-top:.35mm}
-
-      /* Grotere filamentnaam en kleur op 50 x 75 mm label */
-      .filament-main{
-        font-size:13pt;
-        font-weight:900;
-        line-height:1.02;
-        margin:0 0 .45mm;
-        white-space:normal;
-        overflow-wrap:anywhere;
-      }
-      .filament-color{
-        font-size:12pt;
-        font-weight:900;
-        line-height:1.02;
-        margin:0 0 .35mm;
-        white-space:normal;
-        overflow-wrap:anywhere;
-        display:-webkit-box;
-        -webkit-box-orient:vertical;
-        -webkit-line-clamp:2;
-        overflow:hidden;
-        min-height:0;
-        max-height:2.1em;
-      }
-</style>
+    </style>
   </head>
   <body>
     <div class="sheet">${html}</div>
@@ -901,7 +792,7 @@ printSelectedLabelsBtn.onclick=()=>{
   openLabelPrintWindow(selected,'a4');
 };
 
-function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderSpools();renderRefills();renderOrderList();renderOrders();renderLibraries();renderLog()}
+function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderStock();renderOrderList();renderOrders();renderLibraries();renderLog()}
 renderAll();
 
 if(window.copyDiagnosisBtn){

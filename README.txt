@@ -1,17 +1,13 @@
-FILAMENT MANAGER v7.5.27 — SPOELEN EN REFILLS APART
+FILAMENT MANAGER v7.5.21 — EXACTE REFILL-CONTROLE
 
-Wijziging:
-- De gezamenlijke pagina Voorraad is opgesplitst.
-- Nieuw scherm Spoelen: alleen spoelen, resterend percentage en spoelfuncties.
-- Nieuw scherm Refills: alleen refills en refillfuncties.
-- Beide schermen hebben hun eigen zoekveld en sortering.
-- Navigatie toont nu afzonderlijk Spoelen en Refills.
-- Dashboard blijft ongewijzigd.
+Nieuw:
+- Een refill mag alleen gekoppeld worden aan een spoel met exact hetzelfde filament.
+- De controle gebeurt op filamentId.
+- Daardoor moeten categorie, type en kleur exact overeenkomen.
+- Elke afwijking wordt volledig geblokkeerd.
+- Voor een ander filament moet een nieuw spoelnummer aangemaakt worden.
+- Werkt zowel bij Manueel als bij Scan.
 
-Niet gewijzigd:
-- Onderliggende voorraadgegevens.
-- JSON import/export.
-- localStorage-sleutel en opslagstructuur.
-- Bestellingen.
-- QR/printfunctionaliteit.
-- Labelopmaak.
+Bestaand behouden:
+- Niet-lege spoel kan gewisseld worden na bevestiging.
+- JSON import/export en localStorage ongewijzigd.
