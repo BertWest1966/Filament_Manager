@@ -279,8 +279,8 @@ function stockPageHtml(items,kind,query){
             .map((x,idx)=>`
               <div class="dashboard-stock-row ${kind==='refill'?'refill-row':''}">
                 <div class="dashboard-stock-color">${esc(color)}</div>
-                <div><strong>${esc(x.number)}</strong></div>
-                ${kind==='spool'?`<div><span class="level-badge">${Number(x.level)||0}%</span></div>`:''}
+                <div class="dashboard-stock-number"><strong>${esc(x.number)}</strong></div>
+                ${kind==='spool'?`<div class="dashboard-stock-level"><span class="level-badge">${Number(x.level)||0}%</span></div>`:''}
                 <div class="dashboard-stock-actions">
                   ${kind==='spool'
                     ? `<button onclick="quickLevel('${x.id}')">Hoeveelheid</button><button onclick="openSpool('${x.id}')">Open</button>`

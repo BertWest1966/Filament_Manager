@@ -653,3 +653,35 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     justify-content:flex-start;
   }
 }
+
+
+/* v7.5.43 — mobiel: kleur, resterende hoeveelheid en spoelnummer op één regel */
+@media(max-width:700px){
+  #spoelen .dashboard-stock-row:not(.refill-row){
+    grid-template-columns:minmax(0,1fr) 64px 76px !important;
+    grid-template-areas:
+      "color level number"
+      "actions actions actions";
+    align-items:center;
+    column-gap:8px;
+  }
+  #spoelen .dashboard-stock-color{
+    grid-area:color;
+    padding-left:32px;
+    min-width:0;
+  }
+  #spoelen .dashboard-stock-level{
+    grid-area:level;
+    text-align:center;
+    white-space:nowrap;
+  }
+  #spoelen .dashboard-stock-number{
+    grid-area:number;
+    text-align:right;
+    white-space:nowrap;
+  }
+  #spoelen .dashboard-stock-actions{
+    grid-area:actions;
+    padding-left:32px;
+  }
+}
