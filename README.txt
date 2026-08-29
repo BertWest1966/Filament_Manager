@@ -1,35 +1,29 @@
-FILAMENT MANAGER v7.5.44
+FILAMENT MANAGER v7.5.45
 
-Gebaseerd op v7.5.43.
+Gebaseerd op v7.5.44.
 
-BELANGRIJKSTE HERSTEL
-De gegevensopslag is teruggebracht naar de oorspronkelijke, eenvoudige en eerder werkende methode uit v7.5.38a:
+HERSTEL AFDRUKKEN / DATA
+De regressie vanaf v7.5.7 is teruggedraaid.
 
-  const KEY='filament_manager_v7_1';
-  function load(){...localStorage.getItem(KEY)...}
-  function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
+Voorraad Spoelen (A4) en Voorraad Refills (A4):
+- blijven volledig afdrukbaar;
+- openen opnieuw het ingebouwde afdrukvoorbeeld in dezelfde index.html;
+- de app navigeert hiervoor niet meer naar een aparte HTML-pagina;
+- na sluiten van het afdrukvoorbeeld blijft de hoofdapp geladen.
 
-Verwijderd uit de opslaglaag:
-- automatische opslagmigratie uit latere versies
-- IndexedDB reservekopie/herstel uit v7.5.41
-- asynchrone restorePersistentState bij opstarten
+Dit gebruikt de FMPrint-module die al in de app aanwezig was en die in v7.5.6 voor deze functie werd gebruikt.
 
-De JSON-import blijft de teruggezette gegevens direct opslaan onder dezelfde localStorage-key.
+BEHOUDEN
+- localStorage key: filament_manager_v7_1
+- JSON import/export
+- stickerafdrukken
+- sorteren Spoelen/Refills
+- mobiele layout v7.5.43
+- QR, catalogus en bestellingen
 
-NIET GEWIJZIGD
-- Afdrukken blijft volledig aanwezig.
-- Voorraad Spoelen (A4) blijft aanwezig.
-- Voorraad Refills (A4) blijft aanwezig.
-- Stickerafdrukken blijft aanwezig.
-- Sorteren op categorie/type/kleur en nummer blijft aanwezig.
-- Mobiele layout van v7.5.43 blijft aanwezig.
-- QR, catalogus, bestellingen en overige functies blijven aanwezig.
+OPMERKING
+De losse bestanden voorraad-spoelen.html en voorraad-refills.html blijven in het pakket aanwezig, maar de app gebruikt ze niet meer voor de twee knoppen onder Meer → Afdrukken.
 
-CONTROLES
-- JavaScript-syntax: node --check
-- localStorage-key exact behouden: filament_manager_v7_1
-- ensureManualOrderList aanwezig
-- normalizeBackupData aanwezig
-- voorraad-spoelen.html ongewijzigd
-- voorraad-refills.html ongewijzigd
-- print-tools.js ongewijzigd
+CONTROLE
+- JavaScript-syntax gecontroleerd met node --check.
+- FMPrint.show('spools') en FMPrint.show('refills') aanwezig.
