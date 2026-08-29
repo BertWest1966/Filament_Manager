@@ -333,7 +333,8 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
   color:initial !important;
 }
 
-/* v7.5.31 — categorietekstkleur overal */
+
+/* v7.5.32 — oorspronkelijke categorie-tekstkleur overal */
 [data-category="PLA"]{color:#315c9d!important}
 [data-category="PETG"]{color:#2f7d4a!important}
 [data-category="ASA"]{color:#b26724!important}
@@ -342,5 +343,6 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 [data-category="PC"]{color:#2b7180!important}
 [data-category="PA"]{color:#8a5a2b!important}
 [data-category="PVA"]{color:#6b7280!important}
-[data-category] strong,[data-category] .item-meta,[data-category] .inventory-type,[data-category] .inventory-type-title,[data-category] .inventory-header,[data-category] .inventory-row,[data-category] .inventory-color,[data-category] .stock-type,[data-category] .stock-type-title,[data-category] .stock-color,[data-category] .stock-color-title{color:inherit!important}
-[data-category] button,[data-category] input,[data-category] select{color:var(--text,#1f2937)!important}
+[data-category] *:not(button):not(input):not(select):not(option):not(textarea){color:inherit!important}
+[data-category] button,[data-category] input,[data-category] select,[data-category] option,[data-category] textarea{color:var(--text,#1f2937)!important}
+[data-category] .danger-button{color:#b91c1c!important}
