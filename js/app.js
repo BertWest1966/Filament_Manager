@@ -8,6 +8,23 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
 function fresh(){return{appVersion:'7.2',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS)}}
 function load(){try{return {...fresh(),...JSON.parse(localStorage.getItem(KEY)||'null')}}catch{return fresh()}}
+
+function migrateLegacyStorage(){
+  try{
+    if(localStorage.getItem(KEY))return;
+    const candidates=[];
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k&&/^filament_manager_v7_/i.test(k)&&k!==KEY&&localStorage.getItem(k))candidates.push(k);
+    }
+    candidates.sort().reverse();
+    if(candidates.length){
+      localStorage.setItem(KEY,localStorage.getItem(candidates[0]));
+    }
+  }catch(e){console.warn('Opslagmigratie overgeslagen',e)}
+}
+migrateLegacyStorage();
+
 function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
 function pushUnique(arr,v){v=String(v||'').trim();if(v&&!arr.some(x=>x.toLowerCase()===v.toLowerCase()))arr.push(v)}
 function filament(id){return state.catalog.find(f=>f.id===id)}
@@ -887,6 +904,21 @@ printSelectedLabelsBtn.onclick=()=>{
 };
 
 function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderSpools();renderRefills();renderOrderList();renderOrders();renderLibraries();renderLog()}
+
+document.querySelectorAll('.mobile-bottom-nav [data-view]').forEach(btn=>{
+  btn.addEventListener('click',()=>setView(btn.dataset.view));
+});
+const mobileScanBtn=document.getElementById('mobileScanBtn');
+if(mobileScanBtn)mobileScanBtn.addEventListener('click',()=>{
+  const b=document.querySelector('#scanBtn,[data-action="scan"],#openScannerBtn');
+  if(b)b.click(); else if(typeof openScanner==='function')openScanner();
+});
+const mobileMoreBtn=document.getElementById('mobileMoreBtn');
+if(mobileMoreBtn)mobileMoreBtn.addEventListener('click',()=>{
+  const b=document.querySelector('#moreBtn,[data-action="more"],button[data-view="more"],button[data-view="meer"]');
+  if(b)b.click(); else setView('more');
+});
+
 renderAll();
 
 if(window.copyDiagnosisBtn){

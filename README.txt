@@ -1,6 +1,8 @@
-FILAMENT MANAGER v7.5.38a
-Herstel Catalogus vanuit werkende v7.5.37.
-- Bestaande catalogus-databron en zoek/filterlogica behouden.
-- Alleen weergave gegroepeerd als Dashboard: categorie > type > kleur.
-- Categoriekleuren behouden.
-- JSON/localStorage en overige logica ongewijzigd.
+FILAMENT MANAGER v7.5.39
+- iPhone ondermenu horizontaal schuifbaar.
+- Volgorde: Dashboard, Spoelen, Refills, Scannen, Bestellen, Lopende bestellingen, Meer.
+- Mac/desktopmenu ongewijzigd.
+- localStorage-key blijft filament_manager_v7_1.
+- Bestaande load/save-logica behouden.
+- Extra migratie: als huidige sleutel leeg is, wordt een oudere filament_manager_v7_* opslag automatisch overgenomen.
+- JSON import/export ongewijzigd.
