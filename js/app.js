@@ -905,17 +905,6 @@ printSelectedLabelsBtn.onclick=()=>{
 
 function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderSpools();renderRefills();renderOrderList();renderOrders();renderLibraries();renderLog()}
 
-document.querySelectorAll('.mobile-bottom-nav [data-view]').forEach(btn=>{
-  btn.addEventListener('click',()=>setView(btn.dataset.view));
-});
-const mobileScanBtn=document.getElementById('mobileScanBtn');
-if(mobileScanBtn)mobileScanBtn.addEventListener('click',()=>{
-  const b=document.querySelector('#scanBtn,[data-action="scan"],#openScannerBtn');
-  if(b)b.click(); else if(typeof openScanner==='function')openScanner();
-});
-const mobileMoreBtn=document.getElementById('mobileMoreBtn');
-if(mobileMoreBtn)mobileMoreBtn.addEventListener('click',()=>setView('meer'));
-
 renderAll();
 
 if(window.copyDiagnosisBtn){
