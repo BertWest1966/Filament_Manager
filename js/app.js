@@ -1,7 +1,6 @@
 
 const KEY='filament_manager_v7_1';
 const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','Andere'],types:{PLA:['Basic','Matte'],PETG:['Basic'],TPU:['95A'],ABS:['Basic'],ASA:['Basic'],Andere:[]},colors:[],brands:['Bambu Lab'],suppliers:['Bambu Lab']};
-
 let state=load();
 let currentView='dashboard',previousView='dashboard',stockMode='spools',stockSortMode='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,activeLibraryKind='colors',editingLibraryValue=null;
 const $=id=>document.getElementById(id);
@@ -10,14 +9,6 @@ function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.
 function fresh(){return{appVersion:'7.2',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS)}}
 function load(){try{return {...fresh(),...JSON.parse(localStorage.getItem(KEY)||'null')}}catch{return fresh()}}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
-
-
-
-
-
-
-
-
 function pushUnique(arr,v){v=String(v||'').trim();if(v&&!arr.some(x=>x.toLowerCase()===v.toLowerCase()))arr.push(v)}
 function filament(id){return state.catalog.find(f=>f.id===id)}
 function label(f){return f?`${f.category} · ${f.type} · ${f.color}`:''}
@@ -250,7 +241,6 @@ function renderSpools(){
     ? stockPageHtml(state.spools,'spool',spoolSearch?.value||'')
     : stockNumberPageHtml(state.spools,'spool',spoolSearch?.value||'',mode);
 }
-
 function renderRefills(){
   const mode=document.getElementById('refillSort')?.value||'filament';
   refillList.innerHTML=mode==='filament'
@@ -259,10 +249,6 @@ function renderRefills(){
 }
 spoolSearch.oninput=renderSpools;
 refillSearch.oninput=renderRefills;
-const spoolSortEl=document.getElementById('spoolSort');
-const refillSortEl=document.getElementById('refillSort');
-if(spoolSortEl)spoolSortEl.onchange=renderSpools;
-if(refillSortEl)refillSortEl.onchange=renderRefills;
 
 function ensureManualOrderList(){
   if(!Array.isArray(state.manualOrderList))state.manualOrderList=[];
@@ -949,8 +935,12 @@ printSelectedLabelsBtn.onclick=()=>{
   openLabelPrintWindow(selected,'a4');
 };
 
-function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderSpools();renderRefills();renderOrderList();renderOrders();renderLibraries();renderLog()}
+const spoolSortEl=document.getElementById('spoolSort');
+const refillSortEl=document.getElementById('refillSort');
+if(spoolSortEl)spoolSortEl.onchange=renderSpools;
+if(refillSortEl)refillSortEl.onchange=renderRefills;
 
+function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderSpools();renderRefills();renderOrderList();renderOrders();renderLibraries();renderLog()}
 renderAll();
 
 if(window.copyDiagnosisBtn){

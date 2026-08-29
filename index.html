@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Filament">
-  <title>Filament Manager v7.5.45</title>
+  <title>Filament Manager v7.5.38a</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=7.5.45">
+  <link rel="stylesheet" href="assets/app.css?v=7.5.47">
 </head>
 <body>
 <div class="app-shell">
@@ -18,7 +18,7 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 7.5.45 · Afdrukken</span>
+      <span>Versie 7.5.47 · Afdrukken</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active">Dashboard</button>
@@ -38,7 +38,7 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 7.5.45 · Afdrukken</span>
+        <span>Versie 7.5.47 · Afdrukken</span>
       </div>
     </header>
 
@@ -206,8 +206,8 @@
           <h2>Afdrukken</h2>
           <p class="note">Druk een compacte A4-voorraadlijst af.</p>
           <div class="menu-grid">
-            <button type="button" id="printSpoolInventoryBtn" onclick="FMPrint.show('spools')">Voorraad Spoelen (A4)</button>
-            <button type="button" id="printRefillInventoryBtn" onclick="FMPrint.show('refills')">Voorraad Refills (A4)</button>
+            <a class="print-link-button" href="voorraad-spoelen.html">Voorraad Spoelen (A4)</a>
+            <a class="print-link-button" href="voorraad-refills.html">Voorraad Refills (A4)</a>
           </div>
         </div>
         <div class="panel">
@@ -502,7 +502,7 @@ window.FMPrint = (() => {
   </form>
 </dialog>
 
-<script src="js/app.js?v=7.5.45"></script>
+<script src="js/app.js?v=7.5.47"></script>
 <script src="js/print-tools.js?v=7.5.5"></script>
 </body>
 </html>

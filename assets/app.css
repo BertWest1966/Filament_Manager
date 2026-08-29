@@ -522,6 +522,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
  .catalog-dashboard-actions{grid-column:1/-1;justify-content:flex-start;padding-left:32px}
 }
 
+
 /* v7.5.40 — compact horizontaal schuifbaar iPhone-menu */
 .mobile-bottom-nav{display:none}
 @media(max-width:700px){

@@ -1,29 +1,20 @@
-FILAMENT MANAGER v7.5.45
+FILAMENT MANAGER v7.5.47
 
-Gebaseerd op v7.5.44.
+Schone herbouw vanaf v7.5.38a.
 
-HERSTEL AFDRUKKEN / DATA
-De regressie vanaf v7.5.7 is teruggedraaid.
+De volledige opslagbasis is bewust die van v7.5.38a:
+- localStorage-key filament_manager_v7_1
+- originele load()
+- originele save()
+- originele JSON import/export
+- GEEN migrateLegacyStorage
+- GEEN IndexedDB-herstelcode
+- GEEN restorePersistentState
 
-Voorraad Spoelen (A4) en Voorraad Refills (A4):
-- blijven volledig afdrukbaar;
-- openen opnieuw het ingebouwde afdrukvoorbeeld in dezelfde index.html;
-- de app navigeert hiervoor niet meer naar een aparte HTML-pagina;
-- na sluiten van het afdrukvoorbeeld blijft de hoofdapp geladen.
+Alleen latere UI-functies zijn teruggezet:
+- mobiel menu met Spoelen en Refills
+- sortering op categorie/type/kleur of nummer
+- compacte mobiele navigatie
+- mobiele Spoelen-regel met kleur, resterend percentage en spoelnummer
 
-Dit gebruikt de FMPrint-module die al in de app aanwezig was en die in v7.5.6 voor deze functie werd gebruikt.
-
-BEHOUDEN
-- localStorage key: filament_manager_v7_1
-- JSON import/export
-- stickerafdrukken
-- sorteren Spoelen/Refills
-- mobiele layout v7.5.43
-- QR, catalogus en bestellingen
-
-OPMERKING
-De losse bestanden voorraad-spoelen.html en voorraad-refills.html blijven in het pakket aanwezig, maar de app gebruikt ze niet meer voor de twee knoppen onder Meer → Afdrukken.
-
-CONTROLE
-- JavaScript-syntax gecontroleerd met node --check.
-- FMPrint.show('spools') en FMPrint.show('refills') aanwezig.
+Afdrukfuncties en JSON-back-up blijven behouden vanuit de werkende basis.
