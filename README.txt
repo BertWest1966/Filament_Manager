@@ -1,20 +1,9 @@
-FILAMENT MANAGER v7.5.35
+FILAMENT MANAGER v7.5.36 — VOORRAAD VOLGT DASHBOARD-INDELING
 
-Definitieve voorraadweergave:
-PETG
-    Basic
-        Black
-        Gray
-    HF
-        Black
-        Blue
-
-PLA
-    Basic
-        Black
-
-- Het zichtbare woord 'Kleur' is verwijderd uit de voorraadweergave.
-- Basic, HF, Translucent enz. krijgen dezelfde tekstkleur als hun categorie.
-- Categorie > type > filamentkleur blijft ingesprongen.
-- Bestaande kolommen Spoel, Hoeveelh. en Refill blijven behouden.
+- Spoelen en Refills gebruiken dezelfde systematiek als het Dashboard:
+  categorie > type > kleur.
+- Zelfde visuele inspringing en categoriekleur.
+- Compacte tabelopbouw met Spoel/Refill en Hoeveelh.
+- Het woord 'Kleur' blijft verwijderd.
+- Mobiele/iPhone-weergave behoudt dezelfde hiërarchie.
 - JSON, localStorage en voorraadlogica zijn niet gewijzigd.

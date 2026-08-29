@@ -107,41 +107,58 @@ function stockGroups(items){
   });
   return groups;
 }
+
 function stockPageHtml(items,kind,query){
   const q=(query||'').trim().toLowerCase();
   const filtered=items.filter(x=>{
     const f=filament(x.filamentId);
-    return !q||`${x.number||''} ${f?.category||''} ${f?.type||''} ${f?.color||''}`.toLowerCase().includes(q);
+    const hay=`${x.number||''} ${f?.category||''} ${f?.type||''} ${f?.color||''}`.toLowerCase();
+    return !q||hay.includes(q);
   });
+
   const groups=stockGroups(filtered);
   const categories=Object.keys(groups).sort((a,b)=>a.localeCompare(b,'nl'));
-  if(!categories.length)return `<div class="note">Geen ${kind==='spool'?'spoelen':'refills'} gevonden.</div>`;
+
+  if(!categories.length){
+    return `<div class="note">Geen ${kind==='spool'?'spoelen':'refills'} gevonden.</div>`;
+  }
+
   return categories.map(category=>`
-    <div class="inventory-category" data-category="${esc(category)}">
-      <div class="inventory-category-title">${esc(category)}</div>
+    <div class="dashboard-stock-group inventory-category" data-category="${esc(category)}">
+      <div class="dashboard-stock-category">${esc(category)}</div>
+
       ${Object.keys(groups[category]).sort((a,b)=>a.localeCompare(b,'nl')).map(type=>`
-        <div class="inventory-type">
-          <div class="inventory-type-title">${esc(type)}</div>
-          <div class="inventory-header">
-            <div></div><div>${kind==='spool'?'Spoel':'Refill'}</div>${kind==='spool'?'<div>Hoeveelh.</div>':''}<div></div>
-          </div>
-          ${Object.keys(groups[category][type]).sort((a,b)=>a.localeCompare(b,'nl')).flatMap(color=>
-            groups[category][type][color]
-              .sort((a,b)=>String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true}))
-              .map((x,idx)=>`
-                <div class="inventory-row">
-                  <div class="inventory-color">${idx===0?esc(color):''}</div>
-                  <div><strong>${esc(x.number)}</strong></div>
-                  ${kind==='spool'?`<div><span class="level-badge">${Number(x.level)||0}%</span></div>`:''}
-                  <div class="inventory-actions">
-                    ${kind==='spool'?`<button onclick="quickLevel('${x.id}')">Hoeveelheid</button><button onclick="openSpool('${x.id}')">Open</button>`:`<button onclick="openRefill('${x.id}')">Open</button>`}
-                    <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
-                  </div>
-                </div>`).join('')
-          ).join('')}
-        </div>`).join('')}
-    </div>`).join('');
+        <div class="dashboard-stock-type">${esc(type)}</div>
+
+        <div class="dashboard-stock-header ${kind==='refill'?'refill-header':''}">
+          <div></div>
+          <div>${kind==='spool'?'Spoel':'Refill'}</div>
+          ${kind==='spool'?'<div>Hoeveelh.</div>':''}
+          <div></div>
+        </div>
+
+        ${Object.keys(groups[category][type]).sort((a,b)=>a.localeCompare(b,'nl')).flatMap(color=>
+          groups[category][type][color]
+            .sort((a,b)=>String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true}))
+            .map((x,idx)=>`
+              <div class="dashboard-stock-row ${kind==='refill'?'refill-row':''}">
+                <div class="dashboard-stock-color">${idx===0?esc(color):''}</div>
+                <div><strong>${esc(x.number)}</strong></div>
+                ${kind==='spool'?`<div><span class="level-badge">${Number(x.level)||0}%</span></div>`:''}
+                <div class="dashboard-stock-actions">
+                  ${kind==='spool'
+                    ? `<button onclick="quickLevel('${x.id}')">Hoeveelheid</button><button onclick="openSpool('${x.id}')">Open</button>`
+                    : `<button onclick="openRefill('${x.id}')">Open</button>`}
+                  <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
+                </div>
+              </div>
+            `)
+        ).join('')}
+      `).join('')}
+    </div>
+  `).join('');
 }
+
 function renderSpools(){spoolList.innerHTML=stockPageHtml(state.spools,'spool',spoolSearch?.value||'')}
 function renderRefills(){refillList.innerHTML=stockPageHtml(state.refills,'refill',refillSearch?.value||'')}
 spoolSearch.oninput=renderSpools;
