@@ -332,3 +332,190 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 .category-data-row select{
   color:initial !important;
 }
+
+
+/* v7.5.48: alleen UI van 29-08-2026 */
+@media(max-width:700px){
+  body{padding-bottom:66px}
+  .mobile-bottom-nav{
+    display:block;
+    position:fixed;
+    left:0;right:0;bottom:0;
+    z-index:9999;
+    background:var(--card,#fff);
+    border-top:1px solid var(--border,#d1d5db);
+  }
+  .mobile-bottom-nav-scroll{
+    display:flex;
+    align-items:center;
+    gap:2px;
+    height:64px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    white-space:nowrap;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding:0 8px env(safe-area-inset-bottom);
+  }
+  .mobile-bottom-nav-scroll::-webkit-scrollbar{display:none}
+  .mobile-bottom-nav button{
+    flex:0 0 auto;
+    min-width:max-content;
+    height:48px;
+    padding:0 12px;
+    border:0;
+    border-radius:9px;
+    background:transparent;
+    color:var(--muted,#4b5563);
+    font-weight:700;
+    font-size:.82rem;
+  }
+  .mobile-bottom-nav button.active,
+  .mobile-bottom-nav button[aria-current="page"]{
+    background:rgba(47,125,74,.12);
+    color:#2f7d4a;
+  }
+}
+
+@media(max-width:700px){
+  /* Lagere iPhone-navigatie. Safe-area blijft gerespecteerd. */
+  body{padding-bottom:calc(48px + env(safe-area-inset-bottom))}
+  main{padding-bottom:calc(58px + env(safe-area-inset-bottom))}
+
+  .mobile-bottom-nav{
+    min-height:0 !important;
+    padding:0 !important;
+  }
+  .mobile-bottom-nav-scroll{
+    height:auto !important;
+    min-height:0 !important;
+    align-items:center;
+    gap:1px;
+    padding:3px 6px calc(3px + env(safe-area-inset-bottom)) !important;
+  }
+  .mobile-bottom-nav button{
+    min-height:36px !important;
+    height:36px !important;
+    padding:4px 10px !important;
+    border-radius:7px !important;
+    font-size:.78rem !important;
+    line-height:1.05 !important;
+  }
+
+  /* Alleen knoppen in Spoelen en Refills compacter. */
+  #spoelen button,
+  #refills button{
+    min-height:34px;
+    padding:5px 9px;
+    border-radius:7px;
+    font-size:.86rem;
+  }
+
+  #spoelen .toolbar,
+  #refills .toolbar{
+    gap:6px;
+  }
+
+  #spoelen .toolbar select,
+  #refills .toolbar select{
+    min-height:38px;
+    padding:6px 9px;
+    font-size:.84rem;
+  }
+
+  .dashboard-stock-actions,
+  .number-stock-actions{
+    gap:5px;
+  }
+}
+
+@media(max-width:700px){
+  .number-stock-row{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:6px;
+  }
+  .number-stock-actions{
+    justify-content:flex-start;
+  }
+}
+
+@media(max-width:700px){
+  #spoelen .dashboard-stock-row:not(.refill-row){
+    grid-template-columns:minmax(0,1fr) 64px 76px !important;
+    grid-template-areas:
+      "color level number"
+      "actions actions actions";
+    align-items:center;
+    column-gap:8px;
+  }
+  #spoelen .dashboard-stock-color{
+    grid-area:color;
+    padding-left:32px;
+    min-width:0;
+  }
+  #spoelen .dashboard-stock-level{
+    grid-area:level;
+    text-align:center;
+    white-space:nowrap;
+  }
+  #spoelen .dashboard-stock-number{
+    grid-area:number;
+    text-align:right;
+    white-space:nowrap;
+  }
+  #spoelen .dashboard-stock-actions{
+    grid-area:actions;
+    padding-left:32px;
+  }
+}
+
+.number-stock-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:8px 4px;
+  border-bottom:1px solid var(--border,#e5e7eb);
+  color:inherit;
+}
+
+.number-stock-row button{color:var(--text,#1f2937)!important}
+
+.number-stock-row .danger-button{color:#b91c1c!important}
+
+.number-stock-row{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:6px;
+  }
+
+.number-stock-actions{
+    gap:5px;
+  }
+
+.number-stock-actions{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap:6px;
+}
+
+.number-stock-actions{
+    justify-content:flex-start;
+  }
+
+.number-stock-info{min-width:0}
+
+.dashboard-stock-number{
+    grid-area:number;
+    text-align:right;
+    white-space:nowrap;
+  }
+
+.dashboard-stock-level{
+    grid-area:level;
+    text-align:center;
+    white-space:nowrap;
+  }
+#spoelen .label-select,#refills .label-select{width:18px;height:18px;min-width:18px;align-self:center}

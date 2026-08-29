@@ -10,7 +10,7 @@
   <title>Filament Manager v7.5.21</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=7.5.21">
+  <link rel="stylesheet" href="assets/app.css?v=7.5.48">
 </head>
 <body>
 <div class="app-shell">
@@ -18,12 +18,13 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 7.5.21 · Afdrukken</span>
+      <span>Versie 7.5.48 · Afdrukken</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active">Dashboard</button>
       <button data-view="catalogus">Catalogus</button>
-      <button data-view="voorraad">Voorraad</button>
+      <button data-view="spoelen">Spoelen</button>
+<button data-view="refills">Refills</button>
       <button data-view="bestellijst">Bestellijst</button>
       <button data-view="bestellingen">Lopende bestellingen</button>
       <button data-view="scannen">Scannen</button>
@@ -37,7 +38,7 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 7.5.21 · Afdrukken</span>
+        <span>Versie 7.5.48 · Afdrukken</span>
       </div>
     </header>
 
@@ -71,23 +72,36 @@
         <div class="panel"><div id="catalogList"></div></div>
       </section>
 
-      <section id="voorraad" class="view">
+      <section id="spoelen" class="view">
         <div class="toolbar">
           <button class="primary" id="newSpoolBtn">Nieuwe spoel</button>
-          <button id="newRefillBtn">Nieuwe refill</button>
           <button id="printSelectedLabelsBtn">Print geselecteerde stickers</button>
-          <input id="stockSearch" placeholder="Zoek nummer, type of kleur">
-          <select id="stockSort">
+          <input id="spoolSearch" placeholder="Zoek type, kleur of spoelnummer">
+          <select id="spoolSort" aria-label="Spoelen sorteren">
             <option value="filament">Categorie → type → kleur</option>
-            <option value="number-asc">Nummer oplopend</option>
-            <option value="number-desc">Nummer aflopend</option>
+            <option value="number-asc">Spoelnummer oplopend</option>
+            <option value="number-desc">Spoelnummer aflopend</option>
           </select>
         </div>
-        <div class="tabs">
-          <button data-stock-mode="spools" class="active">Spoelen</button>
-          <button data-stock-mode="refills">Refills</button>
+        <div class="panel">
+          <div id="spoolList"></div>
         </div>
-        <div class="panel"><div id="stockList"></div></div>
+      </section>
+
+      <section id="refills" class="view">
+        <div class="toolbar">
+          <button class="primary" id="newRefillBtn">Nieuwe refill</button>
+          <button id="printSelectedRefillLabelsBtn">Print geselecteerde stickers</button>
+          <input id="refillSearch" placeholder="Zoek type, kleur of refillnummer">
+          <select id="refillSort" aria-label="Refills sorteren">
+            <option value="filament">Categorie → type → kleur</option>
+            <option value="number-asc">Refillnummer oplopend</option>
+            <option value="number-desc">Refillnummer aflopend</option>
+          </select>
+        </div>
+        <div class="panel">
+          <div id="refillList"></div>
+        </div>
       </section>
 
       <section id="bestellijst" class="view">
@@ -220,12 +234,16 @@
   </div>
 </div>
 
-<nav class="mobile-bottom-nav">
-  <button data-view="dashboard" class="active"><span>⌂</span>Dashboard</button>
-  <button data-view="voorraad"><span>◫</span>Voorraad</button>
-  <button data-view="scannen"><span>▣</span>Scannen</button>
-  <button data-view="bestellijst"><span>☷</span>Bestellen</button>
-  <button data-view="meer"><span>•••</span>Meer</button>
+<nav class="mobile-bottom-nav" aria-label="Mobiele navigatie">
+  <div class="mobile-bottom-nav-scroll">
+    <button data-view="dashboard">Dashboard</button>
+    <button data-view="spoelen">Spoelen</button>
+    <button data-view="refills">Refills</button>
+    <button data-view="scannen">Scannen</button>
+    <button data-view="bestellijst">Bestellen</button>
+    <button data-view="bestellingen">Lopende bestellingen</button>
+    <button data-view="meer">Meer</button>
+  </div>
 </nav>
 
 <dialog id="filamentDialog">
@@ -466,7 +484,7 @@ window.FMPrint = (() => {
   </form>
 </dialog>
 
-<script src="js/app.js?v=7.5.21"></script>
+<script src="js/app.js?v=7.5.48"></script>
 <script src="js/print-tools.js?v=7.5.5"></script>
 </body>
 </html>
