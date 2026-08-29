@@ -914,10 +914,7 @@ if(mobileScanBtn)mobileScanBtn.addEventListener('click',()=>{
   if(b)b.click(); else if(typeof openScanner==='function')openScanner();
 });
 const mobileMoreBtn=document.getElementById('mobileMoreBtn');
-if(mobileMoreBtn)mobileMoreBtn.addEventListener('click',()=>{
-  const b=document.querySelector('#moreBtn,[data-action="more"],button[data-view="more"],button[data-view="meer"]');
-  if(b)b.click(); else setView('more');
-});
+if(mobileMoreBtn)mobileMoreBtn.addEventListener('click',()=>setView('meer'));
 
 renderAll();
 

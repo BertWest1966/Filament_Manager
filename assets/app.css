@@ -522,24 +522,46 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
  .catalog-dashboard-actions{grid-column:1/-1;justify-content:flex-start;padding-left:32px}
 }
 
-/* v7.5.39 — horizontaal schuifbaar iPhone-menu */
+/* v7.5.40 — compact horizontaal schuifbaar iPhone-menu */
 .mobile-bottom-nav{display:none}
 @media(max-width:700px){
-  body{padding-bottom:76px}
+  body{padding-bottom:66px}
   .mobile-bottom-nav{
-    display:block;position:fixed;left:0;right:0;bottom:0;z-index:9999;
-    background:var(--card,#fff);border-top:1px solid var(--border,#d1d5db);
-    box-shadow:0 -2px 10px rgba(0,0,0,.08)
+    display:block;
+    position:fixed;
+    left:0;right:0;bottom:0;
+    z-index:9999;
+    background:var(--card,#fff);
+    border-top:1px solid var(--border,#d1d5db);
   }
   .mobile-bottom-nav-scroll{
-    display:flex;gap:4px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;
-    -webkit-overflow-scrolling:touch;scrollbar-width:none;
-    padding:7px 8px calc(7px + env(safe-area-inset-bottom))
+    display:flex;
+    align-items:center;
+    gap:2px;
+    height:64px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    white-space:nowrap;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding:0 8px env(safe-area-inset-bottom);
   }
   .mobile-bottom-nav-scroll::-webkit-scrollbar{display:none}
   .mobile-bottom-nav button{
-    flex:0 0 auto;min-width:max-content;padding:9px 12px;border:0;border-radius:9px;
-    background:transparent;color:var(--muted,#4b5563);font-weight:700;font-size:.82rem
+    flex:0 0 auto;
+    min-width:max-content;
+    height:48px;
+    padding:0 12px;
+    border:0;
+    border-radius:9px;
+    background:transparent;
+    color:var(--muted,#4b5563);
+    font-weight:700;
+    font-size:.82rem;
   }
-  .mobile-bottom-nav button.active{background:rgba(47,125,74,.12);color:#2f7d4a}
+  .mobile-bottom-nav button.active,
+  .mobile-bottom-nav button[aria-current="page"]{
+    background:rgba(47,125,74,.12);
+    color:#2f7d4a;
+  }
 }
