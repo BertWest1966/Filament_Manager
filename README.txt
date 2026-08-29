@@ -1,31 +1,40 @@
-FILAMENT MANAGER v7.5.41
+FILAMENT MANAGER v7.5.42
 
-BELANGRIJKSTE WIJZIGING: DATA BLIJFT BEWAARD BIJ OPNIEUW OPENEN
+Gebaseerd op v7.5.41.
 
-Probleem gevonden:
-- In de vorige versie werd de legacy-opslagmigratie pas uitgevoerd nadat state=load() al was uitgevoerd.
-- Daardoor kon de app bij het starten al een lege state gebruiken.
+AANGEPAST
 
-Oplossing:
-1. Opslagmigratie wordt nu uitgevoerd VOORDAT de app de state laadt.
-2. De bestaande localStorage-key blijft exact:
-   filament_manager_v7_1
-3. Er is een tweede permanente opslaglaag toegevoegd via IndexedDB.
-4. Bij elke wijziging wordt de volledige state opgeslagen in:
-   - localStorage
-   - IndexedDB
-5. Bij het opstarten:
-   - eerst wordt localStorage gebruikt;
-   - als die leeg is, probeert de app automatisch de IndexedDB-reservekopie te herstellen.
-6. Na JSON-import wordt de geïmporteerde database meteen in beide opslagplaatsen opgeslagen.
+1. SPOELEN EN REFILLS SORTEREN
+Op beide schermen is de sorteerkeuze terug:
+- Categorie → type → kleur
+- Nummer oplopend
+- Nummer aflopend
 
-Verder niet gewijzigd:
-- mobiele menustructuur van v7.5.40a
-- Spoelen / Refills
-- Catalogus
-- Bestellijst / Lopende bestellingen
-- QR en print
-- JSON export/import formaat
+Bij 'Categorie → type → kleur' blijft de bestaande gegroepeerde weergave behouden.
+Bij nummer-sortering wordt werkelijk over alle spoelen/refills op nummer gesorteerd.
 
-Controle:
+2. IPHONE ONDERBALK COMPACTER
+- De onderste navigatie is lager gemaakt.
+- Horizontaal schuiven blijft behouden.
+- De iPhone safe-area blijft gerespecteerd.
+
+3. KNOPPEN OP IPHONE KLEINER
+Alleen op Spoelen en Refills:
+- Nieuwe spoel/refill
+- Hoeveelheid
+- Open
+- Verwijderen
+zijn compacter gemaakt.
+
+MAC / DESKTOP
+- De aanpassingen aan knopgrootte en onderbalk staan uitsluitend binnen max-width:700px.
+- De Mac-layout wordt hierdoor niet gewijzigd.
+
+DATA / OPSLAG
+- localStorage key blijft exact: filament_manager_v7_1
+- IndexedDB reserveopslag uit v7.5.41 blijft behouden.
+- JSON import/export is niet gewijzigd.
+- QR, print, catalogus en bestelregels zijn niet gewijzigd.
+
+CONTROLE
 - JavaScript-syntax gecontroleerd met node --check.

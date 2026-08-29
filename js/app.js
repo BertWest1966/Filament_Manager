@@ -295,10 +295,64 @@ function stockPageHtml(items,kind,query){
   `).join('');
 }
 
-function renderSpools(){spoolList.innerHTML=stockPageHtml(state.spools,'spool',spoolSearch?.value||'')}
-function renderRefills(){refillList.innerHTML=stockPageHtml(state.refills,'refill',refillSearch?.value||'')}
+function stockNumberPageHtml(items,kind,query,mode){
+  const q=(query||'').trim().toLowerCase();
+  const filtered=items.filter(x=>{
+    const f=filament(x.filamentId);
+    const hay=`${x.number||''} ${f?.category||''} ${f?.type||''} ${f?.color||''}`.toLowerCase();
+    return !q||hay.includes(q);
+  });
+
+  const sorted=[...filtered].sort((a,b)=>{
+    const cmp=String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true});
+    return mode==='number-desc'?-cmp:cmp;
+  });
+
+  if(!sorted.length){
+    return `<div class="note">Geen ${kind==='spool'?'spoelen':'refills'} gevonden.</div>`;
+  }
+
+  return sorted.map(x=>{
+    const f=filament(x.filamentId);
+    const category=f?.category||'';
+    const type=f?.type||'';
+    const color=f?.color||'';
+    return `
+      <div class="number-stock-row category-data-row" data-category="${esc(category)}">
+        <div class="number-stock-info">
+          <strong class="number-stock-number">${esc(x.number)}</strong>
+          <div class="number-stock-filament">${esc(category)} · ${esc(type)} · ${esc(color)}</div>
+          ${kind==='spool'?`<div class="number-stock-level">${Number(x.level)||0}%</div>`:''}
+        </div>
+        <div class="number-stock-actions">
+          ${kind==='spool'
+            ? `<button onclick="quickLevel('${x.id}')">Hoeveelheid</button><button onclick="openSpool('${x.id}')">Open</button>`
+            : `<button onclick="openRefill('${x.id}')">Open</button>`}
+          <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderSpools(){
+  const mode=document.getElementById('spoolSort')?.value||'filament';
+  spoolList.innerHTML=mode==='filament'
+    ? stockPageHtml(state.spools,'spool',spoolSearch?.value||'')
+    : stockNumberPageHtml(state.spools,'spool',spoolSearch?.value||'',mode);
+}
+
+function renderRefills(){
+  const mode=document.getElementById('refillSort')?.value||'filament';
+  refillList.innerHTML=mode==='filament'
+    ? stockPageHtml(state.refills,'refill',refillSearch?.value||'')
+    : stockNumberPageHtml(state.refills,'refill',refillSearch?.value||'',mode);
+}
 spoolSearch.oninput=renderSpools;
 refillSearch.oninput=renderRefills;
+const spoolSortEl=document.getElementById('spoolSort');
+const refillSortEl=document.getElementById('refillSort');
+if(spoolSortEl)spoolSortEl.onchange=renderSpools;
+if(refillSortEl)refillSortEl.onchange=renderRefills;
 
 function ensureManualOrderList(){
   if(!Array.isArray(state.manualOrderList))state.manualOrderList=[];

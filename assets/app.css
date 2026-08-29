@@ -565,3 +565,91 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     color:#2f7d4a;
   }
 }
+
+
+/* v7.5.42 — alleen mobiel: compactere onderbalk en kleinere knoppen */
+@media(max-width:700px){
+  /* Lagere iPhone-navigatie. Safe-area blijft gerespecteerd. */
+  body{padding-bottom:calc(48px + env(safe-area-inset-bottom))}
+  main{padding-bottom:calc(58px + env(safe-area-inset-bottom))}
+
+  .mobile-bottom-nav{
+    min-height:0 !important;
+    padding:0 !important;
+  }
+  .mobile-bottom-nav-scroll{
+    height:auto !important;
+    min-height:0 !important;
+    align-items:center;
+    gap:1px;
+    padding:3px 6px calc(3px + env(safe-area-inset-bottom)) !important;
+  }
+  .mobile-bottom-nav button{
+    min-height:36px !important;
+    height:36px !important;
+    padding:4px 10px !important;
+    border-radius:7px !important;
+    font-size:.78rem !important;
+    line-height:1.05 !important;
+  }
+
+  /* Alleen knoppen in Spoelen en Refills compacter. */
+  #spoelen button,
+  #refills button{
+    min-height:34px;
+    padding:5px 9px;
+    border-radius:7px;
+    font-size:.86rem;
+  }
+
+  #spoelen .toolbar,
+  #refills .toolbar{
+    gap:6px;
+  }
+
+  #spoelen .toolbar select,
+  #refills .toolbar select{
+    min-height:38px;
+    padding:6px 9px;
+    font-size:.84rem;
+  }
+
+  .dashboard-stock-actions,
+  .number-stock-actions{
+    gap:5px;
+  }
+}
+
+/* Nummer-sortering: neutrale compacte lijst */
+.number-stock-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:8px 4px;
+  border-bottom:1px solid var(--border,#e5e7eb);
+  color:inherit;
+}
+.number-stock-info{min-width:0}
+.number-stock-number{display:block;font-size:1rem;color:inherit}
+.number-stock-filament{font-size:.82rem;color:inherit;margin-top:2px}
+.number-stock-level{font-size:.82rem;color:inherit;margin-top:2px}
+.number-stock-actions{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap:6px;
+}
+.number-stock-row button{color:var(--text,#1f2937)!important}
+.number-stock-row .danger-button{color:#b91c1c!important}
+
+@media(max-width:700px){
+  .number-stock-row{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:6px;
+  }
+  .number-stock-actions{
+    justify-content:flex-start;
+  }
+}
