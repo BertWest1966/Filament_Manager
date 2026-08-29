@@ -346,3 +346,15 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 [data-category] *:not(button):not(input):not(select):not(option):not(textarea){color:inherit!important}
 [data-category] button,[data-category] input,[data-category] select,[data-category] option,[data-category] textarea{color:var(--text,#1f2937)!important}
 [data-category] .danger-button{color:#b91c1c!important}
+
+
+/* v7.5.33 — categorietitels krijgen dezelfde kleur als de categorie */
+[data-category] .category-title,
+[data-category] .inventory-category-title,
+[data-category] .stock-category-title,
+.category-group[data-category] .category-title,
+.inventory-category[data-category] .inventory-category-title,
+.stock-category[data-category] .stock-category-title{
+  color:inherit !important;
+  border-color:currentColor !important;
+}
