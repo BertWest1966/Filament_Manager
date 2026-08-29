@@ -96,129 +96,22 @@ function removeStockItem(kind,id){
 }
 
 
-function sortStockItems(items,mode){
-  return [...items].sort((a,b)=>{
-    if(mode==='number')return String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true});
-    const fa=filament(a.filamentId),fb=filament(b.filamentId);
-    return (fa?.category||'').localeCompare(fb?.category||'','nl')||
-           (fa?.type||'').localeCompare(fb?.type||'','nl')||
-           (fa?.color||'').localeCompare(fb?.color||'','nl')||
-           String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true});
-  });
+function stockGroups(items){const g={};items.forEach(x=>{const f=filament(x.filamentId);if(!f)return;const c=f.category||'Overig',t=f.type||'',co=f.color||'';g[c]??={};g[c][t]??={};g[c][t][co]??=[];g[c][t][co].push(x)});return g}
+function stockHtml(items,kind,q){
+ const g=stockGroups(items.filter(x=>{const f=filament(x.filamentId);return !q||`${x.number} ${f?.category||''} ${f?.type||''} ${f?.color||''}`.toLowerCase().includes(q)}));
+ const cats=Object.keys(g).sort((a,b)=>a.localeCompare(b,'nl'));
+ if(!cats.length)return `<div class="note">Geen ${kind==='spool'?'spoelen':'refills'} gevonden.</div>`;
+ return cats.map(c=>`<div class="stock-category" data-category="${esc(c)}"><div class="stock-category-title">${esc(c)}</div>${
+ Object.keys(g[c]).sort((a,b)=>a.localeCompare(b,'nl')).map(t=>`<div class="stock-type"><div class="stock-type-title">${esc(t)}</div>${
+ Object.keys(g[c][t]).sort((a,b)=>a.localeCompare(b,'nl')).map(co=>`<div class="stock-color"><div class="stock-color-title">${esc(co)}</div>${
+ g[c][t][co].sort((a,b)=>String(a.number).localeCompare(String(b.number),'nl',{numeric:true})).map(x=>`<div class="item-row category-data-row" data-category="${esc(c)}"><div><strong>${esc(x.number)}</strong>${kind==='spool'?`<div class="item-meta">Resterend: ${Number(x.level)||0}%</div>`:''}</div><div class="item-actions">${kind==='spool'?`<button onclick="quickLevel('${x.id}')">Hoeveelheid</button><button onclick="openSpool('${x.id}')">Open</button>`:`<button onclick="openRefill('${x.id}')">Open</button>`}<button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button></div></div>`).join('')
+ }</div>`).join('')
+ }</div>`).join('')
+ }</div>`).join('');
 }
-
-function renderSpools(){
-  const q=(spoolSearch?.value||'').toLowerCase();
-  const mode=spoolSort?.value||'filament';
-  const items=sortStockItems(
-    state.spools.filter(s=>{
-      const f=filament(s.filamentId);
-      const hay=`${s.number} ${label(f)}`.toLowerCase();
-      return !q||hay.includes(q);
-    }),
-    mode
-  );
-
-  spoolList.innerHTML=items.map(s=>{
-    const f=filament(s.filamentId);
-    return `<div class="item-row category-data-row" data-category="${esc(f?.category||'')}">
-      <div>
-        <strong>${esc(s.number)} · ${esc(label(f))}</strong>
-        <div class="item-meta">Resterend: ${Number(s.level)||0}%</div>
-      </div>
-      <div class="item-actions">
-        <button onclick="quickLevel('${s.id}')">Hoeveelheid</button>
-        <button onclick="openSpool('${s.id}')">Open</button>
-        <button class="danger-button" onclick="removeStockItem('spool','${s.id}')">Verwijderen</button>
-      </div>
-    </div>`;
-  }).join('')||'<div class="note">Geen spoelen gevonden.</div>';
-}
-
-function renderRefills(){
-  const q=(refillSearch?.value||'').toLowerCase();
-  const mode=refillSort?.value||'filament';
-  const items=sortStockItems(
-    state.refills.filter(r=>{
-      const f=filament(r.filamentId);
-      const hay=`${r.number} ${label(f)}`.toLowerCase();
-      return !q||hay.includes(q);
-    }),
-    mode
-  );
-
-  refillList.innerHTML=items.map(r=>{
-    const f=filament(r.filamentId);
-    return `<div class="item-row category-data-row" data-category="${esc(f?.category||'')}">
-      <div>
-        <strong>${esc(r.number)} · ${esc(label(f))}</strong>
-      </div>
-      <div class="item-actions">
-        <button onclick="openRefill('${r.id}')">Open</button>
-        <button class="danger-button" onclick="removeStockItem('refill','${r.id}')">Verwijderen</button>
-      </div>
-    </div>`;
-  }).join('')||'<div class="note">Geen refills gevonden.</div>';
-}
-
-spoolSearch.oninput=renderSpools;
-spoolSort.onchange=renderSpools;
-refillSearch.oninput=renderRefills;
-refillSort.onchange=renderRefills;
-
-
-let manualOrderPendingId=null;
-
-const manualOrderAddBtnEl=$('manualOrderAddBtn');
-const manualOrderDialogEl=$('manualOrderDialog');
-const manualOrderFormEl=$('manualOrderForm');
-const manualOrderFilamentEl=$('manualOrderFilament');
-const manualOrderQtyEl=$('manualOrderQty');
-
-function ensureManualOrderList(){
-  if(!Array.isArray(state.manualOrderList))state.manualOrderList=[];
-}
-
-manualOrderAddBtnEl.onclick=()=>{
-  if(!state.catalog.length)return alert('Maak eerst een filament aan.');
-  ensureManualOrderList();
-  fillFilamentSelect(manualOrderFilamentEl,state.catalog[0].id);
-  manualOrderQtyEl.value='1';
-  manualOrderDialogEl.showModal();
-};
-
-manualOrderFormEl.onsubmit=e=>{
-  e.preventDefault();
-  ensureManualOrderList();
-
-  const filamentId=manualOrderFilamentEl.value;
-  const quantity=Math.max(1,Math.floor(Number(manualOrderQtyEl.value)||1));
-  if(!filamentId)return;
-
-  const existing=state.manualOrderList.find(x=>x.filamentId===filamentId);
-  if(existing){
-    existing.quantity=Number(existing.quantity||0)+quantity;
-  }else{
-    state.manualOrderList.push({id:uid(),filamentId,quantity});
-  }
-
-  manualOrderDialogEl.close();
-  save();
-};
-
-function removeManualOrderItem(id){
-  ensureManualOrderList();
-  state.manualOrderList=state.manualOrderList.filter(x=>x.id!==id);
-  save();
-}
-
-function createManualOrderFor(entryId,fid,qty){
-  manualOrderPendingId=entryId;
-  fillFilamentSelect(oFilament,fid);
-  oQuantity.value=qty;
-  oSupplier.value=filament(fid)?.supplier||'';
-  orderDialog.showModal();
-}
+function renderSpools(){spoolList.innerHTML=stockHtml(state.spools,'spool',(spoolSearch?.value||'').toLowerCase())}
+function renderRefills(){refillList.innerHTML=stockHtml(state.refills,'refill',(refillSearch?.value||'').toLowerCase())}
+spoolSearch.oninput=renderSpools; refillSearch.oninput=renderRefills;
 
 function renderOrderList(){
   ensureManualOrderList();
