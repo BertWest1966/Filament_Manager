@@ -76,123 +76,18 @@ function removeStockItem(kind,id){
   save();
 }
 
-function stockGroups(items){
-  const groups={};
-  items.forEach(x=>{
-    const f=filament(x.filamentId); if(!f)return;
-    const category=f.category||'Overig', type=f.type||'', color=f.color||'';
-    groups[category]??={}; groups[category][type]??={}; groups[category][type][color]??=[];
-    groups[category][type][color].push(x);
-  });
-  return groups;
-}
-
-function stockPageHtml(items,kind,query){
-  const q=(query||'').trim().toLowerCase();
-  const filtered=items.filter(x=>{
+function renderStock(){
+  document.querySelectorAll('[data-stock-mode]').forEach(b=>b.classList.toggle('active',b.dataset.stockMode===stockMode));
+  const q=stockSearch.value.toLowerCase();
+  const items=sortStock((stockMode==='spools'?state.spools:state.refills).filter(x=>{
     const f=filament(x.filamentId);
-    const hay=`${x.number||''} ${f?.category||''} ${f?.type||''} ${f?.color||''}`.toLowerCase();
-    return !q||hay.includes(q);
-  });
-
-  const groups=stockGroups(filtered);
-  const categories=Object.keys(groups).sort((a,b)=>a.localeCompare(b,'nl'));
-
-  if(!categories.length){
-    return `<div class="note">Geen ${kind==='spool'?'spoelen':'refills'} gevonden.</div>`;
-  }
-
-  return categories.map(category=>`
-    <div class="dashboard-stock-group inventory-category" data-category="${esc(category)}">
-      <div class="dashboard-stock-category">${esc(category)}</div>
-
-      ${Object.keys(groups[category]).sort((a,b)=>a.localeCompare(b,'nl')).map(type=>`
-        <div class="dashboard-stock-type">${esc(type)}</div>
-
-        <div class="dashboard-stock-header ${kind==='refill'?'refill-header':''}">
-          <div></div>
-          <div>${kind==='spool'?'Spoel':'Refill'}</div>
-          ${kind==='spool'?'<div>Hoeveelh.</div>':''}
-          <div></div>
-        </div>
-
-        ${Object.keys(groups[category][type]).sort((a,b)=>a.localeCompare(b,'nl')).flatMap(color=>
-          groups[category][type][color]
-            .sort((a,b)=>String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true}))
-            .map((x,idx)=>`
-              <div class="dashboard-stock-row ${kind==='refill'?'refill-row':''}">
-                <div class="dashboard-stock-color">${esc(color)}</div>
-                <div class="dashboard-stock-number"><strong>${esc(x.number)}</strong></div>
-                ${kind==='spool'?`<div class="dashboard-stock-level"><span class="level-badge">${Number(x.level)||0}%</span></div>`:''}
-                <div class="dashboard-stock-actions">
-                  <input class="label-select" type="checkbox" data-kind="${kind}" data-id="${x.id}" aria-label="Selecteer ${esc(x.number)}">
-                  <button onclick="openQr('${kind}','${x.id}')">QR</button>
-                  ${kind==='spool'
-                    ? `<button onclick="quickLevel('${x.id}')">Hoeveelheid</button><button onclick="openSpool('${x.id}')">Open</button>`
-                    : `<button onclick="openRefill('${x.id}')">Open</button>`}
-                  <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
-                </div>
-              </div>
-            `)
-        ).join('')}
-      `).join('')}
-    </div>
-  `).join('');
-}
-
-function stockNumberPageHtml(items,kind,query,mode){
-  const q=(query||'').trim().toLowerCase();
-  const filtered=items.filter(x=>{
+    return !q||`${x.number} ${label(f)}`.toLowerCase().includes(q);
+  }));
+  stockList.innerHTML=items.map(x=>{
     const f=filament(x.filamentId);
-    const hay=`${x.number||''} ${f?.category||''} ${f?.type||''} ${f?.color||''}`.toLowerCase();
-    return !q||hay.includes(q);
-  });
-
-  const sorted=[...filtered].sort((a,b)=>{
-    const cmp=String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true});
-    return mode==='number-desc'?-cmp:cmp;
-  });
-
-  if(!sorted.length){
-    return `<div class="note">Geen ${kind==='spool'?'spoelen':'refills'} gevonden.</div>`;
-  }
-
-  return sorted.map(x=>{
-    const f=filament(x.filamentId);
-    const category=f?.category||'';
-    const type=f?.type||'';
-    const color=f?.color||'';
-    return `
-      <div class="number-stock-row category-data-row" data-category="${esc(category)}">
-        <div class="number-stock-info">
-          <strong class="number-stock-number">${esc(x.number)}</strong>
-          <div class="number-stock-filament">${esc(category)} · ${esc(type)} · ${esc(color)}</div>
-          ${kind==='spool'?`<div class="number-stock-level">${Number(x.level)||0}%</div>`:''}
-        </div>
-        <div class="number-stock-actions">
-          <input class="label-select" type="checkbox" data-kind="${kind}" data-id="${x.id}" aria-label="Selecteer ${esc(x.number)}">
-          <button onclick="openQr('${kind}','${x.id}')">QR</button>
-          ${kind==='spool'
-            ? `<button onclick="quickLevel('${x.id}')">Hoeveelheid</button><button onclick="openSpool('${x.id}')">Open</button>`
-            : `<button onclick="openRefill('${x.id}')">Open</button>`}
-          <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
-        </div>
-      </div>`;
-  }).join('');
-}
-
-function renderSpools(){
-  const mode=document.getElementById('spoolSort')?.value||'filament';
-  spoolList.innerHTML=mode==='filament'
-    ? stockPageHtml(state.spools,'spool',spoolSearch?.value||'')
-    : stockNumberPageHtml(state.spools,'spool',spoolSearch?.value||'',mode);
-}
-
-function renderRefills(){
-  const mode=document.getElementById('refillSort')?.value||'filament';
-  refillList.innerHTML=mode==='filament'
-    ? stockPageHtml(state.refills,'refill',refillSearch?.value||'')
-    : stockNumberPageHtml(state.refills,'refill',refillSearch?.value||'',mode);
+    const kind=stockMode==='spools'?'spoel':'refill';
+    return `<div class="item-row category-data-row" data-category="${esc(f.category)}"><div><strong>${esc(label(f))}</strong><div class="item-meta">${x.number} · ${stockMode==='spools'?x.level+'%':'Refill'}</div></div><div class="item-actions"><input class="label-select" type="checkbox" data-kind="${kind}" data-id="${x.id}" aria-label="Selecteer ${x.number}"><button onclick="${stockMode==='spools'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button><button onclick="openQr('${kind}','${x.id}')">QR</button><button class="danger-button" onclick="removeStockItem('${stockMode==='spools'?'spool':'refill'}','${x.id}')">Verwijderen</button></div></div>`;
+  }).join('')||'<div class="note">Geen voorraad.</div>';
 }
 document.querySelectorAll('[data-stock-mode]').forEach(b=>b.onclick=()=>{stockMode=b.dataset.stockMode;renderStock()});
 stockSearch.oninput=renderStock;
@@ -897,18 +792,7 @@ printSelectedLabelsBtn.onclick=()=>{
   openLabelPrintWindow(selected,'a4');
 };
 
-function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderSpools();renderRefills();renderOrderList();renderOrders();renderLibraries();renderLog()}
-spoolSearch.oninput=renderSpools;
-refillSearch.oninput=renderRefills;
-const spoolSortEl=document.getElementById('spoolSort');
-const refillSortEl=document.getElementById('refillSort');
-if(spoolSortEl)spoolSortEl.onchange=renderSpools;
-if(refillSortEl)refillSortEl.onchange=renderRefills;
-
-if(window.printSelectedRefillLabelsBtn){
-  printSelectedRefillLabelsBtn.onclick=()=>printSelectedLabelsBtn.click();
-}
-
+function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderStock();renderOrderList();renderOrders();renderLibraries();renderLog()}
 renderAll();
 
 if(window.copyDiagnosisBtn){
