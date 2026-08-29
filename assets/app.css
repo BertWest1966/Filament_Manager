@@ -358,3 +358,63 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
   color:inherit !important;
   border-color:currentColor !important;
 }
+
+
+/* v7.5.34 — vaste visuele hiërarchie: categorie > type > kleur */
+/* Categorie: niveau 1 */
+.inventory-category-title,
+.stock-category-title,
+.category-title{
+  margin-left:0 !important;
+  padding-left:0 !important;
+  font-weight:800 !important;
+}
+
+/* Type: niveau 2 */
+.inventory-type-title,
+.stock-type-title{
+  margin-left:28px !important;
+  padding-left:0 !important;
+  font-weight:800 !important;
+}
+
+/* Kleur/gegevens: niveau 3 */
+.inventory-color,
+.stock-color-title{
+  margin-left:52px !important;
+  padding-left:0 !important;
+}
+
+/* Dashboard gebruikt tabelregels: eerste kolom met kleur verder inspringen */
+#dashboard .inventory-color,
+#dashboard .stock-color-title,
+#dashboard [data-role="color"],
+#dashboard td:first-child{
+  padding-left:52px !important;
+}
+
+/* Spoelen en Refills dezelfde hiërarchie */
+#spoolList .inventory-type-title,
+#refillList .inventory-type-title{
+  margin-left:28px !important;
+}
+#spoolList .inventory-color,
+#refillList .inventory-color{
+  margin-left:52px !important;
+}
+
+/* Op kleine schermen blijft de hiërarchie zichtbaar, maar compacter */
+@media(max-width:700px){
+  .inventory-type-title,
+  .stock-type-title,
+  #spoolList .inventory-type-title,
+  #refillList .inventory-type-title{
+    margin-left:16px !important;
+  }
+  .inventory-color,
+  .stock-color-title,
+  #spoolList .inventory-color,
+  #refillList .inventory-color{
+    margin-left:32px !important;
+  }
+}

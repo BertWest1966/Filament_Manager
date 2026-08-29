@@ -1,6 +1,22 @@
-FILAMENT MANAGER v7.5.33 — CATEGORIETITELS IN CATEGORIEKLEUR
+FILAMENT MANAGER v7.5.34 — HIËRARCHIE CATEGORIE > TYPE > KLEUR
 
-- Titels zoals PETG, PLA, ASA, TPU enz. krijgen nu dezelfde tekstkleur als hun categorie.
-- De scheidingslijn onder de categorietitel volgt dezelfde kleur.
-- Alle overige kleurwerking en indeling uit v7.5.32 blijft behouden.
-- JSON import/export en localStorage ongewijzigd.
+Weergave:
+PETG
+    Basic
+        Black
+        Gray
+    HF
+        Black
+        Blue
+
+PLA
+    Basic
+        Black
+
+- Categorie op niveau 1.
+- Type duidelijk ingesprongen op niveau 2.
+- Kleur verder ingesprongen op niveau 3.
+- Bestaande categoriekleuren uit v7.5.33 blijven behouden.
+- Toegepast op Dashboard, Spoelen en Refills.
+- Mobiele weergave gebruikt dezelfde hiërarchie met iets kleinere inspringing.
+- Geen wijziging aan JSON, localStorage of voorraadlogica.
