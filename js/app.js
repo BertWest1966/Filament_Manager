@@ -1,6 +1,11 @@
 
 const KEY='filament_manager_v7_1';
+const IDB_DB='filament_manager_db';
+const IDB_STORE='state';
+const IDB_KEY='current';
 const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','Andere'],types:{PLA:['Basic','Matte'],PETG:['Basic'],TPU:['95A'],ABS:['Basic'],ASA:['Basic'],Andere:[]},colors:[],brands:['Bambu Lab'],suppliers:['Bambu Lab']};
+
+migrateLegacyStorage();
 let state=load();
 let currentView='dashboard',previousView='dashboard',stockMode='spools',stockSortMode='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,activeLibraryKind='colors',editingLibraryValue=null;
 const $=id=>document.getElementById(id);
@@ -23,9 +28,86 @@ function migrateLegacyStorage(){
     }
   }catch(e){console.warn('Opslagmigratie overgeslagen',e)}
 }
-migrateLegacyStorage();
 
-function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
+
+function openStateDB(){
+  return new Promise((resolve,reject)=>{
+    if(!('indexedDB' in window)){reject(new Error('IndexedDB niet beschikbaar'));return}
+    const req=indexedDB.open(IDB_DB,1);
+    req.onupgradeneeded=()=>{
+      const db=req.result;
+      if(!db.objectStoreNames.contains(IDB_STORE))db.createObjectStore(IDB_STORE);
+    };
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error||new Error('IndexedDB openen mislukt'));
+  });
+}
+
+async function saveStateToIndexedDB(data){
+  try{
+    const db=await openStateDB();
+    await new Promise((resolve,reject)=>{
+      const tx=db.transaction(IDB_STORE,'readwrite');
+      tx.objectStore(IDB_STORE).put(structuredClone(data),IDB_KEY);
+      tx.oncomplete=()=>resolve();
+      tx.onerror=()=>reject(tx.error||new Error('IndexedDB schrijven mislukt'));
+      tx.onabort=()=>reject(tx.error||new Error('IndexedDB schrijven afgebroken'));
+    });
+    db.close();
+  }catch(e){
+    console.warn('IndexedDB reservekopie opslaan mislukt',e);
+  }
+}
+
+async function loadStateFromIndexedDB(){
+  try{
+    const db=await openStateDB();
+    const value=await new Promise((resolve,reject)=>{
+      const tx=db.transaction(IDB_STORE,'readonly');
+      const req=tx.objectStore(IDB_STORE).get(IDB_KEY);
+      req.onsuccess=()=>resolve(req.result||null);
+      req.onerror=()=>reject(req.error||new Error('IndexedDB lezen mislukt'));
+    });
+    db.close();
+    return value;
+  }catch(e){
+    console.warn('IndexedDB reservekopie lezen mislukt',e);
+    return null;
+  }
+}
+
+function hasUserData(data){
+  return !!(data && (
+    (Array.isArray(data.catalog)&&data.catalog.length) ||
+    (Array.isArray(data.spools)&&data.spools.length) ||
+    (Array.isArray(data.refills)&&data.refills.length) ||
+    (Array.isArray(data.orders)&&data.orders.length) ||
+    (Array.isArray(data.history)&&data.history.length)
+  ));
+}
+
+async function restorePersistentState(){
+  const localHasData=hasUserData(state);
+  const backup=await loadStateFromIndexedDB();
+
+  if(localHasData){
+    await saveStateToIndexedDB(state);
+    return;
+  }
+
+  if(hasUserData(backup)){
+    state=normalizeBackupData(backup);
+    try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){console.warn('localStorage herstel mislukt',e)}
+    renderAll();
+    showAppToast('Opgeslagen gegevens automatisch hersteld.');
+  }
+}
+
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){console.warn('localStorage opslaan mislukt',e)}
+  saveStateToIndexedDB(state);
+  renderAll();
+}
 function pushUnique(arr,v){v=String(v||'').trim();if(v&&!arr.some(x=>x.toLowerCase()===v.toLowerCase()))arr.push(v)}
 function filament(id){return state.catalog.find(f=>f.id===id)}
 function label(f){return f?`${f.category} · ${f.type} · ${f.color}`:''}
@@ -657,6 +739,7 @@ restoreBackupInput.onchange=async event=>{
   try{
     state=restored;
     localStorage.setItem(KEY,JSON.stringify(state));
+    saveStateToIndexedDB(state);
     renderAll();
     add('Opslaan in browser: geslaagd');
     add('Schermen opnieuw opbouwen: geslaagd');
@@ -667,6 +750,7 @@ restoreBackupInput.onchange=async event=>{
     add(`Fout: ${error.name}: ${error.message}`);
     state=previousState;
     localStorage.setItem(KEY,JSON.stringify(state));
+    saveStateToIndexedDB(state);
     try{renderAll()}catch{}
     backupStatus.textContent='Terugzetten mislukt; oude gegevens zijn behouden.';
     alert(`De JSON is geldig, maar verwerken mislukte:\n${error.message}`);
@@ -906,6 +990,7 @@ printSelectedLabelsBtn.onclick=()=>{
 function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderSpools();renderRefills();renderOrderList();renderOrders();renderLibraries();renderLog()}
 
 renderAll();
+restorePersistentState();
 
 if(window.copyDiagnosisBtn){
   copyDiagnosisBtn.onclick=async()=>{
