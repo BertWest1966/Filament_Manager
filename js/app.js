@@ -75,58 +75,40 @@ quickLevelForm.onsubmit=e=>{
 }
 
 function renderCatalog(){
-  const q=(document.getElementById('catalogSearch')?.value||'').trim().toLowerCase();
-  const list=(state.filaments||[]).filter(f=>{
-    const hay=`${f.category||''} ${f.type||''} ${f.color||''} ${f.brand||''} ${f.supplier||''} ${f.supplierRef||''}`.toLowerCase();
-    return !q||hay.includes(q);
-  });
+const q=catalogSearch.value.toLowerCase();const items=state.catalog.filter(f=>!q||label(f).toLowerCase().includes(q)).sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));
+  const catalogRoot=document.getElementById('catalogList');
 
+  const catalogItems=items;
   const grouped={};
-  list.forEach(f=>{
+  catalogItems.forEach(f=>{
     const category=f.category||'Overig';
     const type=f.type||'Overig';
     (grouped[category]??={});
     (grouped[category][type]??=[]).push(f);
   });
 
-  const root=document.getElementById('catalogList');
-  if(!root) return;
   const categories=Object.keys(grouped).sort((a,b)=>a.localeCompare(b,'nl'));
   if(!categories.length){
-    root.innerHTML='<div class="note">Geen filament gevonden.</div>';
+    catalogRoot.innerHTML='<div class="note">Geen filament gevonden.</div>';
     return;
   }
 
-  root.innerHTML=categories.map(category=>`
+  catalogRoot.innerHTML=categories.map(category=>`
     <div class="catalog-dashboard-group" data-category="${esc(category)}">
       <div class="catalog-dashboard-category">${esc(category)}</div>
-
       ${Object.keys(grouped[category]).sort((a,b)=>a.localeCompare(b,'nl')).map(type=>`
         <div class="catalog-dashboard-type">${esc(type)}</div>
-        <div class="catalog-dashboard-header">
-          <div></div>
-          <div>Fabrikant</div>
-          <div>Min.</div>
-          <div>Gewenst</div>
-          <div></div>
-        </div>
-
-        ${grouped[category][type]
-          .slice()
-          .sort((a,b)=>(a.color||'').localeCompare(b.color||'','nl'))
-          .map(f=>`
-            <div class="catalog-dashboard-row">
-              <div class="catalog-dashboard-color">${esc(f.color||'')}</div>
-              <div>${esc(f.brand||'')}</div>
-              <div>${f.minStock??f.min??0}</div>
-              <div>${f.targetStock??f.target??f.desiredStock??0}</div>
-              <div class="catalog-dashboard-actions">
-                <button onclick="openFilament('${f.id}')">Open</button>
-                <button onclick="editFilament('${f.id}')">Wijzig</button>
-                <button class="danger-button" onclick="deleteFilament('${f.id}')">Verwijderen</button>
-              </div>
+        ${grouped[category][type].slice().sort((a,b)=>(a.color||'').localeCompare(b.color||'','nl')).map(f=>`
+          <div class="catalog-dashboard-row">
+            <div class="catalog-dashboard-color">${esc(f.color||'')}</div>
+            <div class="catalog-dashboard-meta">${esc(f.brand||'')} · min ${f.min??0} · gewenst ${f.target??f.desired??0}</div>
+            <div class="catalog-dashboard-actions">
+              <button onclick="openFilament('${f.id}')">Open</button>
+              <button onclick="editFilament('${f.id}')">Wijzig</button>
+              <button class="danger-button" onclick="deleteFilament('${f.id}')">Verwijderen</button>
             </div>
-          `).join('')}
+          </div>
+        `).join('')}
       `).join('')}
     </div>
   `).join('');
