@@ -1,11 +1,17 @@
-FILAMENT MANAGER v7.5.25 — GROTERE FILAMENTTEKST OP LABEL
+FILAMENT MANAGER v7.5.27 — SPOELEN EN REFILLS APART
 
 Wijziging:
-- Label blijft 50 x 75 mm, rechtop.
-- Categorie + type (bv. PETG Basic) groter en vetter.
-- Kleur groter en vetter.
-- Lange kleurnamen mogen automatisch over maximaal 2 regels lopen.
-- QR-code en groot spoel-/refillnummer blijven ongewijzigd.
-- Leverancier, referentie en SPOEL/REFILL blijven ongewijzigd.
-- Spoelnummer blijft zwart; refillnummer blijft rood.
-- Overige appfunctionaliteit is niet gewijzigd.
+- De gezamenlijke pagina Voorraad is opgesplitst.
+- Nieuw scherm Spoelen: alleen spoelen, resterend percentage en spoelfuncties.
+- Nieuw scherm Refills: alleen refills en refillfuncties.
+- Beide schermen hebben hun eigen zoekveld en sortering.
+- Navigatie toont nu afzonderlijk Spoelen en Refills.
+- Dashboard blijft ongewijzigd.
+
+Niet gewijzigd:
+- Onderliggende voorraadgegevens.
+- JSON import/export.
+- localStorage-sleutel en opslagstructuur.
+- Bestellingen.
+- QR/printfunctionaliteit.
+- Labelopmaak.
