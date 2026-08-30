@@ -938,21 +938,21 @@ function openLabelPrintWindow(items,format='a4'){
       }
       .sheet{
         display:grid;
-        grid-template-columns:75mm 75mm;
-        grid-auto-rows:55mm;
+        grid-template-columns:55mm 55mm 55mm;
+        grid-auto-rows:75mm;
         gap:0;
-        width:150mm;
+        width:165mm;
         align-items:start;
         justify-content:start;
       }
       .label{
         box-sizing:border-box;
-        width:75mm;
-        min-width:75mm;
-        max-width:75mm;
-        height:55mm;
-        min-height:55mm;
-        max-height:55mm;
+        width:55mm;
+        min-width:55mm;
+        max-width:55mm;
+        height:75mm;
+        min-height:75mm;
+        max-height:75mm;
         padding:2.5mm;
         border:1px solid #000;
         border-radius:2mm;
@@ -965,8 +965,8 @@ function openLabelPrintWindow(items,format='a4'){
       }
       .label img{
         display:block;
-        width:24mm;
-        height:24mm;
+        width:34mm;
+        height:34mm;
         margin:0 auto 1.2mm;
       }
       .number{

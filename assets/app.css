@@ -942,3 +942,105 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     width:100%;
   }
 }
+
+
+/* v7.5.33 - volledige donkere Mac/desktop interface; mobiel/iPhone blijft ongewijzigd */
+@media (min-width:901px){
+  :root{
+    --desktop-bg:#05080b;
+    --desktop-panel:#090e13;
+    --desktop-panel-2:#0d131a;
+    --desktop-line:#26313b;
+    --desktop-text:#edf2f7;
+    --desktop-muted:#9aa6b2;
+  }
+
+  body,.main-shell,main{background:var(--desktop-bg)!important;color:var(--desktop-text)!important}
+  .view{color:var(--desktop-text)}
+  .panel,.summary-card,.card,.modal-card,.menu-card,.settings-card{
+    background:var(--desktop-panel)!important;
+    color:var(--desktop-text)!important;
+    border-color:var(--desktop-line)!important;
+    box-shadow:none!important;
+  }
+
+  .summary-card span,.note,.muted,.small,.help-text{color:var(--desktop-muted)!important}
+  .summary-card strong,h1,h2,h3,label{color:var(--desktop-text)}
+
+  .toolbar,.panel-head{background:transparent!important;color:var(--desktop-text)}
+  input,select,textarea{
+    background:#0a1016!important;
+    color:var(--desktop-text)!important;
+    border-color:#34414d!important;
+  }
+  input::placeholder,textarea::placeholder{color:#7f8b97!important}
+
+  table{color:var(--desktop-text)}
+  th{color:#aab5c0!important;background:var(--desktop-panel)!important}
+  td{background:var(--desktop-panel)!important;border-color:#1d2730!important}
+  tr:hover td{background:#0d151c!important}
+
+  /* Generieke lijsten/rijen op Dashboard, Catalogus, Voorraad, Bestellen enz. */
+  .list-row,.stock-row,.catalog-row,.order-row,.library-row,.log-row,
+  .inventory-row,.filament-row,.result-row{
+    background:var(--desktop-panel)!important;
+    color:var(--desktop-text)!important;
+    border-color:#1d2730!important;
+  }
+
+  button:not(.primary):not(.danger-button){
+    background:#0b1117;
+    color:#dce5ed;
+    border-color:#34414d;
+  }
+  button.primary,.primary{
+    background:#0b4fb3!important;
+    color:#fff!important;
+    border-color:#1767d5!important;
+  }
+  .danger-button{
+    background:#150909!important;
+    color:#ff5b5b!important;
+    border-color:#d32929!important;
+  }
+
+  /* Dashboard zelf ook donker */
+  #dashboard .panel,
+  #dashboard .summary-card{
+    background:var(--desktop-panel)!important;
+  }
+  #dashboard .dashboard-table td,
+  #dashboard .dashboard-table th{
+    background:var(--desktop-panel)!important;
+  }
+
+  /* Catalogus / oude Voorraad / bestellijsten */
+  #catalogus .panel,#voorraad .panel,#bestellijst .panel,#bestellingen .panel,
+  #bibliotheken .panel,#logboek .panel,#meer .panel,#scannen .panel{
+    background:var(--desktop-panel)!important;
+    color:var(--desktop-text)!important;
+    border-color:var(--desktop-line)!important;
+  }
+
+  #catalogus .panel *,#voorraad .panel *,#bestellijst .panel *,
+  #bestellingen .panel *,#bibliotheken .panel *,#logboek .panel *,
+  #meer .panel *,#scannen .panel *{
+    border-color:var(--desktop-line);
+  }
+
+  /* Witte blokken die door component-CSS nog expliciet wit waren */
+  #catalogus [style*="background"],
+  #voorraad [style*="background"],
+  #bestellijst [style*="background"],
+  #bestellingen [style*="background"]{
+    color:inherit;
+  }
+
+  .search-results{
+    background:#0b1117!important;
+    color:var(--desktop-text)!important;
+    border-color:var(--desktop-line)!important;
+  }
+
+  .modal,.overlay{color:var(--desktop-text)}
+}
