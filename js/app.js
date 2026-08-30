@@ -143,33 +143,70 @@ document.getElementById('stockSort').onchange=e=>{stockSortMode=e.target.value;r
 
 
 
-function groupStockForSeparateScreen(items,query){
+function groupStockForSeparateScreen(items,query,sortMode='filament'){
   const q=(query||'').trim().toLowerCase();
-  const grouped={};
-
-  items.forEach(x=>{
+  const filtered=items.filter(x=>{
     const f=filament(x.filamentId);
-    if(!f)return;
+    if(!f)return false;
     const hay=`${x.number||''} ${f.category||''} ${f.type||''} ${f.color||''}`.toLowerCase();
-    if(q&&!hay.includes(q))return;
+    return !q||hay.includes(q);
+  });
 
+  filtered.sort((a,b)=>{
+    const fa=filament(a.filamentId),fb=filament(b.filamentId);
+    if(sortMode==='number-asc'){
+      return String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true});
+    }
+    if(sortMode==='number-desc'){
+      return String(b.number||'').localeCompare(String(a.number||''),'nl',{numeric:true});
+    }
+    return (fa?.category||'').localeCompare(fb?.category||'','nl')
+      ||(fa?.type||'').localeCompare(fb?.type||'','nl')
+      ||(fa?.color||'').localeCompare(fb?.color||'','nl')
+      ||String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true});
+  });
+
+  const grouped={};
+  filtered.forEach(x=>{
+    const f=filament(x.filamentId);
     grouped[f.category]??={};
     grouped[f.category][f.type]??={};
     grouped[f.category][f.type][f.color]??=[];
     grouped[f.category][f.type][f.color].push(x);
   });
 
-  return grouped;
+  return {grouped,filtered};
 }
 
-function separateStockScreenHtml(items,kind,query){
-  const grouped=groupStockForSeparateScreen(items,query);
-  const categories=Object.keys(grouped).sort((a,b)=>a.localeCompare(b,'nl'));
+function separateStockScreenHtml(items,kind,query,sortMode='filament'){
+  const {grouped,filtered}=groupStockForSeparateScreen(items,query,sortMode);
 
-  if(!categories.length){
+  if(!filtered.length){
     return `<div class="note">Geen ${kind==='spool'?'spoelen':'refills'} gevonden.</div>`;
   }
 
+  if(sortMode==='number-asc'||sortMode==='number-desc'){
+    return `<div class="separate-stock-list separate-stock-flat">
+      ${filtered.map(x=>{
+        const f=filament(x.filamentId);
+        return `
+          <div class="separate-stock-row category-data-row" data-category="${esc(f.category)}">
+            <div class="separate-stock-color">${esc(f.color)}</div>
+            <div class="separate-stock-number"><strong>${esc(x.number)}</strong></div>
+            ${kind==='spool'
+              ? `<div class="separate-stock-level">${Number(x.level)||0}%</div>`
+              : `<div class="separate-stock-level"></div>`}
+            <div class="separate-stock-actions">
+              <input class="label-select separate-label-select" type="checkbox" data-kind="${kind==='spool'?'spoel':'refill'}" data-id="${x.id}" aria-label="Selecteer ${esc(x.number)}">
+              <button onclick="${kind==='spool'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button>
+              <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  const categories=Object.keys(grouped).sort((a,b)=>a.localeCompare(b,'nl'));
   return categories.map(category=>`
     <div class="separate-stock-category" data-category="${esc(category)}">
       <div class="category-title">${esc(category)}</div>
@@ -209,7 +246,8 @@ function renderSpoolScreen(){
   el.innerHTML=separateStockScreenHtml(
     state.spools.filter(s=>s.status==='active'),
     'spool',
-    search?.value||''
+    search?.value||'',
+    document.getElementById('spoolScreenSort')?.value||'filament'
   );
 }
 
@@ -220,7 +258,8 @@ function renderRefillScreen(){
   el.innerHTML=separateStockScreenHtml(
     state.refills,
     'refill',
-    search?.value||''
+    search?.value||'',
+    document.getElementById('refillScreenSort')?.value||'filament'
   );
 }
 
@@ -927,8 +966,12 @@ function renderAll(){refreshDatalists();renderDashboard();renderCatalog();render
 
 const spoolScreenSearchEl=document.getElementById('spoolScreenSearch');
 const refillScreenSearchEl=document.getElementById('refillScreenSearch');
+const spoolScreenSortEl=document.getElementById('spoolScreenSort');
+const refillScreenSortEl=document.getElementById('refillScreenSort');
 if(spoolScreenSearchEl)spoolScreenSearchEl.oninput=renderSpoolScreen;
 if(refillScreenSearchEl)refillScreenSearchEl.oninput=renderRefillScreen;
+if(spoolScreenSortEl)spoolScreenSortEl.onchange=renderSpoolScreen;
+if(refillScreenSortEl)refillScreenSortEl.onchange=renderRefillScreen;
 
 const printSelectedSpoolLabelsBtnEl=document.getElementById('printSelectedSpoolLabelsBtn');
 const printSelectedRefillLabelsBtnEl=document.getElementById('printSelectedRefillLabelsBtn');

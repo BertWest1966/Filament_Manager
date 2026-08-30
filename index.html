@@ -10,7 +10,7 @@
   <title>Filament Manager v7.5.21</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=7.5.24">
+  <link rel="stylesheet" href="assets/app.css?v=7.5.25">
 </head>
 <body>
 <div class="app-shell">
@@ -18,7 +18,7 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 7.5.24 · Afdrukken</span>
+      <span>Versie 7.5.25 · Afdrukken</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active">Dashboard</button>
@@ -39,7 +39,7 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 7.5.24 · Afdrukken</span>
+        <span>Versie 7.5.25 · Afdrukken</span>
       </div>
     </header>
 
@@ -97,6 +97,11 @@
           <button class="primary" type="button" onclick="openSpool()">Nieuwe spoel</button>
           <button type="button" id="printSelectedSpoolLabelsBtn">Print geselecteerde stickers</button>
           <input id="spoolScreenSearch" placeholder="Zoek nummer, type of kleur">
+          <select id="spoolScreenSort">
+            <option value="filament">Categorie → type → kleur</option>
+            <option value="number-asc">Nummer oplopend</option>
+            <option value="number-desc">Nummer aflopend</option>
+          </select>
         </div>
         <div class="panel"><div id="spoolScreenList"></div></div>
       </section>
@@ -106,6 +111,11 @@
           <button class="primary" type="button" onclick="openRefill()">Nieuwe refill</button>
           <button type="button" id="printSelectedRefillLabelsBtn">Print geselecteerde stickers</button>
           <input id="refillScreenSearch" placeholder="Zoek nummer, type of kleur">
+          <select id="refillScreenSort">
+            <option value="filament">Categorie → type → kleur</option>
+            <option value="number-asc">Nummer oplopend</option>
+            <option value="number-desc">Nummer aflopend</option>
+          </select>
         </div>
         <div class="panel"><div id="refillScreenList"></div></div>
       </section>
@@ -487,7 +497,7 @@ window.FMPrint = (() => {
   </form>
 </dialog>
 
-<script src="js/app.js?v=7.5.24"></script>
+<script src="js/app.js?v=7.5.25"></script>
 <script src="js/print-tools.js?v=7.5.5"></script>
 </body>
 </html>
