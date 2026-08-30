@@ -10,7 +10,7 @@
   <title>Filament Manager v7.5.21</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=7.5.27">
+  <link rel="stylesheet" href="assets/app.css?v=7.5.28">
 </head>
 <body>
 <div class="app-shell">
@@ -18,7 +18,7 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 7.5.27 · Afdrukken</span>
+      <span>Versie 7.5.28 · Afdrukken</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active">Dashboard</button>
@@ -39,7 +39,7 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 7.5.27 · Afdrukken</span>
+        <span>Versie 7.5.28 · Afdrukken</span>
       </div>
     </header>
 
@@ -214,9 +214,11 @@
         <div class="panel">
           <h2>Beheer</h2>
           <div class="menu-grid">
-            <button data-view="catalogus">Catalogus</button>
+            <button data-view="bestellijst">Bestellen</button>
             <button data-view="bestellingen">Lopende bestellingen</button>
-            <button data-view="bibliotheken">Bibliotheken</button>
+            <button data-view="voorraad">Voorraad</button>
+            <button data-view="catalogus">Catalogus</button>
+            <button data-view="bibliotheken">Bibliotheek</button>
             <button data-view="logboek">Logboek</button>
           </div>
         </div>
@@ -253,9 +255,9 @@
 
 <nav class="mobile-bottom-nav">
   <button data-view="dashboard" class="active"><span>⌂</span>Dashboard</button>
-  <button data-view="voorraad"><span>◫</span>Voorraad</button>
+  <button data-view="spoelen"><span>◫</span>Spoelen</button>
+  <button data-view="refills"><span>▤</span>Refills</button>
   <button data-view="scannen"><span>▣</span>Scannen</button>
-  <button data-view="bestellijst"><span>☷</span>Bestellen</button>
   <button data-view="meer"><span>•••</span>Meer</button>
 </nav>
 
@@ -508,7 +510,7 @@ window.FMPrint = (() => {
   </form>
 </dialog>
 
-<script src="js/app.js?v=7.5.27"></script>
+<script src="js/app.js?v=7.5.28"></script>
 <script src="js/print-tools.js?v=7.5.5"></script>
 </body>
 </html>

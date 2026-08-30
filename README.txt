@@ -1,21 +1,17 @@
-Filament Manager - versie 7.5.27
+Filament Manager - versie 7.5.28
 
-Basis
------
-Gebaseerd op versie 7.5.26.
+Mobiele navigatie
+-----------------
+Dashboard | Spoelen | Refills | Scannen | Meer
 
-Wijzigingen
------------
-- Dashboard: resterend filament is nu een keuzeveld.
-- Mogelijke waarden: 100%, 75%, 50%, 25% en 0%.
-- Een gekozen percentage wordt meteen opgeslagen.
-- Bestellen > Handmatig toevoegen: "Aantal rollen" is nu een keuzelijst.
-- Mogelijke aantallen: 1 t/m 10.
-- De keuze werkt zonder het numerieke toetsenbord te openen op iPhone.
-- Layout van Spoelen/Refills en bestaande voorraadfuncties blijven behouden.
+Meer > Beheer
+-------------
+1. Bestellen
+2. Lopende bestellingen
+3. Voorraad
+4. Catalogus
+5. Bibliotheek
+6. Logboek
 
-Niet gewijzigd
---------------
-- Lokale opslagstructuur.
-- JSON import/export.
-- QR-labelopmaak en printmechanisme.
+Voorraad blijft voorlopig behouden en is bereikbaar via Meer.
+Overige functies van versie 7.5.27 zijn niet gewijzigd.
