@@ -1,8 +1,14 @@
-Filament Manager - versie 7.5.36
+Filament Manager - versie 7.5.37
 
-Wijziging
----------
-- De tekst '· Afdrukken' is verwijderd uit de versie-aanduiding.
-- Er staat nu alleen 'Versie 7.5.36'.
+Sticker
+-------
+- Stickerkader aangepast naar 70 mm breed x 50 mm hoog.
+- Alleen de afmetingen van het kader zijn gewijzigd.
+- Tekstgroottes zijn niet aangepast.
+- QR-code blijft behouden.
+- Refillnummer Rxxxx blijft rood.
 
-Alle overige functies en layouts blijven ongewijzigd.
+Overig
+------
+- Mac- en iPhone-layout blijven verder ongewijzigd.
+- Opslag, JSON import/export en overige app-logica zijn niet gewijzigd.
