@@ -737,7 +737,11 @@ createBackupBtn.onclick=()=>{
     const a=document.createElement('a');
     const url=URL.createObjectURL(blob);
     a.href=url;
-    a.download=`FilamentManager_Backup_${new Date().toISOString().replace(/[:.]/g,'-')}.json`;
+    const now=new Date();
+    const pad=n=>String(n).padStart(2,'0');
+    const backupDate=`${pad(now.getDate())}-${pad(now.getMonth()+1)}-${now.getFullYear()}`;
+    const backupTime=`${pad(now.getHours())}u${pad(now.getMinutes())}`;
+    a.download=`Filament_Backup_${backupDate}_${backupTime}.json`;
     document.body.appendChild(a);
     a.click();
     a.remove();
