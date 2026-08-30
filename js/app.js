@@ -901,7 +901,7 @@ function openQr(kind,id){
 }
 
 function labelHtml(i){
-  return `<div class="label">
+  return `<div class="label ${String(i.kind).toLowerCase()==='refill'?'refill-label':''}">
     <img src="${qrImageUrl(i.kind,i.number)}" alt="QR">
     <div class="number">${esc(i.number)}</div>
     <div class="divider"></div>
@@ -938,22 +938,22 @@ function openLabelPrintWindow(items,format='a4'){
       }
       .sheet{
         display:grid;
-        grid-template-columns:55mm 55mm 55mm;
-        grid-auto-rows:90mm;
+        grid-template-columns:75mm 75mm;
+        grid-auto-rows:55mm;
         gap:0;
-        width:165mm;
+        width:150mm;
         align-items:start;
         justify-content:start;
       }
       .label{
         box-sizing:border-box;
-        width:55mm;
-        min-width:55mm;
-        max-width:55mm;
-        height:90mm;
-        min-height:90mm;
-        max-height:90mm;
-        padding:3mm;
+        width:75mm;
+        min-width:75mm;
+        max-width:75mm;
+        height:55mm;
+        min-height:55mm;
+        max-height:55mm;
+        padding:2.5mm;
         border:1px solid #000;
         border-radius:2mm;
         background:#fff;
@@ -965,42 +965,45 @@ function openLabelPrintWindow(items,format='a4'){
       }
       .label img{
         display:block;
-        width:43mm;
-        height:43mm;
-        margin:0 auto 2mm;
+        width:24mm;
+        height:24mm;
+        margin:0 auto 1.2mm;
       }
       .number{
-        font-size:22pt;
+        font-size:18pt;
         font-weight:900;
-        letter-spacing:.8mm;
+        letter-spacing:.6mm;
         line-height:1;
+      }
+      .refill-label .number{
+        color:#c00000;
       }
       .divider{
         border-top:1px solid #000;
-        margin:2mm 0;
+        margin:1.2mm 0;
       }
       .main{
-        font-size:10pt;
+        font-size:9pt;
         font-weight:800;
-        line-height:1.1;
+        line-height:1.05;
       }
       .line{
-        font-size:8.5pt;
+        font-size:7.5pt;
         font-weight:700;
-        line-height:1.15;
-        margin-top:.7mm;
+        line-height:1.1;
+        margin-top:.4mm;
       }
       .small{
-        font-size:7pt;
-        line-height:1.1;
-        margin-top:.6mm;
-        min-height:2.5mm;
+        font-size:6.5pt;
+        line-height:1.05;
+        margin-top:.4mm;
+        min-height:2mm;
       }
       .kind{
-        font-size:7.5pt;
+        font-size:6.5pt;
         font-weight:900;
         text-transform:uppercase;
-        margin-top:1mm;
+        margin-top:.5mm;
       }
       @media screen{
         body{padding:10mm;background:#eee}
