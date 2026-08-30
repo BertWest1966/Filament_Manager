@@ -1,17 +1,17 @@
-Filament Manager - versie 7.5.28
+Filament Manager - versie 7.5.29
 
-Mobiele navigatie
------------------
-Dashboard | Spoelen | Refills | Scannen | Meer
+Wijzigingen
+-----------
+- Spoelen: mobiele voorraadregel compact op één lijn.
+- Refills: dezelfde compacte mobiele voorraadregel.
+- Volgorde per regel: selectie | kleur | spoel/refill | hoeveelheid (bij spoelen) | Wijzig | Verwijderen.
+- Selectievakje staat niet meer los boven de voorraadregel.
+- Wijzig en Verwijderen staan naast elkaar.
+- Sorteren en Print geselecteerde stickers blijven behouden.
+- Mobiele navigatie van versie 7.5.28 blijft behouden.
 
-Meer > Beheer
--------------
-1. Bestellen
-2. Lopende bestellingen
-3. Voorraad
-4. Catalogus
-5. Bibliotheek
-6. Logboek
-
-Voorraad blijft voorlopig behouden en is bereikbaar via Meer.
-Overige functies van versie 7.5.27 zijn niet gewijzigd.
+Niet gewijzigd
+--------------
+- Lokale opslag en gegevensstructuur.
+- JSON import/export.
+- QR-labelopmaak en printmechanisme.

@@ -212,6 +212,7 @@ function separateStockScreenHtml(items,kind,query,sortMode='filament'){
       <table class="dashboard-table separate-dashboard-table separate-flat-table">
         <thead>
           <tr>
+            <th class="select-col"></th>
             <th>Kleur</th>
             <th>${kind==='spool'?'Spoel':'Refill'}</th>
             ${kind==='spool'?'<th>Hoeveelh.</th>':''}
@@ -222,11 +223,15 @@ function separateStockScreenHtml(items,kind,query,sortMode='filament'){
           ${filtered.map(x=>{
             const f=filament(x.filamentId);
             return `
-              <tr class="category-data-row" data-category="${esc(f.category)}">
+              <tr class="category-data-row compact-stock-row" data-category="${esc(f.category)}">
+                <td class="select-col"><input class="label-select separate-label-select" type="checkbox" data-kind="${kind==='spool'?'spoel':'refill'}" data-id="${x.id}" aria-label="Selecteer ${esc(x.number)}"></td>
                 <td class="separate-stock-color">${esc(f.category)} · ${esc(f.type)} · ${esc(f.color)}</td>
                 <td><strong>${esc(x.number)}</strong></td>
                 ${kind==='spool'?`<td>${Number(x.level)||0}%</td>`:''}
-                <td>${actionHtml(x)}</td>
+                <td class="compact-actions">
+                  <button onclick="${kind==='spool'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button>
+                  <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
+                </td>
               </tr>`;
           }).join('')}
         </tbody>
@@ -245,7 +250,8 @@ function separateStockScreenHtml(items,kind,query,sortMode='filament'){
         <table class="dashboard-table separate-dashboard-table">
           <thead>
             <tr>
-              <th></th>
+              <th class="select-col"></th>
+              <th>Kleur</th>
               <th>${kind==='spool'?'Spoel':'Refill'}</th>
               ${kind==='spool'?'<th>Hoeveelh.</th>':''}
               <th>Acties</th>
@@ -256,11 +262,15 @@ function separateStockScreenHtml(items,kind,query,sortMode='filament'){
               grouped[category][type][color]
                 .sort((a,b)=>String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true}))
                 .map(x=>`
-                  <tr class="category-data-row" data-category="${esc(category)}">
+                  <tr class="category-data-row compact-stock-row" data-category="${esc(category)}">
+                    <td class="select-col"><input class="label-select separate-label-select" type="checkbox" data-kind="${kind==='spool'?'spoel':'refill'}" data-id="${x.id}" aria-label="Selecteer ${esc(x.number)}"></td>
                     <td class="separate-stock-color">${esc(color)}</td>
                     <td><strong>${esc(x.number)}</strong></td>
                     ${kind==='spool'?`<td>${Number(x.level)||0}%</td>`:''}
-                    <td>${actionHtml(x)}</td>
+                    <td class="compact-actions">
+                      <button onclick="${kind==='spool'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button>
+                      <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
+                    </td>
                   </tr>
                 `)
             ).join('')}
