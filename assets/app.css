@@ -1495,3 +1495,20 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     gap:10px!important;
   }
 }
+
+
+/* v7.5.45 - donkerdere tekst in het Mac-zijmenu */
+@media (min-width:901px){
+  .desktop-sidebar nav button{
+    color:#0b5f59!important;
+  }
+  .desktop-sidebar nav button .nav-icon{
+    color:#0b756d!important;
+  }
+  .desktop-sidebar nav button.active{
+    color:#fff!important;
+  }
+  .desktop-sidebar nav button.active .nav-icon{
+    color:#fff!important;
+  }
+}

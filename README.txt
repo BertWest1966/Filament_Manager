@@ -1,12 +1,11 @@
-Filament Manager - versie 7.5.44
+Filament Manager - versie 7.5.45
 
 Mac/desktop
 -----------
-- Tekstsymbolen in het linkermenu vervangen door uniforme lijniconen.
-- Alle menu-iconen hebben dezelfde grootte en uitlijning.
-- Inactieve iconen volgen de groene menukleur.
-- Het icoon van de actieve pagina wordt wit.
-- Compacte Dashboard/Spoelen/Refill-layout van v7.5.43 behouden.
+- Tekst van niet-actieve knoppen in het linkermenu donkerder groen gemaakt.
+- Menu-iconen blijven groen en uniform.
+- Actieve knop blijft groen met witte tekst en wit icoon.
+- Overige layout van v7.5.44 behouden.
 
 iPhone
 ------
