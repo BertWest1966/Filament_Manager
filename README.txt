@@ -1,11 +1,28 @@
-Filament Manager - versie 7.5.31
+Filament Manager - versie 7.5.32
 
-Wijzigingen stickers
---------------------
-- Stickerformaat gecorrigeerd naar 75 x 55 mm.
-- Sticker wordt liggend afgedrukt: 75 mm breed en 55 mm hoog.
-- Refillstickers tonen het nummer Rxxxx opnieuw in rood.
-- Spoelnummers blijven zwart.
-- QR-code en overige stickerinformatie blijven behouden.
+Desktop/Mac
+-----------
+- Nieuwe donkere desktopweergave voor Spoelen en Refills.
+- Zwarte/donkere achtergrond en donker zijmenu.
+- Compactere tabellen met minder horizontale witruimte.
+- Categorieën en types worden als gekleurde donkere balken weergegeven.
+- Inklapbare categorieën/types uit v7.5.30 blijven behouden.
+- Compactere Wijzig/Verwijderen-knoppen.
+- Inhoud op grote schermen begrensd en gecentreerd.
 
-Overige functies van versie 7.5.30 blijven ongewijzigd.
+iPhone
+------
+- De iPhone/mobile layout is niet gewijzigd.
+- Alle nieuwe layoutregels gelden uitsluitend vanaf 901 px schermbreedte.
+
+Stickers
+--------
+- Stickerformaat blijft 75 x 55 mm.
+- Refillnummer Rxxxx blijft rood.
+
+Niet gewijzigd
+--------------
+- Opslag en lokale data.
+- JSON import/export.
+- QR- en stickerfunctionaliteit.
+- Bestellingen, catalogus en overige app-logica.

@@ -726,3 +726,219 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     font-size:11px;
   }
 }
+
+
+/* v7.5.32 - desktop/Mac dark layout. Mobiel blijft ongewijzigd. */
+@media (min-width:901px){
+  body{
+    background:#05080b;
+    color:#eef2f6;
+  }
+
+  .main-shell{
+    background:#05080b;
+    min-height:100vh;
+  }
+
+  aside,
+  .sidebar{
+    background:#080d12 !important;
+    border-right:1px solid #26303a !important;
+    color:#eef2f6;
+  }
+
+  aside strong,
+  aside span,
+  aside button,
+  .sidebar strong,
+  .sidebar span,
+  .sidebar button{
+    color:#eef2f6;
+  }
+
+  aside nav button,
+  .sidebar nav button{
+    background:transparent;
+    border-color:transparent;
+  }
+
+  aside nav button.active,
+  .sidebar nav button.active{
+    background:#0b4fb3 !important;
+    color:#fff !important;
+  }
+
+  .mobile-header{
+    background:#05080b;
+    color:#fff;
+    border-bottom:1px solid #26303a;
+  }
+
+  .global-search{
+    background:#05080b;
+  }
+
+  .global-search input,
+  #spoelen .toolbar input,
+  #refills .toolbar input,
+  #spoelen .toolbar select,
+  #refills .toolbar select{
+    background:#080d12;
+    color:#eef2f6;
+    border-color:#34404c;
+  }
+
+  .global-search input::placeholder,
+  #spoelen input::placeholder,
+  #refills input::placeholder{
+    color:#8b96a3;
+  }
+
+  #spoelen,
+  #refills{
+    max-width:1180px;
+    margin:0 auto;
+  }
+
+  #spoelen .toolbar,
+  #refills .toolbar{
+    gap:8px;
+    align-items:center;
+  }
+
+  #spoelen .toolbar button,
+  #refills .toolbar button{
+    min-height:38px;
+    padding:7px 12px;
+  }
+
+  #spoelen .toolbar input,
+  #refills .toolbar input{
+    flex:1 1 340px;
+  }
+
+  #spoelen .panel,
+  #refills .panel{
+    background:#080d12;
+    border:1px solid #26303a;
+    box-shadow:none;
+    color:#eef2f6;
+  }
+
+  #spoelen .collapsible-stock-category,
+  #refills .collapsible-stock-category{
+    margin:0 0 5px;
+  }
+
+  #spoelen .category-collapse-button,
+  #refills .category-collapse-button{
+    min-height:34px;
+    padding:5px 10px;
+    border:1px solid color-mix(in srgb,var(--cat-color) 55%,#202a34);
+    border-radius:5px;
+    background:color-mix(in srgb,var(--cat-color) 25%,#081018);
+    color:color-mix(in srgb,var(--cat-color) 75%,white);
+    font-size:16px;
+  }
+
+  #spoelen .type-collapse-button,
+  #refills .type-collapse-button{
+    min-height:31px;
+    margin:2px 0 0 28px;
+    width:calc(100% - 28px);
+    padding:4px 10px;
+    border:1px solid color-mix(in srgb,var(--cat-color) 42%,#202a34);
+    border-radius:4px;
+    background:color-mix(in srgb,var(--cat-color) 17%,#081018);
+    color:color-mix(in srgb,var(--cat-color) 70%,white);
+  }
+
+  #spoelen .collapse-count,
+  #refills .collapse-count{
+    color:inherit;
+  }
+
+  #spoelen .separate-dashboard-table,
+  #refills .separate-dashboard-table{
+    width:calc(100% - 48px);
+    margin:0 0 4px 48px;
+    background:#080d12;
+    color:#eef2f6;
+    table-layout:fixed;
+    border-collapse:collapse;
+  }
+
+  #spoelen .separate-dashboard-table th,
+  #refills .separate-dashboard-table th{
+    padding:5px 7px;
+    color:#aeb8c3;
+    background:#080d12;
+    border-bottom:1px solid #26303a;
+    font-size:12px;
+  }
+
+  #spoelen .separate-dashboard-table td,
+  #refills .separate-dashboard-table td{
+    padding:5px 7px;
+    height:34px;
+    border-bottom:1px solid #1c252e;
+    background:#080d12;
+    color:#eef2f6;
+    font-size:13px;
+  }
+
+  #spoelen .separate-dashboard-table tr:hover td,
+  #refills .separate-dashboard-table tr:hover td{
+    background:#0d141b;
+  }
+
+  #spoelen .separate-stock-color,
+  #refills .separate-stock-color,
+  #spoelen .separate-dashboard-table strong,
+  #refills .separate-dashboard-table strong{
+    color:color-mix(in srgb,var(--cat-color) 72%,white);
+  }
+
+  #spoelen .separate-dashboard-table .select-col,
+  #refills .separate-dashboard-table .select-col{
+    width:34px;
+    min-width:34px;
+  }
+
+  #spoelen .compact-actions,
+  #refills .compact-actions{
+    text-align:right;
+    white-space:nowrap;
+  }
+
+  #spoelen .compact-actions button,
+  #refills .compact-actions button{
+    min-height:28px;
+    padding:4px 8px;
+    margin-left:4px;
+    background:#0b1117;
+    border-color:#2c7bc9;
+    color:#55aaff;
+    font-size:11px;
+  }
+
+  #spoelen .compact-actions .danger-button,
+  #refills .compact-actions .danger-button{
+    border-color:#d32929;
+    color:#ff5252;
+    background:#150909;
+  }
+
+  #spoelen .primary,
+  #refills .primary{
+    background:#0b4fb3;
+    border-color:#1767d5;
+    color:#fff;
+  }
+
+  #spoelen .separate-flat-table,
+  #refills .separate-flat-table{
+    margin-left:0;
+    width:100%;
+  }
+}
