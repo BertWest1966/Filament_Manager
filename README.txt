@@ -1,11 +1,12 @@
-Filament Manager - versie 7.5.42
+Filament Manager - versie 7.5.43
 
 Mac/desktop
 -----------
-- Rijen op Dashboard, Spoelen en Refill nog iets lager gemaakt.
-- Checkbox iets dichter tegen de kleurkolom geplaatst.
-- Actieknoppen iets lager/compacter gemaakt.
-- De compacte breedte en kolomverhoudingen van v7.5.41 blijven behouden.
+- Rijhoogte van Spoelen en Refill gelijkgemaakt aan Dashboard.
+- Categorie- en typebalken compacter gemaakt in dezelfde stijl.
+- Actieknoppen behouden hun compacte hoogte.
+- Linkermenu voorzien van iconen voor alle knoppen.
+- Actieve menukeuze blijft groen gemarkeerd.
 
 iPhone
 ------
