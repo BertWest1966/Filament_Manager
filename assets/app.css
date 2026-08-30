@@ -1512,3 +1512,15 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     color:#fff!important;
   }
 }
+
+
+/* v7.5.46 - menutekst expliciet donker groen */
+@media (min-width:901px){
+  .desktop-sidebar nav button > span:not(.nav-icon){
+    color:#0b5f59!important;
+  }
+
+  .desktop-sidebar nav button.active > span:not(.nav-icon){
+    color:#fff!important;
+  }
+}

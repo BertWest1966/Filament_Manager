@@ -1,11 +1,11 @@
-Filament Manager - versie 7.5.45
+Filament Manager - versie 7.5.46
 
 Mac/desktop
 -----------
-- Tekst van niet-actieve knoppen in het linkermenu donkerder groen gemaakt.
-- Menu-iconen blijven groen en uniform.
+- Tekstkleur van niet-actieve knoppen in het linkermenu expliciet donker groen gemaakt.
+- De tekstkleur wordt nu rechtstreeks op de tekst-span toegepast.
 - Actieve knop blijft groen met witte tekst en wit icoon.
-- Overige layout van v7.5.44 behouden.
+- Iconen en overige menu-opmaak blijven ongewijzigd.
 
 iPhone
 ------
