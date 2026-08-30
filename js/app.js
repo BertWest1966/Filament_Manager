@@ -938,21 +938,21 @@ function openLabelPrintWindow(items,format='a4'){
       }
       .sheet{
         display:grid;
-        grid-template-columns:70mm 70mm;
-        grid-auto-rows:50mm;
+        grid-template-columns:50mm 50mm 50mm;
+        grid-auto-rows:70mm;
         gap:0;
-        width:140mm;
+        width:150mm;
         align-items:start;
         justify-content:start;
       }
       .label{
         box-sizing:border-box;
-        width:70mm;
-        min-width:70mm;
-        max-width:70mm;
-        height:50mm;
-        min-height:50mm;
-        max-height:50mm;
+        width:50mm;
+        min-width:50mm;
+        max-width:50mm;
+        height:70mm;
+        min-height:70mm;
+        max-height:70mm;
         padding:2.5mm;
         border:1px solid #000;
         border-radius:2mm;
