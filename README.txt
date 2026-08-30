@@ -1,15 +1,15 @@
-Filament Manager - versie 7.5.40
+Filament Manager - versie 7.5.41
 
 Mac/desktop
 -----------
-- Zijmenu compacter gemaakt.
-- Actieve menukeuze duidelijk groen gemarkeerd.
-- Dashboard, Spoelen en Refill dichter tegen het zijmenu geplaatst.
-- Bovenste bediening op Spoelen en Refill compacter gemaakt.
-- Kolommen op Spoelen en Refill dichter bij elkaar geplaatst.
-- Checkbox en kleur staan visueel dichter bij elkaar.
-- Categorie- en typebalken zijn duidelijker zichtbaar.
-- Dashboard eveneens compacter gemaakt met duidelijkere categorie/type-hiërarchie.
+- Dashboard, Spoelen en Refill begrensd tot maximaal 1000 px breed.
+- Inhoud staat dichter bij het zijmenu.
+- Bovenste bediening volgt dezelfde compacte breedte.
+- Kleur, spoel/refill en acties staan dichter bij elkaar.
+- Checkbox staat dichter bij de kleur.
+- Rijen zijn iets lager.
+- PETG/PLA- en Basic/HF-balken volgen dezelfde compacte werkbreedte.
+- Dashboard gebruikt dezelfde compacte verhoudingen.
 
 iPhone
 ------
