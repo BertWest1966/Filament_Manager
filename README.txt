@@ -1,14 +1,22 @@
-Filament Manager - versie 7.5.39
+Filament Manager - versie 7.5.40
 
-iPhone stickerformaat
----------------------
-- Stickerformaat blijft 50 mm breed x 70 mm hoog.
-- De service-worker cache is vernieuwd naar v7.5.39.
-- iPhone/PWA haalt daardoor de nieuwe sticker-printcode op in plaats van een oudere gecachte versie.
-- Mac en iPhone gebruiken dezelfde stickeropmaak.
-- Tekstgroottes, QR-code en kleuren zijn niet gewijzigd.
-- Refillnummer Rxxxx blijft rood.
+Mac/desktop
+-----------
+- Zijmenu compacter gemaakt.
+- Actieve menukeuze duidelijk groen gemarkeerd.
+- Dashboard, Spoelen en Refill dichter tegen het zijmenu geplaatst.
+- Bovenste bediening op Spoelen en Refill compacter gemaakt.
+- Kolommen op Spoelen en Refill dichter bij elkaar geplaatst.
+- Checkbox en kleur staan visueel dichter bij elkaar.
+- Categorie- en typebalken zijn duidelijker zichtbaar.
+- Dashboard eveneens compacter gemaakt met duidelijkere categorie/type-hiërarchie.
 
-Data
-----
-- Lokale opslag, JSON import/export en voorraadgegevens zijn niet gewijzigd.
+iPhone
+------
+- De iPhone/mobile layout is niet gewijzigd.
+
+Overig
+------
+- Stickerformaat blijft 50 x 70 mm.
+- QR-code en stickerteksten zijn niet gewijzigd.
+- Opslag, JSON import/export en overige app-logica zijn niet gewijzigd.

@@ -1159,3 +1159,87 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     border-color:#ef4444!important;
   }
 }
+
+/* v7.5.40 - compactere Mac-layout voor Dashboard, Spoelen en Refill.
+   Alleen desktop; iPhone/mobile blijft ongewijzigd. */
+@media (min-width:901px){
+  .app-shell{grid-template-columns:205px 1fr}
+  .desktop-sidebar{padding:16px 14px}
+  .desktop-sidebar nav{gap:4px;margin-top:20px}
+  .desktop-sidebar nav button{
+    min-height:38px!important;padding:7px 10px!important;
+    border-radius:7px!important;font-size:14px!important;
+  }
+  .desktop-sidebar nav button.active{
+    background:#0f766e!important;border-color:#0f766e!important;
+    color:#fff!important;font-weight:700;
+  }
+
+  main{max-width:1320px;margin-left:0;margin-right:auto;padding-left:18px;padding-right:18px}
+  #dashboard,#spoelen,#refills{width:100%;max-width:1180px;margin-left:0;margin-right:auto}
+
+  #spoelen .toolbar,#refills .toolbar{gap:6px;flex-wrap:nowrap}
+  #spoelen .toolbar button,#refills .toolbar button,
+  #spoelen .toolbar input,#refills .toolbar input,
+  #spoelen .toolbar select,#refills .toolbar select{
+    min-height:36px!important;height:36px;padding:6px 9px!important;font-size:13px!important
+  }
+  #spoelen .toolbar input,#refills .toolbar input{min-width:260px}
+
+  #spoelen .category-collapse-button,#refills .category-collapse-button{
+    min-height:31px;padding:4px 8px!important;font-size:15px!important;
+    background:color-mix(in srgb,var(--cat-color) 14%,white)!important
+  }
+  #spoelen .type-collapse-button,#refills .type-collapse-button{
+    min-height:29px;padding:3px 8px!important;font-size:13px!important;
+    background:color-mix(in srgb,var(--cat-color) 10%,white)!important
+  }
+
+  #spoelen .separate-dashboard-table,#refills .separate-dashboard-table{
+    width:calc(100% - 42px)!important;margin-left:42px!important;table-layout:fixed!important
+  }
+  #spoelen .separate-dashboard-table th,#spoelen .separate-dashboard-table td,
+  #refills .separate-dashboard-table th,#refills .separate-dashboard-table td{
+    padding:4px 6px!important;height:32px!important;font-size:12px!important
+  }
+  #spoelen .separate-dashboard-table .select-col,#refills .separate-dashboard-table .select-col{
+    width:34px!important;min-width:34px!important
+  }
+  #spoelen .separate-dashboard-table th:nth-child(2),#spoelen .separate-dashboard-table td:nth-child(2),
+  #refills .separate-dashboard-table th:nth-child(2),#refills .separate-dashboard-table td:nth-child(2){width:28%!important}
+  #spoelen .separate-dashboard-table th:nth-child(3),#spoelen .separate-dashboard-table td:nth-child(3),
+  #refills .separate-dashboard-table th:nth-child(3),#refills .separate-dashboard-table td:nth-child(3){width:20%!important}
+  #spoelen .separate-dashboard-table th:nth-child(4),#spoelen .separate-dashboard-table td:nth-child(4){
+    width:16%!important;text-align:center
+  }
+  #spoelen .separate-dashboard-table th:last-child,#spoelen .separate-dashboard-table td:last-child,
+  #refills .separate-dashboard-table th:last-child,#refills .separate-dashboard-table td:last-child{
+    width:155px!important;text-align:right
+  }
+  #spoelen .compact-actions button,#refills .compact-actions button{
+    min-height:26px!important;padding:3px 7px!important;font-size:11px!important
+  }
+
+  #dashboard .summary-grid{gap:6px;margin-bottom:7px}
+  #dashboard .summary-card{padding:7px 9px!important}
+  #dashboard .panel{padding:8px 10px!important}
+  #dashboard .panel-head{gap:8px;flex-wrap:nowrap}
+  #dashboard .panel-head input{min-height:35px!important;height:35px;padding:6px 9px!important}
+  #dashboard .category-title{
+    padding:5px 8px!important;margin-top:7px!important;
+    border:1px solid color-mix(in srgb,var(--cat-color) 45%,#d7dde5)!important;
+    border-radius:5px;background:color-mix(in srgb,var(--cat-color) 14%,white)!important
+  }
+  #dashboard .type-title{
+    margin:3px 0 1px 24px!important;padding:4px 8px!important;width:calc(100% - 24px);
+    border-radius:4px;background:color-mix(in srgb,var(--cat-color) 9%,white)!important
+  }
+  #dashboard .dashboard-table{width:calc(100% - 42px);margin-left:42px;table-layout:fixed}
+  #dashboard .dashboard-table th,#dashboard .dashboard-table td{
+    height:29px!important;padding:3px 6px!important
+  }
+  #dashboard .dashboard-table th:first-child,#dashboard .dashboard-table td:first-child{width:auto}
+  #dashboard .dashboard-table th:nth-child(2),#dashboard .dashboard-table td:nth-child(2){width:105px}
+  #dashboard .dashboard-table th:nth-child(3),#dashboard .dashboard-table td:nth-child(3){width:100px}
+  #dashboard .dashboard-table th:nth-child(4),#dashboard .dashboard-table td:nth-child(4){width:62px}
+}
