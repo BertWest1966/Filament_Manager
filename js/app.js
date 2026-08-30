@@ -51,6 +51,16 @@ newOrderBtn.onclick=()=>{manualOrderPendingId=null;if(!state.catalog.length)retu
 oFilament.onchange=()=>oSupplier.value=filament(oFilament.value)?.supplier||'';
 orderForm.onsubmit=e=>{e.preventDefault();state.orders.push({id:uid(),filamentId:oFilament.value,quantity:Number(oQuantity.value),received:0,supplier:oSupplier.value.trim(),status:'Besteld'});if(manualOrderPendingId){ensureManualOrderList();state.manualOrderList=state.manualOrderList.filter(x=>x.id!==manualOrderPendingId);manualOrderPendingId=null;}orderDialog.close();save()}
 
+function setDashboardLevel(id,value){
+  const s=state.spools.find(x=>x.id===id);
+  if(!s)return;
+  const allowed=[100,75,50,25,0];
+  const level=Number(value);
+  if(!allowed.includes(level))return;
+  s.level=level;
+  save();
+}
+
 function renderDashboard(){
   sumSpools.textContent=state.spools.filter(s=>s.status==='active').length;
   sumRefills.textContent=state.refills.length;
@@ -90,7 +100,9 @@ function renderDashboard(){
               <tr data-category="${esc(c)}">
                 <td class="dashboard-color-name" onclick="openDetail('${r.f.id}')">${esc(r.f.color)}</td>
                 <td>${r.spool?`<button onclick="openSpool('${r.spool.id}')">${r.spool.number}</button>`:'—'}</td>
-                <td>${r.spool?`<button class="level-btn" onclick="quickLevel('${r.spool.id}')">${r.spool.level}%</button>`:'—'}</td>
+                <td>${r.spool?`<select class="dashboard-level-select" onchange="setDashboardLevel('${r.spool.id}',this.value)" aria-label="Resterend filament ${r.spool.number}">
+                  ${[100,75,50,25,0].map(v=>`<option value="${v}" ${Number(r.spool.level)===v?'selected':''}>${v}%</option>`).join('')}
+                </select>`:'—'}</td>
                 <td>${refillCount(r.f.id)}</td>
               </tr>
             `).join('')}
