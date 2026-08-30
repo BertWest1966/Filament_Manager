@@ -365,3 +365,73 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     width:calc(100% - 36px);
   }
 }
+
+
+/* v7.5.23 - Aparte schermen Spoelen en Refills; Voorraad blijft bestaan */
+#spoelen .separate-stock-category,
+#refills .separate-stock-category{
+  margin-bottom:24px;
+}
+#spoelen .separate-stock-category .category-title,
+#refills .separate-stock-category .category-title{
+  font-weight:800;
+}
+#spoelen .separate-stock-category .type-title,
+#refills .separate-stock-category .type-title{
+  margin-left:28px;
+  font-weight:700;
+}
+#spoelen .separate-stock-list,
+#refills .separate-stock-list{
+  margin-left:56px;
+}
+#spoelen .separate-stock-row,
+#refills .separate-stock-row{
+  display:grid;
+  grid-template-columns:minmax(120px,1fr) 90px 70px auto;
+  gap:10px;
+  align-items:center;
+  padding:8px 0;
+  border-bottom:1px solid var(--border);
+}
+#spoelen .separate-stock-color,
+#refills .separate-stock-color{
+  font-weight:600;
+}
+#spoelen .separate-stock-actions,
+#refills .separate-stock-actions{
+  display:flex;
+  gap:6px;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+}
+
+/* Categorie, type en kleur gebruiken allemaal de categoriekleur */
+#spoelen .separate-stock-category[data-category] .category-title,
+#spoelen .separate-stock-category[data-category] .type-title,
+#spoelen .separate-stock-category[data-category] .separate-stock-color,
+#refills .separate-stock-category[data-category] .category-title,
+#refills .separate-stock-category[data-category] .type-title,
+#refills .separate-stock-category[data-category] .separate-stock-color{
+  color:var(--cat-color);
+}
+
+@media(max-width:700px){
+  #spoelen .separate-stock-category .type-title,
+  #refills .separate-stock-category .type-title{
+    margin-left:18px;
+  }
+  #spoelen .separate-stock-list,
+  #refills .separate-stock-list{
+    margin-left:36px;
+  }
+  #spoelen .separate-stock-row,
+  #refills .separate-stock-row{
+    grid-template-columns:minmax(90px,1fr) 72px 54px;
+  }
+  #spoelen .separate-stock-actions,
+  #refills .separate-stock-actions{
+    grid-column:1 / -1;
+    justify-content:flex-start;
+  }
+}

@@ -10,7 +10,7 @@
   <title>Filament Manager v7.5.21</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=7.5.22">
+  <link rel="stylesheet" href="assets/app.css?v=7.5.23">
 </head>
 <body>
 <div class="app-shell">
@@ -18,12 +18,14 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 7.5.22 · Afdrukken</span>
+      <span>Versie 7.5.23 · Afdrukken</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active">Dashboard</button>
       <button data-view="catalogus">Catalogus</button>
       <button data-view="voorraad">Voorraad</button>
+      <button data-view="spoelen">Spoelen</button>
+      <button data-view="refills">Refills</button>
       <button data-view="bestellijst">Bestellijst</button>
       <button data-view="bestellingen">Lopende bestellingen</button>
       <button data-view="scannen">Scannen</button>
@@ -37,7 +39,7 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 7.5.22 · Afdrukken</span>
+        <span>Versie 7.5.23 · Afdrukken</span>
       </div>
     </header>
 
@@ -89,6 +91,23 @@
         </div>
         <div class="panel"><div id="stockList"></div></div>
       </section>
+
+      <section id="spoelen" class="view">
+        <div class="toolbar">
+          <button class="primary" type="button" onclick="openSpool()">Nieuwe spoel</button>
+          <input id="spoolScreenSearch" placeholder="Zoek nummer, type of kleur">
+        </div>
+        <div class="panel"><div id="spoolScreenList"></div></div>
+      </section>
+
+      <section id="refills" class="view">
+        <div class="toolbar">
+          <button class="primary" type="button" onclick="openRefill()">Nieuwe refill</button>
+          <input id="refillScreenSearch" placeholder="Zoek nummer, type of kleur">
+        </div>
+        <div class="panel"><div id="refillScreenList"></div></div>
+      </section>
+
 
       <section id="bestellijst" class="view">
         <div class="panel">
@@ -466,7 +485,7 @@ window.FMPrint = (() => {
   </form>
 </dialog>
 
-<script src="js/app.js?v=7.5.22"></script>
+<script src="js/app.js?v=7.5.23"></script>
 <script src="js/print-tools.js?v=7.5.5"></script>
 </body>
 </html>

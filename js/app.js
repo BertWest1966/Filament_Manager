@@ -142,6 +142,89 @@ stockSearch.oninput=renderStock;
 document.getElementById('stockSort').onchange=e=>{stockSortMode=e.target.value;renderStock()};
 
 
+
+function groupStockForSeparateScreen(items,query){
+  const q=(query||'').trim().toLowerCase();
+  const grouped={};
+
+  items.forEach(x=>{
+    const f=filament(x.filamentId);
+    if(!f)return;
+    const hay=`${x.number||''} ${f.category||''} ${f.type||''} ${f.color||''}`.toLowerCase();
+    if(q&&!hay.includes(q))return;
+
+    grouped[f.category]??={};
+    grouped[f.category][f.type]??={};
+    grouped[f.category][f.type][f.color]??=[];
+    grouped[f.category][f.type][f.color].push(x);
+  });
+
+  return grouped;
+}
+
+function separateStockScreenHtml(items,kind,query){
+  const grouped=groupStockForSeparateScreen(items,query);
+  const categories=Object.keys(grouped).sort((a,b)=>a.localeCompare(b,'nl'));
+
+  if(!categories.length){
+    return `<div class="note">Geen ${kind==='spool'?'spoelen':'refills'} gevonden.</div>`;
+  }
+
+  return categories.map(category=>`
+    <div class="separate-stock-category" data-category="${esc(category)}">
+      <div class="category-title">${esc(category)}</div>
+
+      ${Object.keys(grouped[category]).sort((a,b)=>a.localeCompare(b,'nl')).map(type=>`
+        <div class="type-title">${esc(type)}</div>
+
+        <div class="separate-stock-list">
+          ${Object.keys(grouped[category][type]).sort((a,b)=>a.localeCompare(b,'nl')).flatMap(color=>
+            grouped[category][type][color]
+              .sort((a,b)=>String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true}))
+              .map(x=>`
+                <div class="separate-stock-row category-data-row" data-category="${esc(category)}">
+                  <div class="separate-stock-color">${esc(color)}</div>
+                  <div class="separate-stock-number"><strong>${esc(x.number)}</strong></div>
+                  ${kind==='spool'
+                    ? `<div class="separate-stock-level">${Number(x.level)||0}%</div>`
+                    : `<div class="separate-stock-level"></div>`}
+                  <div class="separate-stock-actions">
+                    <button onclick="${kind==='spool'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button>
+                    <button onclick="openQr('${kind==='spool'?'spoel':'refill'}','${x.id}')">QR</button>
+                    <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
+                  </div>
+                </div>
+              `)
+          ).join('')}
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function renderSpoolScreen(){
+  const el=document.getElementById('spoolScreenList');
+  if(!el)return;
+  const search=document.getElementById('spoolScreenSearch');
+  el.innerHTML=separateStockScreenHtml(
+    state.spools.filter(s=>s.status==='active'),
+    'spool',
+    search?.value||''
+  );
+}
+
+function renderRefillScreen(){
+  const el=document.getElementById('refillScreenList');
+  if(!el)return;
+  const search=document.getElementById('refillScreenSearch');
+  el.innerHTML=separateStockScreenHtml(
+    state.refills,
+    'refill',
+    search?.value||''
+  );
+}
+
+
 let manualOrderPendingId=null;
 
 const manualOrderAddBtnEl=$('manualOrderAddBtn');
@@ -840,7 +923,13 @@ printSelectedLabelsBtn.onclick=()=>{
   openLabelPrintWindow(selected,'a4');
 };
 
-function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderStock();renderOrderList();renderOrders();renderLibraries();renderLog()}
+function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderStock();renderSpoolScreen();renderRefillScreen();renderOrderList();renderOrders();renderLibraries();renderLog()}
+
+const spoolScreenSearchEl=document.getElementById('spoolScreenSearch');
+const refillScreenSearchEl=document.getElementById('refillScreenSearch');
+if(spoolScreenSearchEl)spoolScreenSearchEl.oninput=renderSpoolScreen;
+if(refillScreenSearchEl)refillScreenSearchEl.oninput=renderRefillScreen;
+
 renderAll();
 
 if(window.copyDiagnosisBtn){
