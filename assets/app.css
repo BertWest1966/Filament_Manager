@@ -1362,3 +1362,56 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     width:calc(100% - 24px)!important;
   }
 }
+
+
+/* v7.5.42 - lagere rijen op Mac voor Dashboard, Spoelen en Refill.
+   Mobiel/iPhone blijft ongewijzigd. */
+@media (min-width:901px){
+
+  /* Checkbox iets dichter naar de kleur. */
+  #spoelen .separate-dashboard-table .select-col,
+  #refills .separate-dashboard-table .select-col{
+    width:26px!important;
+    min-width:26px!important;
+    max-width:26px!important;
+    padding-left:0!important;
+    padding-right:2px!important;
+  }
+
+  /* Nog compactere tabelrijen. */
+  #spoelen .separate-dashboard-table th,
+  #spoelen .separate-dashboard-table td,
+  #refills .separate-dashboard-table th,
+  #refills .separate-dashboard-table td{
+    height:25px!important;
+    padding-top:2px!important;
+    padding-bottom:2px!important;
+    line-height:1.15!important;
+  }
+
+  #spoelen .compact-actions button,
+  #refills .compact-actions button{
+    min-height:22px!important;
+    padding:1px 6px!important;
+    line-height:1.15!important;
+  }
+
+  /* Dashboard eveneens iets lager. */
+  #dashboard .dashboard-table th,
+  #dashboard .dashboard-table td{
+    height:25px!important;
+    padding-top:2px!important;
+    padding-bottom:2px!important;
+    line-height:1.15!important;
+  }
+
+  #dashboard .category-title{
+    padding-top:4px!important;
+    padding-bottom:4px!important;
+  }
+
+  #dashboard .type-title{
+    padding-top:3px!important;
+    padding-bottom:3px!important;
+  }
+}
