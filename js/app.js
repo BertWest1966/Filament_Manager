@@ -19,7 +19,12 @@ function totalStock(fid){return spoolStock(fid)+refillCount(fid)}
 function openOrdered(fid){return state.orders.filter(o=>o.status!=='Geleverd').reduce((a,o)=>a+(o.filamentId===fid?Math.max(0,o.quantity-o.received):0),0)}
 function toOrder(f){const total=totalStock(f.id);if(total>=Number(f.min))return 0;return Math.max(0,Math.ceil(Number(f.target)-total-openOrdered(f.id)))}
 function log(message,filamentId=null){state.history.push({id:uid(),date:new Date().toISOString(),message,filamentId})}
-function setView(view){currentView=view;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view))}
+function setView(view){
+  currentView=view;
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));
+  document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+  document.querySelector('.global-search')?.classList.toggle('hidden',view==='spoelen'||view==='refills');
+}
 document.addEventListener('click',e=>{
   const viewBtn=e.target.closest('[data-view]');if(viewBtn){setView(viewBtn.dataset.view);return}
   const closeBtn=e.target.closest('[data-close]');if(closeBtn){$(closeBtn.dataset.close).close()}
@@ -155,6 +160,58 @@ document.getElementById('stockSort').onchange=e=>{stockSortMode=e.target.value;r
 
 
 
+const COLLAPSE_KEY='filament_manager_collapsed_v1';
+
+function loadSeparateCollapseState(){
+  try{
+    const raw=JSON.parse(localStorage.getItem(COLLAPSE_KEY)||'{}');
+    return {
+      spool:{categories:{...(raw.spool?.categories||{})},types:{...(raw.spool?.types||{})}},
+      refill:{categories:{...(raw.refill?.categories||{})},types:{...(raw.refill?.types||{})}}
+    };
+  }catch{
+    return {
+      spool:{categories:{},types:{}},
+      refill:{categories:{},types:{}}
+    };
+  }
+}
+
+const separateCollapseState=loadSeparateCollapseState();
+
+function saveSeparateCollapseState(){
+  localStorage.setItem(COLLAPSE_KEY,JSON.stringify(separateCollapseState));
+}
+
+function separateTypeKey(category,type){
+  return `${category}|||${type}`;
+}
+
+function isSeparateCategoryCollapsed(kind,category){
+  return separateCollapseState[kind]?.categories?.[category]===true;
+}
+
+function isSeparateTypeCollapsed(kind,category,type){
+  return separateCollapseState[kind]?.types?.[separateTypeKey(category,type)]===true;
+}
+
+function toggleSeparateCategory(kind,category){
+  const bucket=separateCollapseState[kind];
+  if(!bucket)return;
+  bucket.categories[category]=!isSeparateCategoryCollapsed(kind,category);
+  saveSeparateCollapseState();
+  kind==='spool'?renderSpoolScreen():renderRefillScreen();
+}
+
+function toggleSeparateType(kind,category,type){
+  const bucket=separateCollapseState[kind];
+  if(!bucket)return;
+  const key=separateTypeKey(category,type);
+  bucket.types[key]=!isSeparateTypeCollapsed(kind,category,type);
+  saveSeparateCollapseState();
+  kind==='spool'?renderSpoolScreen():renderRefillScreen();
+}
+
 function groupStockForSeparateScreen(items,query,sortMode='filament'){
   const q=(query||'').trim().toLowerCase();
   const filtered=items.filter(x=>{
@@ -197,16 +254,6 @@ function separateStockScreenHtml(items,kind,query,sortMode='filament'){
     return `<div class="note">Geen ${kind==='spool'?'spoelen':'refills'} gevonden.</div>`;
   }
 
-  const actionHtml=x=>`
-    <div class="separate-stock-actions">
-      <input class="label-select separate-label-select" type="checkbox"
-        data-kind="${kind==='spool'?'spoel':'refill'}"
-        data-id="${x.id}"
-        aria-label="Selecteer ${esc(x.number)}">
-      <button onclick="${kind==='spool'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button>
-      <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
-    </div>`;
-
   if(sortMode==='number-asc'||sortMode==='number-desc'){
     return `
       <table class="dashboard-table separate-dashboard-table separate-flat-table">
@@ -240,45 +287,69 @@ function separateStockScreenHtml(items,kind,query,sortMode='filament'){
 
   const categories=Object.keys(grouped).sort((a,b)=>a.localeCompare(b,'nl'));
 
-  return categories.map(category=>`
-    <div class="category-group separate-stock-category dashboard-hierarchy" data-category="${esc(category)}">
-      <div class="category-title">${esc(category)}</div>
+  return categories.map(category=>{
+    const categoryItems=Object.values(grouped[category]).flatMap(typeGroup=>Object.values(typeGroup).flat());
+    const categoryCollapsed=isSeparateCategoryCollapsed(kind,category);
 
-      ${Object.keys(grouped[category]).sort((a,b)=>a.localeCompare(b,'nl')).map(type=>`
-        <div class="type-title">${esc(type)}</div>
+    return `
+      <div class="category-group separate-stock-category collapsible-stock-category" data-category="${esc(category)}">
+        <button type="button"
+          class="category-title collapsible-heading category-collapse-button"
+          onclick="toggleSeparateCategory('${kind}','${esc(category)}')"
+          aria-expanded="${categoryCollapsed?'false':'true'}">
+          <span class="collapse-label"><span class="collapse-arrow">${categoryCollapsed?'›':'⌄'}</span>${esc(category)}</span>
+          <span class="collapse-count">${categoryItems.length} ${kind==='spool'?(categoryItems.length===1?'spoel':'spoelen'):(categoryItems.length===1?'refill':'refills')}</span>
+        </button>
 
-        <table class="dashboard-table separate-dashboard-table">
-          <thead>
-            <tr>
-              <th class="select-col"></th>
-              <th>Kleur</th>
-              <th>${kind==='spool'?'Spoel':'Refill'}</th>
-              ${kind==='spool'?'<th>Hoeveelh.</th>':''}
-              <th>Acties</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${Object.keys(grouped[category][type]).sort((a,b)=>a.localeCompare(b,'nl')).flatMap(color=>
-              grouped[category][type][color]
-                .sort((a,b)=>String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true}))
-                .map(x=>`
-                  <tr class="category-data-row compact-stock-row" data-category="${esc(category)}">
-                    <td class="select-col"><input class="label-select separate-label-select" type="checkbox" data-kind="${kind==='spool'?'spoel':'refill'}" data-id="${x.id}" aria-label="Selecteer ${esc(x.number)}"></td>
-                    <td class="separate-stock-color">${esc(color)}</td>
-                    <td><strong>${esc(x.number)}</strong></td>
-                    ${kind==='spool'?`<td>${Number(x.level)||0}%</td>`:''}
-                    <td class="compact-actions">
-                      <button onclick="${kind==='spool'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button>
-                      <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
-                    </td>
-                  </tr>
-                `)
-            ).join('')}
-          </tbody>
-        </table>
-      `).join('')}
-    </div>
-  `).join('');
+        ${categoryCollapsed?'':Object.keys(grouped[category]).sort((a,b)=>a.localeCompare(b,'nl')).map(type=>{
+          const typeItems=Object.values(grouped[category][type]).flat();
+          const typeCollapsed=isSeparateTypeCollapsed(kind,category,type);
+
+          return `
+            <div class="collapsible-type-block">
+              <button type="button"
+                class="type-title collapsible-heading type-collapse-button"
+                onclick="toggleSeparateType('${kind}','${esc(category)}','${esc(type)}')"
+                aria-expanded="${typeCollapsed?'false':'true'}">
+                <span class="collapse-label"><span class="collapse-arrow">${typeCollapsed?'›':'⌄'}</span>${esc(type)}</span>
+                <span class="collapse-count">${typeItems.length} ${kind==='spool'?(typeItems.length===1?'spoel':'spoelen'):(typeItems.length===1?'refill':'refills')}</span>
+              </button>
+
+              ${typeCollapsed?'':`
+                <table class="dashboard-table separate-dashboard-table">
+                  <thead>
+                    <tr>
+                      <th class="select-col"></th>
+                      <th>Kleur</th>
+                      <th>${kind==='spool'?'Spoel':'Refill'}</th>
+                      ${kind==='spool'?'<th>Hoeveelh.</th>':''}
+                      <th>Acties</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${Object.keys(grouped[category][type]).sort((a,b)=>a.localeCompare(b,'nl')).flatMap(color=>
+                      grouped[category][type][color]
+                        .sort((a,b)=>String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true}))
+                        .map(x=>`
+                          <tr class="category-data-row compact-stock-row" data-category="${esc(category)}">
+                            <td class="select-col"><input class="label-select separate-label-select" type="checkbox" data-kind="${kind==='spool'?'spoel':'refill'}" data-id="${x.id}" aria-label="Selecteer ${esc(x.number)}"></td>
+                            <td class="separate-stock-color">${esc(color)}</td>
+                            <td><strong>${esc(x.number)}</strong></td>
+                            ${kind==='spool'?`<td>${Number(x.level)||0}%</td>`:''}
+                            <td class="compact-actions">
+                              <button onclick="${kind==='spool'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button>
+                              <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
+                            </td>
+                          </tr>
+                        `)
+                    ).join('')}
+                  </tbody>
+                </table>
+              `}
+            </div>`;
+        }).join('')}
+      </div>`;
+  }).join('');
 }
 function renderSpoolScreen(){
   const el=document.getElementById('spoolScreenList');

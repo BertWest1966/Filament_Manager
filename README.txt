@@ -1,17 +1,21 @@
-Filament Manager - versie 7.5.29
+Filament Manager - versie 7.5.30
 
 Wijzigingen
 -----------
-- Spoelen: mobiele voorraadregel compact op één lijn.
-- Refills: dezelfde compacte mobiele voorraadregel.
-- Volgorde per regel: selectie | kleur | spoel/refill | hoeveelheid (bij spoelen) | Wijzig | Verwijderen.
-- Selectievakje staat niet meer los boven de voorraadregel.
-- Wijzig en Verwijderen staan naast elkaar.
-- Sorteren en Print geselecteerde stickers blijven behouden.
-- Mobiele navigatie van versie 7.5.28 blijft behouden.
+- Spoelen: categorieën zoals PLA, PETG en ASA kunnen open/dicht geklapt worden.
+- Spoelen: types zoals Basic, HF en Matte kunnen afzonderlijk open/dicht geklapt worden.
+- Refills: dezelfde open/dicht-bediening.
+- Pijltje '⌄' = open, pijltje '›' = dicht.
+- Naast categorie en type staat het aantal spoelen/refills.
+- De open/dicht-status wordt lokaal onthouden op dit toestel.
+- Geen apart scherm of blok voor zichtbaarheid.
+- De algemene zoekbalk 'Zoek filament, spoel of refill' wordt verborgen op Spoelen en Refills.
+- De eigen zoekfunctie 'Zoek nummer, type of kleur' blijft behouden.
+- Compacte éénregelige layout en mobiele navigatie blijven behouden.
 
 Niet gewijzigd
 --------------
-- Lokale opslag en gegevensstructuur.
+- Voorraadgegevens en lokale opslagstructuur.
 - JSON import/export.
 - QR-labelopmaak en printmechanisme.
+- Bestellingen en catalogus.
