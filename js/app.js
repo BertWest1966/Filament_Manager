@@ -185,60 +185,79 @@ function separateStockScreenHtml(items,kind,query,sortMode='filament'){
     return `<div class="note">Geen ${kind==='spool'?'spoelen':'refills'} gevonden.</div>`;
   }
 
-  if(sortMode==='number-asc'||sortMode==='number-desc'){
-    return `<div class="separate-stock-list separate-stock-flat">
-      ${filtered.map(x=>{
-        const f=filament(x.filamentId);
-        return `
-          <div class="separate-stock-row category-data-row" data-category="${esc(f.category)}">
-            <div class="separate-stock-color">${esc(f.color)}</div>
-            <div class="separate-stock-number"><strong>${esc(x.number)}</strong></div>
-            ${kind==='spool'
-              ? `<div class="separate-stock-level">${Number(x.level)||0}%</div>`
-              : `<div class="separate-stock-level"></div>`}
-            <div class="separate-stock-actions">
-              <input class="label-select separate-label-select" type="checkbox" data-kind="${kind==='spool'?'spoel':'refill'}" data-id="${x.id}" aria-label="Selecteer ${esc(x.number)}">
-              <button onclick="${kind==='spool'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button>
-              <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
-            </div>
-          </div>`;
-      }).join('')}
+  const actionHtml=x=>`
+    <div class="separate-stock-actions">
+      <input class="label-select separate-label-select" type="checkbox"
+        data-kind="${kind==='spool'?'spoel':'refill'}"
+        data-id="${x.id}"
+        aria-label="Selecteer ${esc(x.number)}">
+      <button onclick="${kind==='spool'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button>
+      <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
     </div>`;
+
+  if(sortMode==='number-asc'||sortMode==='number-desc'){
+    return `
+      <table class="dashboard-table separate-dashboard-table separate-flat-table">
+        <thead>
+          <tr>
+            <th>Kleur</th>
+            <th>${kind==='spool'?'Spoel':'Refill'}</th>
+            ${kind==='spool'?'<th>Hoeveelh.</th>':''}
+            <th>Acties</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filtered.map(x=>{
+            const f=filament(x.filamentId);
+            return `
+              <tr class="category-data-row" data-category="${esc(f.category)}">
+                <td class="separate-stock-color">${esc(f.category)} · ${esc(f.type)} · ${esc(f.color)}</td>
+                <td><strong>${esc(x.number)}</strong></td>
+                ${kind==='spool'?`<td>${Number(x.level)||0}%</td>`:''}
+                <td>${actionHtml(x)}</td>
+              </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
   }
 
   const categories=Object.keys(grouped).sort((a,b)=>a.localeCompare(b,'nl'));
+
   return categories.map(category=>`
-    <div class="separate-stock-category" data-category="${esc(category)}">
+    <div class="category-group separate-stock-category dashboard-hierarchy" data-category="${esc(category)}">
       <div class="category-title">${esc(category)}</div>
 
       ${Object.keys(grouped[category]).sort((a,b)=>a.localeCompare(b,'nl')).map(type=>`
         <div class="type-title">${esc(type)}</div>
 
-        <div class="separate-stock-list">
-          ${Object.keys(grouped[category][type]).sort((a,b)=>a.localeCompare(b,'nl')).flatMap(color=>
-            grouped[category][type][color]
-              .sort((a,b)=>String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true}))
-              .map(x=>`
-                <div class="separate-stock-row category-data-row" data-category="${esc(category)}">
-                  <div class="separate-stock-color">${esc(color)}</div>
-                  <div class="separate-stock-number"><strong>${esc(x.number)}</strong></div>
-                  ${kind==='spool'
-                    ? `<div class="separate-stock-level">${Number(x.level)||0}%</div>`
-                    : `<div class="separate-stock-level"></div>`}
-                  <div class="separate-stock-actions">
-                    <input class="label-select separate-label-select" type="checkbox" data-kind="${kind==='spool'?'spoel':'refill'}" data-id="${x.id}" aria-label="Selecteer ${esc(x.number)}">
-                    <button onclick="${kind==='spool'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button>
-                    <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
-                  </div>
-                </div>
-              `)
-          ).join('')}
-        </div>
+        <table class="dashboard-table separate-dashboard-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>${kind==='spool'?'Spoel':'Refill'}</th>
+              ${kind==='spool'?'<th>Hoeveelh.</th>':''}
+              <th>Acties</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${Object.keys(grouped[category][type]).sort((a,b)=>a.localeCompare(b,'nl')).flatMap(color=>
+              grouped[category][type][color]
+                .sort((a,b)=>String(a.number||'').localeCompare(String(b.number||''),'nl',{numeric:true}))
+                .map(x=>`
+                  <tr class="category-data-row" data-category="${esc(category)}">
+                    <td class="separate-stock-color">${esc(color)}</td>
+                    <td><strong>${esc(x.number)}</strong></td>
+                    ${kind==='spool'?`<td>${Number(x.level)||0}%</td>`:''}
+                    <td>${actionHtml(x)}</td>
+                  </tr>
+                `)
+            ).join('')}
+          </tbody>
+        </table>
       `).join('')}
     </div>
   `).join('');
 }
-
 function renderSpoolScreen(){
   const el=document.getElementById('spoolScreenList');
   if(!el)return;

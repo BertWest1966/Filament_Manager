@@ -1,13 +1,26 @@
-FILAMENT MANAGER v7.5.21 — EXACTE REFILL-CONTROLE
+Filament Manager - versie 7.5.26
 
-Nieuw:
-- Een refill mag alleen gekoppeld worden aan een spoel met exact hetzelfde filament.
-- De controle gebeurt op filamentId.
-- Daardoor moeten categorie, type en kleur exact overeenkomen.
-- Elke afwijking wordt volledig geblokkeerd.
-- Voor een ander filament moet een nieuw spoelnummer aangemaakt worden.
-- Werkt zowel bij Manueel als bij Scan.
+Basis
+-----
+Gebaseerd op versie 7.5.25.
 
-Bestaand behouden:
-- Niet-lege spoel kan gewisseld worden na bevestiging.
-- JSON import/export en localStorage ongewijzigd.
+Wijzigingen
+-----------
+- Layout van Spoelen aangepast aan dezelfde visuele structuur als Dashboard.
+- Layout van Refills aangepast aan dezelfde visuele structuur als Dashboard.
+- Hiërarchie blijft Categorie → Type → Kleur.
+- De categoriekleur blijft toegepast op categorie, type en kleur.
+- Spoel/refillnummer en hoeveelheid staan in vaste tabelkolommen.
+- Selecteren, Wijzig en Verwijderen blijven beschikbaar.
+- Sorteerfuncties blijven behouden.
+- Voorraad blijft voorlopig behouden.
+
+README
+------
+Er is voortaan slechts één README.txt. Die wordt per versie bijgewerkt.
+
+Niet gewijzigd
+--------------
+- Lokale opslag en gegevensstructuur.
+- JSON import/export.
+- QR-labelopmaak en printmechanisme.

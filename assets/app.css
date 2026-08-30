@@ -435,3 +435,92 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     justify-content:flex-start;
   }
 }
+
+
+/* v7.5.26 - Spoelen/Refills visueel gelijk aan Dashboard */
+#spoelen .separate-stock-category .category-title,
+#refills .separate-stock-category .category-title{
+  margin-left:0;
+  font-weight:800;
+}
+#spoelen .separate-stock-category .type-title,
+#refills .separate-stock-category .type-title{
+  margin-left:28px;
+  padding-left:0;
+  font-weight:700;
+}
+#spoelen .separate-dashboard-table,
+#refills .separate-dashboard-table{
+  margin-left:56px;
+  width:calc(100% - 56px);
+}
+#spoelen .separate-dashboard-table th:first-child,
+#refills .separate-dashboard-table th:first-child{
+  color:transparent;
+}
+#spoelen .separate-dashboard-table td:first-child,
+#refills .separate-dashboard-table td:first-child{
+  padding-left:4px;
+  font-weight:600;
+}
+#spoelen .separate-dashboard-table th:nth-child(2),
+#spoelen .separate-dashboard-table td:nth-child(2),
+#refills .separate-dashboard-table th:nth-child(2),
+#refills .separate-dashboard-table td:nth-child(2){
+  width:90px;
+}
+#spoelen .separate-dashboard-table th:nth-child(3),
+#spoelen .separate-dashboard-table td:nth-child(3){
+  width:82px;
+  text-align:center;
+}
+#spoelen .separate-dashboard-table th:last-child,
+#spoelen .separate-dashboard-table td:last-child,
+#refills .separate-dashboard-table th:last-child,
+#refills .separate-dashboard-table td:last-child{
+  width:210px;
+  text-align:right;
+}
+#spoelen .separate-stock-actions,
+#refills .separate-stock-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:6px;
+  flex-wrap:wrap;
+}
+#spoelen .separate-stock-category[data-category] .type-title,
+#spoelen .separate-stock-category[data-category] .separate-stock-color,
+#refills .separate-stock-category[data-category] .type-title,
+#refills .separate-stock-category[data-category] .separate-stock-color{
+  color:var(--cat-color);
+}
+
+/* nummer-sortering blijft een compacte tabel */
+#spoelen .separate-flat-table,
+#refills .separate-flat-table{
+  margin-left:0;
+  width:100%;
+}
+#spoelen .separate-flat-table th:first-child,
+#refills .separate-flat-table th:first-child{
+  color:var(--muted);
+}
+
+@media(max-width:700px){
+  #spoelen .separate-stock-category .type-title,
+  #refills .separate-stock-category .type-title{
+    margin-left:18px;
+  }
+  #spoelen .separate-dashboard-table,
+  #refills .separate-dashboard-table{
+    margin-left:36px;
+    width:calc(100% - 36px);
+  }
+  #spoelen .separate-dashboard-table th:last-child,
+  #spoelen .separate-dashboard-table td:last-child,
+  #refills .separate-dashboard-table th:last-child,
+  #refills .separate-dashboard-table td:last-child{
+    width:auto;
+  }
+}
