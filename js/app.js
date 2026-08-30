@@ -51,7 +51,55 @@ newOrderBtn.onclick=()=>{manualOrderPendingId=null;if(!state.catalog.length)retu
 oFilament.onchange=()=>oSupplier.value=filament(oFilament.value)?.supplier||'';
 orderForm.onsubmit=e=>{e.preventDefault();state.orders.push({id:uid(),filamentId:oFilament.value,quantity:Number(oQuantity.value),received:0,supplier:oSupplier.value.trim(),status:'Besteld'});if(manualOrderPendingId){ensureManualOrderList();state.manualOrderList=state.manualOrderList.filter(x=>x.id!==manualOrderPendingId);manualOrderPendingId=null;}orderDialog.close();save()}
 
-function renderDashboard(){sumSpools.textContent=state.spools.filter(s=>s.status==='active').length;sumRefills.textContent=state.refills.length;sumEmpty.textContent=state.spools.filter(s=>s.status==='active'&&Number(s.level)===0).length;sumLow.textContent=state.catalog.filter(f=>totalStock(f.id)<Number(f.min)).length;const q=dashboardSearch.value.toLowerCase(),grouped={};state.catalog.slice().sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl')).forEach(f=>{if(q&&!`${f.category} ${f.type} ${f.color}`.toLowerCase().includes(q))return;grouped[f.category]??={};grouped[f.category][f.type]??=[];const active=state.spools.filter(s=>s.status==='active'&&s.filamentId===f.id).sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));if(!active.length)grouped[f.category][f.type].push({f,spool:null});else active.forEach(s=>grouped[f.category][f.type].push({f,spool:s}))});dashboardList.innerHTML=Object.keys(grouped).map(c=>`<div class="category-group" data-category="${esc(c)}"><div class="category-title">${esc(c)}</div>${Object.keys(grouped[c]).map(t=>`<div class="type-title">${esc(t)}</div><table class="dashboard-table"><thead><tr><th>Kleur</th><th>Spoel</th><th>Hoeveelh.</th><th>Refill</th></tr></thead><tbody>${grouped[c][t].map(r=>`<tr data-category="${esc(c)}"><td onclick="openDetail('${r.f.id}')">${esc(r.f.color)}</td><td>${r.spool?`<button onclick="openSpool('${r.spool.id}')">${r.spool.number}</button>`:'—'}</td><td>${r.spool?`<button class="level-btn" onclick="quickLevel('${r.spool.id}')">${r.spool.level}%</button>`:'—'}</td><td>${refillCount(r.f.id)}</td></tr>`).join('')}</tbody></table>`).join('')}</div>`).join('')||'<div class="note">Nog geen filamenten.</div>'}
+function renderDashboard(){
+  sumSpools.textContent=state.spools.filter(s=>s.status==='active').length;
+  sumRefills.textContent=state.refills.length;
+  sumEmpty.textContent=state.spools.filter(s=>s.status==='active'&&Number(s.level)===0).length;
+  sumLow.textContent=state.catalog.filter(f=>totalStock(f.id)<Number(f.min)).length;
+
+  const q=dashboardSearch.value.toLowerCase(),grouped={};
+  state.catalog.slice()
+    .sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'))
+    .forEach(f=>{
+      if(q&&!`${f.category} ${f.type} ${f.color}`.toLowerCase().includes(q))return;
+      grouped[f.category]??={};
+      grouped[f.category][f.type]??=[];
+      const active=state.spools
+        .filter(s=>s.status==='active'&&s.filamentId===f.id)
+        .sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));
+      if(!active.length)grouped[f.category][f.type].push({f,spool:null});
+      else active.forEach(s=>grouped[f.category][f.type].push({f,spool:s}));
+    });
+
+  dashboardList.innerHTML=Object.keys(grouped).map(c=>`
+    <div class="category-group dashboard-hierarchy" data-category="${esc(c)}">
+      <div class="category-title">${esc(c)}</div>
+      ${Object.keys(grouped[c]).map(t=>`
+        <div class="type-title">${esc(t)}</div>
+        <table class="dashboard-table dashboard-hierarchy-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Spoel</th>
+              <th>Hoeveelh.</th>
+              <th>Refill</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${grouped[c][t].map(r=>`
+              <tr data-category="${esc(c)}">
+                <td class="dashboard-color-name" onclick="openDetail('${r.f.id}')">${esc(r.f.color)}</td>
+                <td>${r.spool?`<button onclick="openSpool('${r.spool.id}')">${r.spool.number}</button>`:'—'}</td>
+                <td>${r.spool?`<button class="level-btn" onclick="quickLevel('${r.spool.id}')">${r.spool.level}%</button>`:'—'}</td>
+                <td>${refillCount(r.f.id)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `).join('')}
+    </div>
+  `).join('')||'<div class="note">Nog geen filamenten.</div>';
+}
 dashboardSearch.oninput=renderDashboard;
 function quickLevel(id){const s=state.spools.find(x=>x.id===id);const v=prompt(`Hoeveelheid op ${s.number}: 0, 25, 50, 75 of 100`,s.level);if(v===null)return;const n=Number(v);if(![0,25,50,75,100].includes(n))return alert('Kies 0, 25, 50, 75 of 100.');s.level=n;log(`Spoel ${s.number} aangepast naar ${n}%`,s.filamentId);save()}
 

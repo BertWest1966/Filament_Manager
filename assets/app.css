@@ -332,3 +332,36 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 .category-data-row select{
   color:initial !important;
 }
+
+
+/* v7.5.22 - Dashboard hiërarchie */
+#dashboard .dashboard-hierarchy .category-title{
+  margin-left:0;
+  font-weight:800;
+}
+#dashboard .dashboard-hierarchy .type-title{
+  margin-left:28px;
+  padding-left:0;
+  font-weight:700;
+}
+#dashboard .dashboard-hierarchy-table{
+  margin-left:56px;
+  width:calc(100% - 56px);
+}
+#dashboard .dashboard-hierarchy-table th:first-child{
+  color:transparent;
+}
+#dashboard .dashboard-color-name{
+  font-weight:600;
+}
+#dashboard .dashboard-hierarchy[data-category] .type-title,
+#dashboard .dashboard-hierarchy[data-category] .dashboard-color-name{
+  color:inherit;
+}
+@media(max-width:700px){
+  #dashboard .dashboard-hierarchy .type-title{margin-left:18px}
+  #dashboard .dashboard-hierarchy-table{
+    margin-left:36px;
+    width:calc(100% - 36px);
+  }
+}
