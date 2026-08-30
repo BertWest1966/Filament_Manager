@@ -970,9 +970,9 @@ function openLabelPrintWindow(items,format='a4'){
         margin:0 auto 1.2mm;
       }
       .number{
-        font-size:18pt;
+        font-size:24pt;
         font-weight:900;
-        letter-spacing:.6mm;
+        letter-spacing:.5mm;
         line-height:1;
       }
       .refill-label .number{
@@ -980,30 +980,30 @@ function openLabelPrintWindow(items,format='a4'){
       }
       .divider{
         border-top:1px solid #000;
-        margin:1.2mm 0;
+        margin:.7mm 0;
       }
       .main{
-        font-size:9pt;
-        font-weight:800;
+        font-size:12pt;
+        font-weight:900;
         line-height:1.05;
       }
       .line{
-        font-size:7.5pt;
-        font-weight:700;
-        line-height:1.1;
-        margin-top:.4mm;
+        font-size:10pt;
+        font-weight:800;
+        line-height:1.05;
+        margin-top:.2mm;
       }
       .small{
         font-size:6.5pt;
         line-height:1.05;
-        margin-top:.4mm;
+        margin-top:.2mm;
         min-height:2mm;
       }
       .kind{
         font-size:6.5pt;
         font-weight:900;
         text-transform:uppercase;
-        margin-top:.5mm;
+        margin-top:.2mm;
       }
       @media screen{
         body{padding:10mm;background:#eee}

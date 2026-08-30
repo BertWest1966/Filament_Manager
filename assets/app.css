@@ -1044,3 +1044,118 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 
   .modal,.overlay{color:var(--desktop-text)}
 }
+
+
+/* v7.5.34 - Mac/desktop terug lichte achtergrond; iPhone ongewijzigd */
+@media (min-width:901px){
+  body,.main-shell,main{
+    background:#f4f5f7!important;
+    color:#111827!important;
+  }
+
+  .mobile-header{
+    background:#fff!important;
+    color:#111827!important;
+    border-bottom:1px solid #d7dde5!important;
+  }
+
+  .global-search{background:#f4f5f7!important}
+
+  .panel,.summary-card,.card,.modal-card,.menu-card,.settings-card,
+  #dashboard .panel,#dashboard .summary-card,
+  #catalogus .panel,#voorraad .panel,#bestellijst .panel,#bestellingen .panel,
+  #bibliotheken .panel,#logboek .panel,#meer .panel,#scannen .panel,
+  #spoelen .panel,#refills .panel{
+    background:#fff!important;
+    color:#111827!important;
+    border-color:#d7dde5!important;
+  }
+
+  .summary-card span,.note,.muted,.small,.help-text{color:#64748b!important}
+  .summary-card strong,h1,h2,h3,label{color:#111827!important}
+
+  .toolbar,.panel-head{background:transparent!important;color:#111827!important}
+
+  input,select,textarea,
+  .global-search input,
+  #spoelen .toolbar input,#refills .toolbar input,
+  #spoelen .toolbar select,#refills .toolbar select{
+    background:#fff!important;
+    color:#111827!important;
+    border-color:#cbd5e1!important;
+  }
+  input::placeholder,textarea::placeholder,
+  .global-search input::placeholder,
+  #spoelen input::placeholder,#refills input::placeholder{
+    color:#94a3b8!important;
+  }
+
+  table{color:#111827!important}
+  th{
+    color:#475569!important;
+    background:#fff!important;
+  }
+  td,
+  #dashboard .dashboard-table td,#dashboard .dashboard-table th,
+  #spoelen .separate-dashboard-table td,#spoelen .separate-dashboard-table th,
+  #refills .separate-dashboard-table td,#refills .separate-dashboard-table th{
+    background:#fff!important;
+    border-color:#e5e7eb!important;
+  }
+  tr:hover td{background:#f8fafc!important}
+
+  .list-row,.stock-row,.catalog-row,.order-row,.library-row,.log-row,
+  .inventory-row,.filament-row,.result-row{
+    background:#fff!important;
+    color:#111827!important;
+    border-color:#e5e7eb!important;
+  }
+
+  button:not(.primary):not(.danger-button){
+    background:#fff!important;
+    color:#0f766e!important;
+    border-color:#cbd5e1!important;
+  }
+  button.primary,.primary{
+    background:#111827!important;
+    color:#fff!important;
+    border-color:#111827!important;
+  }
+  .danger-button{
+    background:#fff!important;
+    color:#dc2626!important;
+    border-color:#ef4444!important;
+  }
+
+  .search-results{
+    background:#fff!important;
+    color:#111827!important;
+    border-color:#d7dde5!important;
+  }
+
+  /* De compacte categorie/type-opbouw blijft, maar op lichte achtergrond. */
+  #spoelen .category-collapse-button,#refills .category-collapse-button{
+    background:color-mix(in srgb,var(--cat-color) 10%,white)!important;
+    border-color:color-mix(in srgb,var(--cat-color) 45%,#d7dde5)!important;
+    color:var(--cat-color)!important;
+  }
+  #spoelen .type-collapse-button,#refills .type-collapse-button{
+    background:color-mix(in srgb,var(--cat-color) 6%,white)!important;
+    border-color:color-mix(in srgb,var(--cat-color) 30%,#e5e7eb)!important;
+    color:var(--cat-color)!important;
+  }
+  #spoelen .separate-stock-color,#refills .separate-stock-color,
+  #spoelen .separate-dashboard-table strong,#refills .separate-dashboard-table strong{
+    color:var(--cat-color)!important;
+  }
+  #spoelen .compact-actions button,#refills .compact-actions button{
+    background:#fff!important;
+    color:#0f766e!important;
+    border-color:#94a3b8!important;
+  }
+  #spoelen .compact-actions .danger-button,#refills .compact-actions .danger-button{
+    background:#fff!important;
+    color:#dc2626!important;
+    border-color:#ef4444!important;
+  }
+}

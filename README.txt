@@ -1,23 +1,25 @@
-Filament Manager - versie 7.5.33
+Filament Manager - versie 7.5.34
 
 Mac/desktop
 -----------
-- Donkere vormgeving uitgebreid naar de volledige desktopinterface.
-- Dashboard, Catalogus, Voorraad, Bestellen, Bestellingen, Bibliotheken,
-  Logboek, Meer en Scannen gebruiken nu dezelfde donkere basisstijl.
-- Spoelen en Refills behouden de compacte donkere hiërarchie.
-- Deze wijzigingen gelden uitsluitend voor schermen vanaf 901 px.
+- Achtergrond en inhoudspanelen terug licht/wit gemaakt.
+- Compacte desktopindeling van Spoelen en Refills blijft behouden.
+- Categorie/type-balken blijven zichtbaar in een lichte kleurvariant.
+- Alleen desktop vanaf 901 px is aangepast.
 
 iPhone
 ------
-- De mobiele/iPhone-layout is niet gewijzigd.
+- iPhone/mobile layout is niet gewijzigd.
 
 Stickers
 --------
-- Correct formaat: 55 mm breed x 75 mm hoog (staand).
-- Refillnummer Rxxxx blijft rood.
-- Spoelnummer blijft zwart.
+- Formaat blijft 55 mm breed x 75 mm hoog.
+- QR-code blijft op iedere sticker aanwezig.
+- Spoelnummer Sxxxx is groter.
+- Refillnummer Rxxxx is groter en blijft rood.
+- Categorie/type is groter.
+- Kleurtekst is groter.
 
-Data en functies
-----------------
-- Lokale opslag, JSON import/export, QR-logica en voorraadgegevens zijn niet gewijzigd.
+Data
+----
+- Lokale opslag, JSON import/export en QR-functionaliteit zijn niet gewijzigd.
