@@ -189,8 +189,8 @@ function separateStockScreenHtml(items,kind,query){
                     ? `<div class="separate-stock-level">${Number(x.level)||0}%</div>`
                     : `<div class="separate-stock-level"></div>`}
                   <div class="separate-stock-actions">
+                    <input class="label-select separate-label-select" type="checkbox" data-kind="${kind==='spool'?'spoel':'refill'}" data-id="${x.id}" aria-label="Selecteer ${esc(x.number)}">
                     <button onclick="${kind==='spool'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button>
-                    <button onclick="openQr('${kind==='spool'?'spoel':'refill'}','${x.id}')">QR</button>
                     <button class="danger-button" onclick="removeStockItem('${kind}','${x.id}')">Verwijderen</button>
                   </div>
                 </div>
@@ -929,6 +929,23 @@ const spoolScreenSearchEl=document.getElementById('spoolScreenSearch');
 const refillScreenSearchEl=document.getElementById('refillScreenSearch');
 if(spoolScreenSearchEl)spoolScreenSearchEl.oninput=renderSpoolScreen;
 if(refillScreenSearchEl)refillScreenSearchEl.oninput=renderRefillScreen;
+
+const printSelectedSpoolLabelsBtnEl=document.getElementById('printSelectedSpoolLabelsBtn');
+const printSelectedRefillLabelsBtnEl=document.getElementById('printSelectedRefillLabelsBtn');
+
+function printSelectedFromSeparateScreen(viewId){
+  const selected=[...document.querySelectorAll(`#${viewId} .label-select:checked`)];
+  if(!selected.length)return alert('Selecteer eerst minstens één sticker.');
+
+  const otherChecked=[...document.querySelectorAll(`.label-select:checked`)].filter(x=>!x.closest(`#${viewId}`));
+  otherChecked.forEach(x=>x.checked=false);
+  document.getElementById('printSelectedLabelsBtn').click();
+  otherChecked.forEach(x=>x.checked=true);
+}
+
+if(printSelectedSpoolLabelsBtnEl)printSelectedSpoolLabelsBtnEl.onclick=()=>printSelectedFromSeparateScreen('spoelen');
+if(printSelectedRefillLabelsBtnEl)printSelectedRefillLabelsBtnEl.onclick=()=>printSelectedFromSeparateScreen('refills');
+
 
 renderAll();
 
