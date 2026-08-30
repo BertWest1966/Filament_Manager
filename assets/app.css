@@ -1468,3 +1468,30 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     padding:1px 6px!important;
   }
 }
+
+
+/* v7.5.44 - uniforme lijniconen in desktopmenu */
+@media (min-width:901px){
+  .desktop-sidebar .nav-icon{
+    width:20px!important;
+    min-width:20px!important;
+    height:20px!important;
+    color:#0f766e;
+  }
+  .desktop-sidebar .nav-icon svg{
+    display:block;
+    width:20px;
+    height:20px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.8;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
+  .desktop-sidebar nav button.active .nav-icon{
+    color:#fff;
+  }
+  .desktop-sidebar nav button{
+    gap:10px!important;
+  }
+}

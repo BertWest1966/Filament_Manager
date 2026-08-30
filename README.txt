@@ -1,12 +1,12 @@
-Filament Manager - versie 7.5.43
+Filament Manager - versie 7.5.44
 
 Mac/desktop
 -----------
-- Rijhoogte van Spoelen en Refill gelijkgemaakt aan Dashboard.
-- Categorie- en typebalken compacter gemaakt in dezelfde stijl.
-- Actieknoppen behouden hun compacte hoogte.
-- Linkermenu voorzien van iconen voor alle knoppen.
-- Actieve menukeuze blijft groen gemarkeerd.
+- Tekstsymbolen in het linkermenu vervangen door uniforme lijniconen.
+- Alle menu-iconen hebben dezelfde grootte en uitlijning.
+- Inactieve iconen volgen de groene menukleur.
+- Het icoon van de actieve pagina wordt wit.
+- Compacte Dashboard/Spoelen/Refill-layout van v7.5.43 behouden.
 
 iPhone
 ------
