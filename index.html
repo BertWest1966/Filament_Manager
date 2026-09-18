@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Filament">
-  <title>Filament Manager v7.5.47</title>
+  <title>Filament Manager v8.0.0</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=7.5.47">
+  <link rel="stylesheet" href="assets/app.css?v=8.0.0">
 </head>
 <body>
 <div class="app-shell">
@@ -18,7 +18,7 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 7.5.47</span>
+      <span>Versie 8.0.0</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M9.5 20v-6h5v6"/></svg></span><span>Dashboard</span></button>
@@ -39,7 +39,7 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 7.5.47</span>
+        <span>Versie 8.0.0</span>
       </div>
     </header>
 
@@ -59,6 +59,7 @@
         <div class="panel">
           <div class="panel-head">
             <h2>Voorraad</h2>
+            <button type="button" id="dashboardScanSpoolBtn">Spoel scannen</button>
             <input id="dashboardSearch" placeholder="Zoek type of kleur">
           </div>
           <div id="dashboardList"></div>
@@ -142,27 +143,6 @@
 
       <section id="scannen" class="view">
         <div class="panel">
-          <h2>QR scannen</h2>
-          <p id="scannerStatus" class="note">Tik op Start camera en geef toestemming voor cameragebruik.</p>
-
-          <div id="qrReader" class="qr-reader hidden"></div>
-
-          <div class="toolbar">
-            <button class="primary" id="startScannerBtn">Start camera</button>
-            <button id="stopScannerBtn">Stop camera</button>
-          </div>
-
-          <div class="form-grid">
-            <label>Code handmatig invoeren
-              <input id="manualScanCode" placeholder="S0001 of R0001">
-            </label>
-          </div>
-          <div class="dialog-actions">
-            <button class="primary" id="manualScanBtn">Open code</button>
-          </div>
-        </div>
-
-        <div class="panel">
           <h2>Spoelwissel / refill koppelen</h2>
           <div class="toolbar fill-mode-tabs">
             <button class="active" type="button" id="fillManualModeBtn">Manueel</button>
@@ -177,7 +157,7 @@
           </div>
 
           <div class="dialog-actions">
-            <button type="button" id="fillStartScanBtn" class="hidden">Start scan</button>
+            <button type="button" id="fillStartScanBtn" class="hidden">Camera openen</button>
             <button class="primary" id="quickFillBtn">Koppelen</button>
           </div>
         </div>
@@ -354,6 +334,39 @@
 </dialog>
 
 
+
+<dialog id="scanDialog">
+  <div class="dialog-card">
+    <h2 id="scanDialogTitle">QR-code scannen</h2>
+    <p id="scannerStatus" class="note">Camera wordt geopend.</p>
+    <div id="qrReader" class="qr-reader"></div>
+    <div class="dialog-actions">
+      <button type="button" id="scanCaptureBtn" class="primary">Scan</button>
+      <button type="button" id="scanCloseBtn">Sluiten</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="dashboardLevelDialog">
+  <form class="dialog-card" id="dashboardLevelForm">
+    <h2>Spoelhoeveelheid aanpassen</h2>
+    <div id="dashboardScannedSpoolInfo" class="scan-spool-info"></div>
+    <label>Nieuwe hoeveelheid
+      <select id="dashboardScannedLevel">
+        <option value="100">100%</option>
+        <option value="75">75%</option>
+        <option value="50">50%</option>
+        <option value="25">25%</option>
+        <option value="0">0%</option>
+      </select>
+    </label>
+    <div class="dialog-actions">
+      <button type="button" id="dashboardLevelCancelBtn">Annuleren</button>
+      <button class="primary" type="submit">Opslaan</button>
+    </div>
+  </form>
+</dialog>
+
 <dialog id="qrDialog">
   <div class="dialog-card">
     <h2 id="qrDialogTitle">QR-sticker</h2>
@@ -510,7 +523,7 @@ window.FMPrint = (() => {
   </form>
 </dialog>
 
-<script src="js/app.js?v=7.5.47"></script>
+<script src="js/app.js?v=8.0.0"></script>
 <script src="js/print-tools.js?v=7.5.5"></script>
 </body>
 </html>

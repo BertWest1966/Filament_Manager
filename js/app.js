@@ -12,6 +12,42 @@ function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
 function pushUnique(arr,v){v=String(v||'').trim();if(v&&!arr.some(x=>x.toLowerCase()===v.toLowerCase()))arr.push(v)}
 function filament(id){return state.catalog.find(f=>f.id===id)}
 function label(f){return f?`${f.category} · ${f.type} · ${f.color}`:''}
+
+function filamentColorCss(name){
+  const n=String(name||'').toLowerCase().trim();
+  const rules=[
+    [['jade white','ivory','cream','white','wit'],'#f4f1e8'],
+    [['black','zwart'],'#111111'],
+    [['gray','grey','grijs'],'#8b9198'],
+    [['silver','zilver'],'#b8bec5'],
+    [['red dark','dark red','bordeaux','burgundy'],'#7f1d1d'],
+    [['scarlet','red','rood'],'#dc2626'],
+    [['orange','oranje'],'#f97316'],
+    [['yellow','geel'],'#facc15'],
+    [['lime'],'#84cc16'],
+    [['green','groen'],'#16a34a'],
+    [['teal','turquoise'],'#0d9488'],
+    [['cyan'],'#06b6d4'],
+    [['marine blue','navy'],'#1e3a8a'],
+    [['blue','blauw'],'#2563eb'],
+    [['purple','paars','violet'],'#7c3aed'],
+    [['magenta','fuchsia'],'#d946ef'],
+    [['pink','roze'],'#ec4899'],
+    [['brown','bruin'],'#92400e'],
+    [['beige','tan','khaki'],'#c4a574'],
+    [['gold','goud'],'#c99a20']
+  ];
+  for(const [keys,color] of rules) if(keys.some(k=>n.includes(k))) return color;
+  return '#94a3b8';
+}
+function colorDotHtml(color){
+  const c=filamentColorCss(color);
+  return `<span class="filament-color-dot" style="--filament-color:${c}" aria-hidden="true"></span>`;
+}
+function filamentLabelHtml(f){
+  return f?`${esc(f.category)} · ${esc(f.type)} · ${colorDotHtml(f.color)}${esc(f.color)}`:'';
+}
+function colorNameHtml(color){return `${colorDotHtml(color)}${esc(color)}`;}
 function nextNumber(prefix,list){const nums=list.map(x=>Number(String(x.number||'').replace(/\D/g,''))).filter(Number.isFinite);return prefix+String((nums.length?Math.max(...nums):0)+1).padStart(4,'0')}
 function spoolStock(fid){return state.spools.filter(s=>s.status==='active'&&s.filamentId===fid).reduce((a,s)=>a+Number(s.level||0)/100,0)}
 function refillCount(fid){return state.refills.filter(r=>r.filamentId===fid).length}
@@ -103,7 +139,7 @@ function renderDashboard(){
           <tbody>
             ${grouped[c][t].map(r=>`
               <tr data-category="${esc(c)}">
-                <td class="dashboard-color-name" onclick="openDetail('${r.f.id}')">${esc(r.f.color)}</td>
+                <td class="dashboard-color-name" onclick="openDetail('${r.f.id}')">${colorNameHtml(r.f.color)}</td>
                 <td>${r.spool?`<button onclick="openSpool('${r.spool.id}')">${r.spool.number}</button>`:'—'}</td>
                 <td>${r.spool?`<select class="dashboard-level-select" onchange="setDashboardLevel('${r.spool.id}',this.value)" aria-label="Resterend filament ${r.spool.number}">
                   ${[100,75,50,25,0].map(v=>`<option value="${v}" ${Number(r.spool.level)===v?'selected':''}>${v}%</option>`).join('')}
@@ -120,7 +156,7 @@ function renderDashboard(){
 dashboardSearch.oninput=renderDashboard;
 function quickLevel(id){const s=state.spools.find(x=>x.id===id);const v=prompt(`Hoeveelheid op ${s.number}: 0, 25, 50, 75 of 100`,s.level);if(v===null)return;const n=Number(v);if(![0,25,50,75,100].includes(n))return alert('Kies 0, 25, 50, 75 of 100.');s.level=n;log(`Spoel ${s.number} aangepast naar ${n}%`,s.filamentId);save()}
 
-function renderCatalog(){const q=catalogSearch.value.toLowerCase();const items=state.catalog.filter(f=>!q||label(f).toLowerCase().includes(q)).sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));catalogList.innerHTML=items.map(f=>`<div class="item-row category-data-row" data-category="${esc(f.category)}"><div><strong>${esc(label(f))}</strong><div class="item-meta">${esc(f.brand)} · min ${f.min} · gewenst ${f.target}</div></div><div class="item-actions"><button onclick="openDetail('${f.id}')">Open</button><button onclick="openFilament('${f.id}')">Wijzig</button><button class="danger-button" onclick="deleteFilament('${f.id}')">Verwijderen</button></div></div>`).join('')||'<div class="note">Geen filamenten.</div>'}
+function renderCatalog(){const q=catalogSearch.value.toLowerCase();const items=state.catalog.filter(f=>!q||label(f).toLowerCase().includes(q)).sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));catalogList.innerHTML=items.map(f=>`<div class="item-row category-data-row" data-category="${esc(f.category)}"><div><strong>${filamentLabelHtml(f)}</strong><div class="item-meta">${esc(f.brand)} · min ${f.min} · gewenst ${f.target}</div></div><div class="item-actions"><button onclick="openDetail('${f.id}')">Open</button><button onclick="openFilament('${f.id}')">Wijzig</button><button class="danger-button" onclick="deleteFilament('${f.id}')">Verwijderen</button></div></div>`).join('')||'<div class="note">Geen filamenten.</div>'}
 catalogSearch.oninput=renderCatalog;
 function sortStock(items){if(stockSortMode==='number-asc')return items.sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));if(stockSortMode==='number-desc')return items.sort((a,b)=>b.number.localeCompare(a.number,'nl',{numeric:true}));return items.sort((a,b)=>{const fa=filament(a.filamentId),fb=filament(b.filamentId);return fa.category.localeCompare(fb.category,'nl')||fa.type.localeCompare(fb.type,'nl')||fa.color.localeCompare(fb.color,'nl')})}
 
@@ -151,7 +187,7 @@ function renderStock(){
   stockList.innerHTML=items.map(x=>{
     const f=filament(x.filamentId);
     const kind=stockMode==='spools'?'spoel':'refill';
-    return `<div class="item-row category-data-row" data-category="${esc(f.category)}"><div><strong>${esc(label(f))}</strong><div class="item-meta">${x.number} · ${stockMode==='spools'?x.level+'%':'Refill'}</div></div><div class="item-actions"><input class="label-select" type="checkbox" data-kind="${kind}" data-id="${x.id}" aria-label="Selecteer ${x.number}"><button onclick="${stockMode==='spools'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button><button onclick="openQr('${kind}','${x.id}')">QR</button><button class="danger-button" onclick="removeStockItem('${stockMode==='spools'?'spool':'refill'}','${x.id}')">Verwijderen</button></div></div>`;
+    return `<div class="item-row category-data-row" data-category="${esc(f.category)}"><div><strong>${filamentLabelHtml(f)}</strong><div class="item-meta">${x.number} · ${stockMode==='spools'?x.level+'%':'Refill'}</div></div><div class="item-actions"><input class="label-select" type="checkbox" data-kind="${kind}" data-id="${x.id}" aria-label="Selecteer ${x.number}"><button onclick="${stockMode==='spools'?`openSpool('${x.id}')`:`openRefill('${x.id}')`}">Wijzig</button><button onclick="openQr('${kind}','${x.id}')">QR</button><button class="danger-button" onclick="removeStockItem('${stockMode==='spools'?'spool':'refill'}','${x.id}')">Verwijderen</button></div></div>`;
   }).join('')||'<div class="note">Geen voorraad.</div>';
 }
 document.querySelectorAll('[data-stock-mode]').forEach(b=>b.onclick=()=>{stockMode=b.dataset.stockMode;renderStock()});
@@ -272,7 +308,7 @@ function separateStockScreenHtml(items,kind,query,sortMode='filament'){
             return `
               <tr class="category-data-row compact-stock-row" data-category="${esc(f.category)}">
                 <td class="select-col"><input class="label-select separate-label-select" type="checkbox" data-kind="${kind==='spool'?'spoel':'refill'}" data-id="${x.id}" aria-label="Selecteer ${esc(x.number)}"></td>
-                <td class="separate-stock-color">${esc(f.category)} · ${esc(f.type)} · ${esc(f.color)}</td>
+                <td class="separate-stock-color">${esc(f.category)} · ${esc(f.type)} · ${colorNameHtml(f.color)}</td>
                 <td><strong>${esc(x.number)}</strong></td>
                 ${kind==='spool'?`<td>${Number(x.level)||0}%</td>`:''}
                 <td class="compact-actions">
@@ -333,7 +369,7 @@ function separateStockScreenHtml(items,kind,query,sortMode='filament'){
                         .map(x=>`
                           <tr class="category-data-row compact-stock-row" data-category="${esc(category)}">
                             <td class="select-col"><input class="label-select separate-label-select" type="checkbox" data-kind="${kind==='spool'?'spoel':'refill'}" data-id="${x.id}" aria-label="Selecteer ${esc(x.number)}"></td>
-                            <td class="separate-stock-color">${esc(color)}</td>
+                            <td class="separate-stock-color">${colorNameHtml(color)}</td>
                             <td><strong>${esc(x.number)}</strong></td>
                             ${kind==='spool'?`<td>${Number(x.level)||0}%</td>`:''}
                             <td class="compact-actions">
@@ -452,7 +488,7 @@ function renderOrderList(){
     if(x.kind==='manual'){
       return `<div class="item-row category-data-row" data-category="${esc(x.f.category)}">
         <div>
-          <strong>${esc(label(x.f))}</strong>
+          <strong>${filamentLabelHtml(x.f)}</strong>
           <div class="item-meta">Leverancier: ${esc(x.f.supplier||'—')} · Ref.: ${esc(x.f.supplierRef||'—')}<br>Handmatig toegevoegd · Aantal: ${x.needed}</div>
         </div>
         <div class="item-actions">
@@ -464,7 +500,7 @@ function renderOrderList(){
 
     return `<div class="item-row category-data-row" data-category="${esc(x.f.category)}">
       <div>
-        <strong>${esc(label(x.f))}</strong>
+        <strong>${filamentLabelHtml(x.f)}</strong>
         <div class="item-meta">Leverancier: ${esc(x.f.supplier||'—')} · Ref.: ${esc(x.f.supplierRef||'—')}<br>Nog bestellen: ${x.needed}</div>
       </div>
       <div class="item-actions"><button onclick="createOrderFor('${x.f.id}',${x.needed})">Bestellen</button></div>
@@ -481,7 +517,7 @@ function renderOrders(){
     return !q || o.supplier.toLowerCase().includes(q);
   });
 
-  ordersList.innerHTML=openOrders.map(o=>`<div class="item-row"><div><strong>${esc(label(filament(o.filamentId)))}</strong><div class="item-meta">${esc(o.supplier)} · ${o.received}/${o.quantity} ontvangen</div></div><div class="item-actions">${o.received<o.quantity?`<button onclick="receiveOrder('${o.id}')">Ontvangen</button>`:''}</div></div>`).join('')||'<div class="note">Geen openstaande bestellingen.</div>';
+  ordersList.innerHTML=openOrders.map(o=>`<div class="item-row"><div><strong>${filamentLabelHtml(filament(o.filamentId))}</strong><div class="item-meta">${esc(o.supplier)} · ${o.received}/${o.quantity} ontvangen</div></div><div class="item-actions">${o.received<o.quantity?`<button onclick="receiveOrder('${o.id}')">Ontvangen</button>`:''}</div></div>`).join('')||'<div class="note">Geen openstaande bestellingen.</div>';
 }
 ordersSearch.oninput=renderOrders;
 function receiveOrder(id){const o=state.orders.find(x=>x.id===id);const open=o.quantity-o.received;const n=Number(prompt(`Aantal ontvangen (max ${open})`,open));if(!n||n<1||n>open)return;o.received+=n;for(let i=0;i<n;i++)state.refills.push({id:uid(),number:nextNumber('R',state.refills),filamentId:o.filamentId});if(o.received===o.quantity)o.status='Geleverd';save()}
@@ -517,14 +553,64 @@ function deleteFilament(id){
   }
 }
 
-function openDetail(id){previousView=currentView;currentView='detail';const f=filament(id);detailContent.innerHTML=`<div class="panel"><h2>${esc(label(f))}</h2><div class="summary-grid"><div class="summary-card"><span>Op spoel</span><strong>${Math.round(spoolStock(f.id)*100)}%</strong></div><div class="summary-card"><span>Refills</span><strong>${refillCount(f.id)}</strong></div><div class="summary-card"><span>Minimum</span><strong>${f.min}</strong></div><div class="summary-card"><span>Gewenst</span><strong>${f.target}</strong></div></div></div>`;setView('detail')}
+function openDetail(id){
+  previousView=currentView;
+  currentView='detail';
+  const f=filament(id);
+  if(!f)return;
+  const spools=state.spools.filter(s=>s.filamentId===id).sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));
+  const refills=state.refills.filter(r=>r.filamentId===id).sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));
+  detailContent.innerHTML=`
+    <div class="panel filament-detail-card">
+      <h2>${filamentLabelHtml(f)}</h2>
+      <div class="summary-grid">
+        <div class="summary-card"><span>Op spoel</span><strong>${Math.round(spoolStock(f.id)*100)}%</strong></div>
+        <div class="summary-card"><span>Refills</span><strong>${refillCount(f.id)}</strong></div>
+        <label class="summary-card editable-summary"><span>Minimum</span>
+          <select id="detailMinimum">${[0,.25,.5,.75,1,1.5,2,3,4].map(v=>`<option value="${v}" ${Number(f.min)===v?'selected':''}>${String(v).replace('.',',')}</option>`).join('')}</select>
+        </label>
+        <label class="summary-card editable-summary"><span>Gewenst</span>
+          <select id="detailTarget">${[1,2,3,4,5].map(v=>`<option value="${v}" ${Number(f.target)===v?'selected':''}>${v}</option>`).join('')}</select>
+        </label>
+      </div>
+      <div class="detail-section">
+        <h3>Spoelen</h3>
+        ${spools.length?spools.map(s=>`<div class="detail-stock-row"><strong>${esc(s.number)}</strong><span>${colorNameHtml(f.color)}</span><select onchange="setDetailSpoolLevel('${s.id}',this.value)">${[100,75,50,25,0].map(v=>`<option value="${v}" ${Number(s.level)===v?'selected':''}>${v}%</option>`).join('')}</select></div>`).join(''):'<div class="note">Geen spoelen.</div>'}
+      </div>
+      <div class="detail-section">
+        <h3>Refills</h3>
+        ${refills.length?refills.map(r=>`<div class="detail-stock-row"><strong>${esc(r.number)}</strong><span>${colorNameHtml(f.color)}</span></div>`).join(''):'<div class="note">Geen refills.</div>'}
+      </div>
+      <div class="dialog-actions"><button class="primary" type="button" onclick="saveDetailFilament('${f.id}')">Opslaan</button></div>
+    </div>`;
+  setView('detail');
+}
+function setDetailSpoolLevel(id,value){
+  const s=state.spools.find(x=>x.id===id);
+  if(!s)return;
+  const v=Number(value);
+  if(![100,75,50,25,0].includes(v))return;
+  s.level=v;
+}
+function saveDetailFilament(id){
+  const f=filament(id);
+  if(!f)return;
+  f.min=Number(document.getElementById('detailMinimum')?.value??f.min);
+  f.target=Number(document.getElementById('detailTarget')?.value??f.target);
+  log(`${label(f)} voorraadinstellingen gewijzigd`,f.id);
+  save();
+  openDetail(id);
+}
 backFromDetail.onclick=()=>setView(previousView);
 
 
 let qrScanner=null;
 let qrScannerRunning=false;
+let latestQrCode='';
+let scanContext=null;
 let refillLinkMode='manual';
 let refillScanPhase=null;
+let dashboardScannedSpoolId=null;
 
 function parseQrCode(value){
   const text=String(value||'').trim();
@@ -534,92 +620,36 @@ function parseQrCode(value){
     : text.toUpperCase();
 }
 
-function handleScannedCode(value){
-  const code=parseQrCode(value);
-  const spool=state.spools.find(x=>String(x.number).toUpperCase()===code);
-  const refill=state.refills.find(x=>String(x.number).toUpperCase()===code);
-
-  if(refillLinkMode==='scan' && refillScanPhase){
-    if(refillScanPhase==='spool'){
-      if(!spool){
-        fillModeStatus.textContent='Dit is geen geldige spoel. Scan de QR-code van de te wisselen spoel.';
-        setTimeout(()=>startQrScanner(),250);
-        return;
-      }
-      quickFillSpool.value=spool.number;
-      refillScanPhase='refill';
-      fillModeStatus.textContent=`Spoel ${spool.number} gekozen (${Number(spool.level)||0}%). Scan nu de QR-code van de refill.`;
-      scannerStatus.textContent=`Spoel ${spool.number} gekozen. Scan nu een refill.`;
-      setTimeout(()=>startQrScanner(),250);
-      return;
-    }
-
-    if(refillScanPhase==='refill'){
-      if(!refill){
-        fillModeStatus.textContent='Dit is geen geldige refill. Scan de QR-code van de refill.';
-        setTimeout(()=>startQrScanner(),250);
-        return;
-      }
-      quickFillRefill.value=refill.number;
-      refillScanPhase=null;
-      fillModeStatus.textContent=`Spoel ${quickFillSpool.value} en refill ${refill.number} gekozen. Tik op Koppelen om te bevestigen.`;
-      scannerStatus.textContent=`Refill ${refill.number} gekozen. Tik op Koppelen.`;
-      return;
-    }
-  }
-
-  if(spool){
-    setView('voorraad');
-    openSpool(spool.id);
-    return;
-  }
-
-  if(refill){
-    setView('voorraad');
-    openRefill(refill.id);
-    return;
-  }
-
-  scannerStatus.textContent=`Code ${code} niet gevonden.`;
-  alert('Code niet gevonden.');
+async function openScanDialog(context){
+  scanContext=context;
+  latestQrCode='';
+  scanDialogTitle.textContent=context==='dashboard'?'Spoel scannen':'Spoelwissel / refill koppelen';
+  scannerStatus.textContent='Camera wordt geopend...';
+  scanDialog.showModal();
+  await startQrScanner();
 }
 
 async function startQrScanner(){
   if(qrScannerRunning)return;
-
   if(typeof Html5Qrcode==='undefined'){
     scannerStatus.textContent='De scannerbibliotheek kon niet geladen worden. Controleer de internetverbinding.';
     return;
   }
-
   try{
-    qrReader.classList.remove('hidden');
     qrScanner=new Html5Qrcode('qrReader');
-
-    scannerStatus.textContent='Camera wordt geopend...';
-
     await qrScanner.start(
       {facingMode:'environment'},
-      {
-        fps:10,
-        aspectRatio:1.0,
-        qrbox:(width,height)=>{
-          const size=Math.floor(Math.min(width,height)*0.72);
-          return {width:size,height:size};
-        }
-      },
-      async decodedText=>{
-        await stopQrScanner();
-        handleScannedCode(decodedText);
+      {fps:10,aspectRatio:1.0,qrbox:(width,height)=>{const size=Math.floor(Math.min(width,height)*0.72);return {width:size,height:size};}},
+      decodedText=>{
+        latestQrCode=decodedText;
+        scannerStatus.textContent='QR-code in beeld. Tik op Scan om deze code te gebruiken.';
       },
       ()=>{}
     );
-
     qrScannerRunning=true;
-    scannerStatus.textContent='Camera actief. Richt de QR-code binnen het kader.';
+    scannerStatus.textContent='Camera actief. Richt de QR-code binnen het kader en tik daarna op Scan.';
   }catch(error){
     qrScannerRunning=false;
-    qrReader.classList.add('hidden');
     scannerStatus.textContent='Camera kon niet worden geopend. Controleer cameratoegang in Safari.';
   }
 }
@@ -631,17 +661,84 @@ async function stopQrScanner(){
       await qrScanner.clear();
     }catch{}
   }
-
   qrScanner=null;
   qrScannerRunning=false;
-  qrReader.classList.add('hidden');
-  scannerStatus.textContent='Scanner gestopt.';
+  latestQrCode='';
 }
 
-startScannerBtn.onclick=startQrScanner;
-stopScannerBtn.onclick=stopQrScanner;
+async function closeScanDialog(){
+  await stopQrScanner();
+  if(scanDialog.open)scanDialog.close();
+}
 
-manualScanBtn.onclick=()=>{const code=parseQrCode(manualScanCode.value);const s=state.spools.find(x=>x.number===code);if(s){setView('voorraad');openSpool(s.id);return}const r=state.refills.find(x=>x.number===code);if(r){setView('voorraad');openRefill(r.id);return}alert('Code niet gevonden.')}
+scanCloseBtn.onclick=closeScanDialog;
+
+scanCaptureBtn.onclick=async()=>{
+  if(!latestQrCode){
+    scannerStatus.textContent='Nog geen QR-code goed in beeld. Richt de camera op de code en probeer opnieuw.';
+    return;
+  }
+  const code=parseQrCode(latestQrCode);
+  latestQrCode='';
+
+  if(scanContext==='dashboard'){
+    const spool=state.spools.find(x=>String(x.number).toUpperCase()===code);
+    if(!spool){
+      scannerStatus.textContent='Dit is geen geldige spoelcode. Richt op een spoel en tik opnieuw op Scan.';
+      return;
+    }
+    await closeScanDialog();
+    dashboardScannedSpoolId=spool.id;
+    const f=filament(spool.filamentId);
+    dashboardScannedSpoolInfo.innerHTML=`<div class="scan-spool-number">${esc(spool.number)}</div><div>${f?filamentLabelHtml(f):''}</div>`;
+    dashboardScannedLevel.value=String(Number(spool.level)||0);
+    dashboardLevelDialog.showModal();
+    return;
+  }
+
+  if(scanContext==='refill-link'){
+    const spool=state.spools.find(x=>String(x.number).toUpperCase()===code);
+    const refill=state.refills.find(x=>String(x.number).toUpperCase()===code);
+    if(refillScanPhase==='spool'){
+      if(!spool){
+        scannerStatus.textContent='Dit is geen geldige spoel. Richt op de te wisselen spoel en tik opnieuw op Scan.';
+        return;
+      }
+      quickFillSpool.value=spool.number;
+      refillScanPhase='refill';
+      fillModeStatus.textContent=`Spoel ${spool.number} gekozen (${Number(spool.level)||0}%). Richt nu op de refill en tik opnieuw op Scan.`;
+      scannerStatus.textContent='Spoel gekozen. Richt nu op de QR-code van de refill en tik op Scan.';
+      return;
+    }
+    if(refillScanPhase==='refill'){
+      if(!refill){
+        scannerStatus.textContent='Dit is geen geldige refill. Richt op de refill en tik opnieuw op Scan.';
+        return;
+      }
+      quickFillRefill.value=refill.number;
+      refillScanPhase=null;
+      fillModeStatus.textContent=`Spoel ${quickFillSpool.value} en refill ${refill.number} gekozen. Tik op Koppelen om te bevestigen.`;
+      await closeScanDialog();
+      return;
+    }
+  }
+};
+
+dashboardScanSpoolBtn.onclick=()=>openScanDialog('dashboard');
+dashboardLevelCancelBtn.onclick=()=>dashboardLevelDialog.close();
+dashboardLevelForm.onsubmit=e=>{
+  e.preventDefault();
+  const spool=state.spools.find(x=>x.id===dashboardScannedSpoolId);
+  if(!spool)return dashboardLevelDialog.close();
+  const level=Number(dashboardScannedLevel.value);
+  if(![100,75,50,25,0].includes(level))return;
+  spool.level=level;
+  log(`Spoel ${spool.number} aangepast naar ${level}%`,spool.filamentId);
+  dashboardLevelDialog.close();
+  dashboardScannedSpoolId=null;
+  save();
+};
+
 function setRefillLinkMode(mode){
   refillLinkMode=mode;
   refillScanPhase=null;
@@ -650,53 +747,39 @@ function setRefillLinkMode(mode){
   fillStartScanBtn.classList.toggle('hidden',mode!=='scan');
   quickFillSpool.readOnly=mode==='scan';
   quickFillRefill.readOnly=mode==='scan';
-
   if(mode==='manual'){
     fillModeStatus.textContent='Vul de spoel en refill manueel in.';
   }else{
     quickFillSpool.value='';
     quickFillRefill.value='';
-    fillModeStatus.textContent='Tik op Start scan. Scan eerst de te wisselen spoel en daarna de refill.';
+    fillModeStatus.textContent='Open de camera. Scan eerst de te wisselen spoel en daarna de refill.';
   }
 }
-
 fillManualModeBtn.onclick=()=>setRefillLinkMode('manual');
 fillScanModeBtn.onclick=()=>setRefillLinkMode('scan');
-
 fillStartScanBtn.onclick=async()=>{
   quickFillSpool.value='';
   quickFillRefill.value='';
   refillScanPhase='spool';
-  fillModeStatus.textContent='Scan de QR-code van de te wisselen spoel.';
-  scannerStatus.textContent='Scan de QR-code van de te wisselen spoel.';
-  await startQrScanner();
+  fillModeStatus.textContent='Richt op de QR-code van de te wisselen spoel en tik op Scan.';
+  await openScanDialog('refill-link');
 };
 
 quickFillBtn.onclick=()=>{
   const s=state.spools.find(x=>x.number===quickFillSpool.value.trim().toUpperCase());
   const r=state.refills.find(x=>x.number===quickFillRefill.value.trim().toUpperCase());
   if(!s||!r)return alert('Spoel of refill niet gevonden.');
-
   const spoolFilament=filament(s.filamentId);
   const refillFilament=filament(r.filamentId);
   if(!spoolFilament||!refillFilament)return alert('Filamentgegevens van spoel of refill ontbreken.');
-
   if(s.filamentId!==r.filamentId){
-    alert(
-      `Verkeerde refill.\n\n`+
-      `Spoel ${s.number}: ${label(spoolFilament)}\n`+
-      `Refill ${r.number}: ${label(refillFilament)}\n\n`+
-      `De refill moet exact hetzelfde filament zijn als het filament op de spoel.\n`+
-      `Gebruik voor een ander filament een nieuw spoelnummer.`
-    );
+    alert(`Verkeerde refill.\n\nSpoel ${s.number}: ${label(spoolFilament)}\nRefill ${r.number}: ${label(refillFilament)}\n\nDe refill moet exact hetzelfde filament zijn als het filament op de spoel.\nGebruik voor een ander filament een nieuw spoelnummer.`);
     return;
   }
-
   if(Number(s.level)!==0){
     const ok=confirm(`Spoel ${s.number} staat nog op ${Number(s.level)||0}%. Toch deze refill koppelen?`);
     if(!ok)return;
   }
-
   s.filamentId=r.filamentId;
   s.level=100;
   state.refills=state.refills.filter(x=>x.id!==r.id);
@@ -706,7 +789,7 @@ quickFillBtn.onclick=()=>{
   refillScanPhase=null;
   save();
   fillModeStatus.textContent=refillLinkMode==='scan'
-    ? 'Koppeling voltooid. Tik op Start scan voor een volgende wissel.'
+    ? 'Koppeling voltooid. Open de camera voor een volgende wissel.'
     : 'Koppeling voltooid. Vul de volgende spoel en refill manueel in.';
   showAppToast(`✓ Spoel ${s.number} is succesvol aangevuld met refill ${r.number}.`);
 }
@@ -884,7 +967,17 @@ restoreBackupInput.onchange=async event=>{
   }
 }
 
-globalSearch.oninput=()=>{const q=globalSearch.value.toLowerCase();if(!q){globalResults.classList.add('hidden');return}const rows=[];state.catalog.forEach(f=>{if(label(f).toLowerCase().includes(q))rows.push({t:label(f),m:'Filament',a:()=>openDetail(f.id)})});state.spools.forEach(s=>{if(s.number.toLowerCase().includes(q))rows.push({t:s.number,m:'Spoel',a:()=>openSpool(s.id)})});state.refills.forEach(r=>{if(r.number.toLowerCase().includes(q))rows.push({t:r.number,m:'Refill',a:()=>openRefill(r.id)})});globalResults.innerHTML=rows.map((r,i)=>`<div class="search-result" data-i="${i}"><strong>${esc(r.t)}</strong><div class="item-meta">${r.m}</div></div>`).join('')||'<div class="search-result">Geen resultaten</div>';globalResults.classList.remove('hidden');globalResults.querySelectorAll('[data-i]').forEach(x=>x.onclick=()=>rows[Number(x.dataset.i)].a())}
+globalSearch.oninput=()=>{
+  const q=globalSearch.value.toLowerCase();
+  if(!q){globalResults.classList.add('hidden');return}
+  const rows=[];
+  state.catalog.forEach(f=>{if(label(f).toLowerCase().includes(q))rows.push({html:filamentLabelHtml(f),m:'Filament',a:()=>openDetail(f.id)})});
+  state.spools.forEach(s=>{if(s.number.toLowerCase().includes(q)){const f=filament(s.filamentId);rows.push({html:`${esc(s.number)}${f?` · ${filamentLabelHtml(f)}`:''}`,m:'Spoel',a:()=>openSpool(s.id)})}});
+  state.refills.forEach(r=>{if(r.number.toLowerCase().includes(q)){const f=filament(r.filamentId);rows.push({html:`${esc(r.number)}${f?` · ${filamentLabelHtml(f)}`:''}`,m:'Refill',a:()=>openRefill(r.id)})}});
+  globalResults.innerHTML=rows.map((r,i)=>`<div class="search-result" data-i="${i}"><strong>${r.html}</strong><div class="item-meta">${r.m}</div></div>`).join('')||'<div class="search-result">Geen resultaten</div>';
+  globalResults.classList.remove('hidden');
+  globalResults.querySelectorAll('[data-i]').forEach(x=>x.onclick=()=>rows[Number(x.dataset.i)].a());
+}
 
 
 function qrPayload(kind,number){return `filament-manager:${kind}:${number}`}

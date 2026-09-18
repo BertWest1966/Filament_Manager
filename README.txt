@@ -1,14 +1,18 @@
-Filament Manager - versie 7.5.47
+Filament Manager - versie 8.0.0
 
-Back-up
--------
-- Bestandsnaam van een nieuwe back-up is eenvoudiger leesbaar.
-- Formaat: Filament_Backup_DD-MM-JJJJ_UUuMM.json
-- Voorbeeld: Filament_Backup_30-08-2026_18u52.json
-- Datum en tijd gebruiken de lokale tijd van het toestel.
+Nieuwe functies
+---------------
+- Kleurbolletjes vóór filamentkleuren in de belangrijkste lijsten en zoekresultaten.
+- Dashboard: knop 'Spoel scannen' om via QR een spoel te kiezen en daarna 100/75/50/25/0% in te stellen.
+- Dashboard-zoekresultaat/detail: minimum, gewenste voorraad en spoelhoeveelheden kunnen worden aangepast.
+- Scannen: algemene QR-scanpagina verwijderd; Spoelwissel / refill koppelen blijft.
+- Camera scant niet meer automatisch door. De gebruiker richt eerst en drukt bewust op 'Scan'.
+- Bij spoelwissel wordt eerst de spoel en daarna de refill met afzonderlijke druk op 'Scan' gekozen.
+- iPhone: invoervelden/selects in formulieren minimaal 16 px en dialogen binnen schermbreedte om automatische Safari-zoom te voorkomen.
 
-Overig
-------
-- Geen andere functies of layouts gewijzigd.
-- Stickerformaat blijft 50 x 70 mm.
-- Opslagstructuur en JSON-inhoud zijn niet gewijzigd.
+Ongewijzigd
+-----------
+- Lokale opslagstructuur en bestaande gegevens.
+- JSON back-up/herstel en leesbare back-upnaam.
+- QR-stickerformaat 50 x 70 mm en bestaande stickerinhoud.
+- Mobiele hoofdnavigatie.
