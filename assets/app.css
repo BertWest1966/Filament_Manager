@@ -1585,3 +1585,33 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
   .detail-stock-row{grid-template-columns:auto 1fr}
   .detail-stock-row select{grid-column:1/-1}
 }
+
+
+/* v8.1 - Mac: kleurbolletje compact houden in Spoelen en Refills */
+@media (min-width:901px){
+  .separate-stock-table .filament-color-dot,
+  .separate-stock-list .filament-color-dot,
+  #spoelen .filament-color-dot,
+  #refills .filament-color-dot{
+    display:inline-block!important;
+    width:9px!important;
+    min-width:9px!important;
+    max-width:9px!important;
+    height:9px!important;
+    min-height:9px!important;
+    max-height:9px!important;
+    margin:0 6px 0 0!important;
+    padding:0!important;
+    border-radius:50%!important;
+    vertical-align:middle!important;
+    background:var(--filament-color,#94a3b8)!important;
+    box-sizing:border-box!important;
+    position:static!important;
+    flex:0 0 9px!important;
+  }
+
+  #spoelen td,
+  #refills td{
+    vertical-align:middle!important;
+  }
+}
