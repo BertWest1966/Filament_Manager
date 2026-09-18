@@ -1,10 +1,12 @@
-Filament Manager - versie 8.1
+Filament Manager - versie 8.2
 
-Correctie Mac
--------------
-- Kleurbolletjes in Spoelen en Refills blijven kleine ronde bolletjes.
-- De zwarte rechthoeken onder de kleurnamen zijn gecorrigeerd.
-- Compacte rijhoogte en uitlijning van de desktopweergave blijven behouden.
-- De correctie is desktop/Mac-specifiek en verandert de iPhone-layout niet.
+Correctie Mac - Spoelen en Refills
+----------------------------------
+- De oorzaak van de zwarte vlakken is gecorrigeerd.
+- De kleurkolom was in v8.0/v8.1 per ongeluk als flex-element ingesteld.
+- De kleurkolom is opnieuw een normale tabelcel.
+- Het kleine gekleurde bolletje vóór de kleurnaam blijft behouden.
+- De compacte rijhoogte en kolomuitlijning blijven behouden.
+- De iPhone-layout is niet gewijzigd.
 
-Bestaande functies uit v8.0 blijven behouden.
+Alle functies uit v8.1 blijven behouden.

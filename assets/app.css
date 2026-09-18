@@ -1539,9 +1539,14 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
   border:1px solid rgba(15,23,42,.28);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
 }
-.search-result strong,.dashboard-color-name,.separate-stock-color{
+.search-result strong{
   display:flex;
   align-items:center;
+}
+/* Tabelcellen moeten table-cell blijven; het kleurbolletje zelf is inline-block. */
+.dashboard-color-name,
+.separate-stock-color{
+  display:table-cell;
 }
 .filament-detail-card .detail-section{margin-top:16px}
 .detail-stock-row{
@@ -1613,5 +1618,16 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
   #spoelen td,
   #refills td{
     vertical-align:middle!important;
+  }
+}
+
+
+/* v8.2 - herstel tabelopbouw Spoelen/Refills op Mac */
+@media (min-width:901px){
+  #spoelen td.separate-stock-color,
+  #refills td.separate-stock-color,
+  #dashboard td.dashboard-color-name{
+    display:table-cell!important;
+    background:#fff!important;
   }
 }
