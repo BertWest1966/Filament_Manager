@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Filament">
-  <title>Filament Manager v8.15</title>
+  <title>Filament Manager v8.16</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=8.15">
+  <link rel="stylesheet" href="assets/app.css?v=8.16">
 </head>
 <body>
 <div class="app-shell">
@@ -18,7 +18,7 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 8.15</span>
+      <span>Versie 8.16</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M9.5 20v-6h5v6"/></svg></span><span>Dashboard</span></button>
@@ -39,7 +39,7 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 8.15</span>
+        <span>Versie 8.16</span>
       </div>
     </header>
 
@@ -158,6 +158,8 @@
 
           <div class="dialog-actions">
             <button type="button" id="fillStartScanBtn" class="hidden">Camera openen</button>
+            <button type="button" id="confirmScannedPairBtn" class="primary hidden">Scan bevestigen</button>
+            <button type="button" id="rescanPairBtn" class="hidden">Opnieuw scannen</button>
             <button class="primary" id="quickFillBtn">Koppelen</button>
           </div>
         </div>
@@ -525,18 +527,7 @@ window.FMPrint = (() => {
   </form>
 </dialog>
 
-<script src="js/app.js?v=8.15"></script>
+<script src="js/app.js?v=8.16"></script>
 <script src="js/print-tools.js?v=7.5.5"></script>
-
-<dialog id="linkScanConfirmDialog">
-  <div class="dialog-card">
-    <h2 id="linkScanConfirmTitle">QR-code bevestigen</h2>
-    <p id="linkScanConfirmText" class="note"></p>
-    <div class="dialog-actions">
-      <button type="button" id="linkScanConfirmYes" class="primary">Bevestigen</button>
-      <button type="button" id="linkScanConfirmNo">Opnieuw scannen</button>
-    </div>
-  </div>
-</dialog>
 </body>
 </html>
