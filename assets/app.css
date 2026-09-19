@@ -1637,3 +1637,15 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 .scan-instruction strong{font-size:18px}.scan-instruction span{color:#475569}
 .scan-confirmation{margin:8px 0 10px;padding:10px 12px;border-radius:10px;background:#ecfdf5;border:1px solid #86efac;color:#166534;font-weight:700}
 #backup button,#backup label.button,#backup .button,#backup .backup-actions button,#backup .backup-actions label{text-align:center!important;justify-content:center!important;align-items:center!important}
+
+
+/* v8.4 - Back-up terugzetten exact centreren */
+#backup .file-button,
+#backup label[for="restoreBackupInput"],
+#backup label:has(#restoreBackupInput),
+#backup .backup-restore-button{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+}

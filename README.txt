@@ -1,13 +1,9 @@
-Filament Manager - versie 8.3
+Filament Manager - versie 8.4
 
-Scannen
-- Duidelijke stap 'Scan spoel'.
-- Bevestiging na geldige spoelscan.
-- Daarna duidelijke stap 'Scan refill'.
-- Bevestiging na geldige refillscan.
-- QR-code wordt alleen verwerkt na druk op Scan.
+Correctie Back-up
+-----------------
+- Tekst 'Back-up terugzetten' wordt nu rechtstreeks op het juiste element gecentreerd.
+- Horizontale en verticale uitlijning is gelijk aan 'Back-up maken'.
+- Verder zijn geen functies of layouts gewijzigd.
 
-Back-up
-- Tekst van Back-up maken en Back-up terugzetten horizontaal en verticaal gecentreerd.
-
-Alle functies uit v8.2 blijven behouden.
+Alle functies uit v8.3 blijven behouden.
