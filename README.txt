@@ -1,13 +1,13 @@
-Filament Manager - versie 8.13
+Filament Manager - versie 8.14
 
-QR-bevestiging bij spoelwissel / refill koppelen
+Gebaseerd op de werkende QR-herkenning van v8.12
 ------------------------------------------------
-- De werkende QR-herkenning van v8.12 blijft behouden.
-- Een herkende spoel wordt niet meer automatisch verwerkt.
-- De herkende spoel wordt zichtbaar getoond en moet met Scan worden bevestigd.
-- Daarna opent de aparte refillscanner.
-- Een herkende refill wordt zichtbaar getoond en moet eveneens met Scan worden bevestigd.
-- Pas daarna worden spoel en refill in het formulier ingevuld.
-- Hierdoor kan een per ongeluk herkende verkeerde QR-code worden gecorrigeerd vóór bevestiging.
-
-Overige functies van v8.12 zijn ongewijzigd.
+- De QR-herkenning van v8.12 is als basis gebruikt.
+- Een geldige spoel wordt eerst herkend en vastgezet als 'pending'.
+- De Scan-knop bevestigt uitsluitend die reeds herkende spoel.
+- Daarna wordt een volledig nieuwe scannersessie voor de refill geopend.
+- Een geldige refill wordt eveneens eerst herkend en vastgezet.
+- De Scan-knop bevestigt uitsluitend die reeds herkende refill.
+- De Scan-knop probeert de QR-code dus niet opnieuw te lezen.
+- Na bevestiging worden spoel en refill in het formulier ingevuld.
+- Overige appfuncties blijven gebaseerd op v8.12.

@@ -613,6 +613,7 @@ let refillScanPhase=null;
 let dashboardScannedSpoolId=null;
 let confirmedQrCode='';
 let refillLinkSpoolNumber='';
+let pendingLinkScan=null;
 
 function parseQrCode(value){
   const text=String(value||'').trim();
@@ -640,6 +641,7 @@ async function openScanDialog(context){
   scanContext=context;
   latestQrCode='';
   confirmedQrCode='';
+  pendingLinkScan=null;
   scanConfirmation.classList.add('hidden');
   scanConfirmation.textContent='';
 
@@ -660,6 +662,7 @@ async function openScanDialog(context){
   if(scanCaptureBtn){
     scanCaptureBtn.style.display='';
     scanCaptureBtn.disabled=false;
+    scanCaptureBtn.textContent=(context==='refill-link-spool' || context==='refill-link-refill')?'Scan':'Scan';
   }
   scanDialog.showModal();
   await startQrScanner();
@@ -686,25 +689,32 @@ async function startQrScanner(){
         if(scanContext==='refill-link-spool'){
           const spool=findSpoolByQr(code);
           if(!spool){
-            confirmedQrCode='';
             scannerStatus.textContent=`${code} gelezen, maar dit is geen geldige spoel.`;
             return;
           }
-          scannerStatus.textContent=`Spoel ${spool.number} in beeld. Druk op Scan om te bevestigen.`;
+          if(pendingLinkScan)return;
+          pendingLinkScan={type:'spool', number:spool.number, id:spool.id};
+          scannerStatus.textContent=`Spoel ${spool.number} herkend. Druk op Scan om te bevestigen.`;
+          scanConfirmation.textContent=`Spoel ${spool.number} herkend`;
+          scanConfirmation.classList.remove('hidden');
           return;
         }
 
         if(scanContext==='refill-link-refill'){
           const refill=findRefillByQr(code);
           if(!refill){
-            confirmedQrCode='';
             scannerStatus.textContent=`${code} gelezen, maar deze refill staat niet in de voorraad.`;
             return;
           }
-          scannerStatus.textContent=`Refill ${refill.number} in beeld. Druk op Scan om te bevestigen.`;
+          if(pendingLinkScan)return;
+          pendingLinkScan={type:'refill', number:refill.number, id:refill.id};
+          scannerStatus.textContent=`Refill ${refill.number} herkend. Druk op Scan om te bevestigen.`;
+          scanConfirmation.textContent=`Refill ${refill.number} herkend`;
+          scanConfirmation.classList.remove('hidden');
           return;
         }
 
+        // Andere scanfuncties blijven zoals in v8.12.
         scannerStatus.textContent=`QR-code spoel ${code} in beeld. Druk op Scan.`;
       },
       ()=>{}
@@ -746,25 +756,18 @@ async function closeScanDialog(){
 scanCloseBtn.onclick=closeScanDialog;
 
 scanCaptureBtn.onclick=async()=>{
-  const code=confirmedQrCode || parseQrCode(latestQrCode);
-  if(!code){
-    scannerStatus.textContent='Nog geen geldige QR-code herkend.';
-    return;
-  }
-
   if(scanContext==='refill-link-spool'){
-    const spool=findSpoolByQr(code);
-    if(!spool){
-      scannerStatus.textContent=`${code} is geen geldige spoel.`;
+    if(!pendingLinkScan || pendingLinkScan.type!=='spool'){
+      scannerStatus.textContent='Nog geen geldige spoel herkend.';
       return;
     }
+    const spoolNumber=pendingLinkScan.number;
     scanCaptureBtn.disabled=true;
-    quickFillSpool.value=spool.number;
-    refillLinkSpoolNumber=spool.number;
-    scanConfirmation.textContent=`✓ Spoel ${spool.number} bevestigd`;
-    scanConfirmation.classList.remove('hidden');
-    fillModeStatus.textContent=`Spoel ${spool.number} bevestigd. Scan nu de refill.`;
-    await new Promise(resolve=>setTimeout(resolve,300));
+    quickFillSpool.value=spoolNumber;
+    refillLinkSpoolNumber=spoolNumber;
+    scanConfirmation.textContent=`✓ Spoel ${spoolNumber} bevestigd`;
+    fillModeStatus.textContent=`Spoel ${spoolNumber} bevestigd. Scan nu de refill.`;
+
     await closeScanDialog();
     await new Promise(resolve=>setTimeout(resolve,250));
     await openScanDialog('refill-link-refill');
@@ -772,26 +775,38 @@ scanCaptureBtn.onclick=async()=>{
   }
 
   if(scanContext==='refill-link-refill'){
-    const refill=findRefillByQr(code);
-    if(!refill){
-      scannerStatus.textContent=`${code} is geen geldige refill in de voorraad.`;
+    if(!pendingLinkScan || pendingLinkScan.type!=='refill'){
+      scannerStatus.textContent='Nog geen geldige refill herkend.';
       return;
     }
+    const refillNumber=pendingLinkScan.number;
     scanCaptureBtn.disabled=true;
+
     quickFillSpool.value=refillLinkSpoolNumber;
-    quickFillRefill.value=refill.number;
+    quickFillRefill.value=refillNumber;
+    quickFillSpool.dispatchEvent(new Event('input',{bubbles:true}));
     quickFillSpool.dispatchEvent(new Event('change',{bubbles:true}));
+    quickFillRefill.dispatchEvent(new Event('input',{bubbles:true}));
     quickFillRefill.dispatchEvent(new Event('change',{bubbles:true}));
-    scanConfirmation.innerHTML=`✓ Spoel ${esc(refillLinkSpoolNumber)} bevestigd<br>✓ Refill ${esc(refill.number)} bevestigd`;
-    scanConfirmation.classList.remove('hidden');
-    fillModeStatus.textContent=`Spoel ${refillLinkSpoolNumber} en refill ${refill.number} bevestigd. Tik op Koppelen om te bevestigen.`;
-    await new Promise(resolve=>setTimeout(resolve,400));
+
+    scanConfirmation.innerHTML=`✓ Spoel ${esc(refillLinkSpoolNumber)} bevestigd<br>✓ Refill ${esc(refillNumber)} bevestigd`;
+    fillModeStatus.textContent=`Spoel ${refillLinkSpoolNumber} en refill ${refillNumber} bevestigd. Tik op Koppelen om te bevestigen.`;
+
     await closeScanDialog();
+
+    // Safari/iPhone: formulierwaarden na sluiten expliciet behouden.
     quickFillSpool.value=refillLinkSpoolNumber;
-    quickFillRefill.value=refill.number;
+    quickFillRefill.value=refillNumber;
     return;
   }
 
+  // Dashboardscan blijft handmatig zoals voorheen.
+  const scanValue=confirmedQrCode || latestQrCode;
+  if(!scanValue){
+    scannerStatus.textContent='Nog geen QR-code herkend.';
+    return;
+  }
+  const code=parseQrCode(scanValue);
   if(scanContext==='dashboard'){
     const spool=findSpoolByQr(code);
     if(!spool){
@@ -800,7 +815,9 @@ scanCaptureBtn.onclick=async()=>{
     }
     await closeScanDialog();
     dashboardScannedSpoolId=spool.id;
-    if(typeof openDashboardSpoolLevelDialog==='function') openDashboardSpoolLevelDialog(spool);
+    if(typeof openDashboardSpoolLevelDialog==='function'){
+      openDashboardSpoolLevelDialog(spool);
+    }
   }
 };
 
