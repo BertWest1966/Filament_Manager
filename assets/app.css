@@ -1649,3 +1649,17 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
   justify-content:center!important;
   text-align:center!important;
 }
+
+
+/* v8.5 - definitieve centrering Back-up terugzetten */
+label.file-button:has(#restoreBackupInput){
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  box-sizing:border-box!important;
+  cursor:pointer;
+}
+label.file-button:has(#restoreBackupInput) #restoreBackupInput{
+  display:none!important;
+}

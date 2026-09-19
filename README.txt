@@ -1,9 +1,10 @@
-Filament Manager - versie 8.4
+Filament Manager - versie 8.5
 
 Correctie Back-up
 -----------------
-- Tekst 'Back-up terugzetten' wordt nu rechtstreeks op het juiste element gecentreerd.
-- Horizontale en verticale uitlijning is gelijk aan 'Back-up maken'.
-- Verder zijn geen functies of layouts gewijzigd.
+- 'Back-up terugzetten' wordt nu rechtstreeks via het echte label.file-button-element gecentreerd.
+- De eerdere #backup-selector werkte niet omdat het Back-up-blok geen id='backup' heeft.
+- Tekst staat horizontaal en verticaal gecentreerd zoals bij 'Back-up maken'.
 
-Alle functies uit v8.3 blijven behouden.
+Verder zijn geen functies gewijzigd.
+Alle functies uit v8.4 blijven behouden.
