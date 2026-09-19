@@ -611,6 +611,7 @@ let scanContext=null;
 let refillLinkMode='manual';
 let refillScanPhase=null;
 let dashboardScannedSpoolId=null;
+let confirmedQrCode='';
 
 function parseQrCode(value){
   const text=String(value||'').trim();
@@ -637,6 +638,7 @@ function findRefillByQr(value){
 async function openScanDialog(context){
   scanContext=context;
   latestQrCode='';
+  confirmedQrCode='';
   scanDialogTitle.textContent=context==='dashboard'?'Spoel scannen':'Spoelwissel / refill koppelen';
   scanConfirmation.classList.add('hidden');
   scanConfirmation.textContent='';
@@ -665,14 +667,17 @@ async function startQrScanner(){
           const spoolCode=String(quickFillSpool.value||'').trim().toUpperCase();
           if(code===spoolCode){
             latestQrCode='';
+            confirmedQrCode='';
             scannerStatus.textContent='Wachten op QR-code van refill...';
             return;
           }
           latestQrCode=decodedText;
+          confirmedQrCode=code;
           scannerStatus.textContent=`QR-code refill ${code} in beeld. Druk op Scan.`;
           return;
         }
         latestQrCode=decodedText;
+        confirmedQrCode=code;
         scannerStatus.textContent=scanContext==='dashboard'
           ? 'QR-code spoel in beeld. Druk op Scan.'
           : 'QR-code spoel in beeld. Druk op Scan.';
@@ -712,13 +717,16 @@ async function closeScanDialog(){
 scanCloseBtn.onclick=closeScanDialog;
 
 scanCaptureBtn.onclick=async()=>{
-  if(!latestQrCode){
+  const scanValue=(scanContext==='refill-link' && refillScanPhase==='refill')
+    ? (confirmedQrCode || latestQrCode)
+    : (latestQrCode || confirmedQrCode);
+  if(!scanValue){
     scannerStatus.textContent=(scanContext==='refill-link' && refillScanPhase==='refill')
       ? 'Nog geen nieuwe refill QR-code herkend. Richt de camera op de refill en probeer opnieuw.'
       : 'Nog geen QR-code goed in beeld. Richt de camera op de code en probeer opnieuw.';
     return;
   }
-  const scannedQrValue=latestQrCode;
+  const scannedQrValue=scanValue;
   const code=parseQrCode(scannedQrValue);
   latestQrCode='';
 
@@ -758,6 +766,7 @@ scanCaptureBtn.onclick=async()=>{
       await stopQrScanner();
       refillScanPhase='refill';
       latestQrCode='';
+      confirmedQrCode='';
       scanInstruction.innerHTML='<strong>Scan refill</strong><span>Richt de camera op de QR-code van de refill en druk op Scan.</span>';
       scannerStatus.textContent='Camera wordt opnieuw gestart voor de refill...';
       await new Promise(resolve=>setTimeout(resolve,300));
@@ -781,6 +790,7 @@ scanCaptureBtn.onclick=async()=>{
       quickFillRefill.dispatchEvent(new Event('change',{bubbles:true}));
 
       refillScanPhase=null;
+      confirmedQrCode='';
       scanConfirmation.innerHTML=`✓ Spoel ${esc(quickFillSpool.value)} succesvol gescand<br>✓ Refill ${esc(detectedRefill.number)} succesvol gescand`;
       scanConfirmation.classList.remove('hidden');
       scanInstruction.innerHTML='<strong>Scannen voltooid</strong><span>Spoel en refill zijn herkend.</span>';

@@ -1,11 +1,11 @@
-Filament Manager - versie 8.9
+Filament Manager - versie 8.10
 
-Correctie spoelwissel / refill koppelen
----------------------------------------
-- De door de camera herkende refillcode wordt vóór het sluiten van de scanner bewaard.
-- De gevonden refill wordt rechtstreeks in het refillveld geplaatst.
-- Het input/change-event wordt uitgevoerd zodat de formulierstatus mee wordt bijgewerkt.
-- Na het sluiten van de scanner wordt de refillwaarde op iPhone/Safari nogmaals bevestigd.
-- Als een gelezen R-code niet in de actieve refillvoorraad bestaat, wordt dit expliciet gemeld.
+Correctie Scan-knop bij refill
+------------------------------
+- De QR-code die de decoder zichtbaar als refill herkent, wordt apart vastgelegd.
+- De Scan-knop gebruikt in de refillfase rechtstreeks die vastgelegde R-code.
+- De Scan-knop is daardoor niet meer afhankelijk van een tijdelijke latestQrCode-waarde.
+- Na de spoelscan wordt de bevestigde spoelcode gewist voordat de refillscan start.
+- Na succesvolle verwerking van de refill wordt de bevestigde code opnieuw gewist.
 
-Overige functies van v8.8 zijn ongewijzigd.
+Camera, QR-parser, aparte scannersessies en overige functies blijven verder ongewijzigd.
