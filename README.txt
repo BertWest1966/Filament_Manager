@@ -1,11 +1,21 @@
-Filament Manager - versie 8.10
+Filament Manager - versie 8.11
 
-Correctie Scan-knop bij refill
-------------------------------
-- De QR-code die de decoder zichtbaar als refill herkent, wordt apart vastgelegd.
-- De Scan-knop gebruikt in de refillfase rechtstreeks die vastgelegde R-code.
-- De Scan-knop is daardoor niet meer afhankelijk van een tijdelijke latestQrCode-waarde.
-- Na de spoelscan wordt de bevestigde spoelcode gewist voordat de refillscan start.
-- Na succesvolle verwerking van de refill wordt de bevestigde code opnieuw gewist.
+Spoelwissel / refill koppelen opnieuw opgebouwd
+-----------------------------------------------
+De scanflow gebruikt nu twee volledig afzonderlijke stappen:
 
-Camera, QR-parser, aparte scannersessies en overige functies blijven verder ongewijzigd.
+1. Scan spoel
+   - aparte scanner/dialoog
+   - spoelnummer wordt opgeslagen
+   - scanner en dialoog worden volledig gesloten
+
+2. Scan refill
+   - nieuw dialoog
+   - volledig nieuwe scannersessie
+   - refillnummer wordt opgeslagen
+   - scanner wordt gesloten
+   - spoel + refill worden in het formulier ingevuld
+
+De oude gedeelde refill-scanfase wordt niet meer gebruikt voor deze koppelflow.
+Camera- en QR-parserfuncties voor andere onderdelen blijven behouden.
+Overige functies van v8.10 zijn ongewijzigd.
