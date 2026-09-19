@@ -614,10 +614,24 @@ let dashboardScannedSpoolId=null;
 
 function parseQrCode(value){
   const text=String(value||'').trim();
-  const parts=text.split(':');
-  return parts.length===3 && parts[0]==='filament-manager'
-    ? parts[2].toUpperCase()
-    : text.toUpperCase();
+  const upper=text.toUpperCase();
+  const numberMatch=upper.match(/(?:^|[^A-Z0-9])([SR]\d{1,})(?=$|[^A-Z0-9])/);
+  if(numberMatch) return numberMatch[1];
+  const parts=text.split(':').map(part=>part.trim()).filter(Boolean);
+  if(parts.length>=3 && parts[0].toLowerCase()==='filament-manager'){
+    return String(parts[parts.length-1]).trim().toUpperCase();
+  }
+  return upper;
+}
+
+function findSpoolByQr(value){
+  const code=parseQrCode(value);
+  return state.spools.find(x=>String(x.number||'').trim().toUpperCase()===code) || null;
+}
+
+function findRefillByQr(value){
+  const code=parseQrCode(value);
+  return state.refills.find(x=>String(x.number||'').trim().toUpperCase()===code) || null;
 }
 
 async function openScanDialog(context){
@@ -655,7 +669,7 @@ async function startQrScanner(){
             return;
           }
           latestQrCode=decodedText;
-          scannerStatus.textContent='QR-code refill in beeld. Druk op Scan.';
+          scannerStatus.textContent=`QR-code refill ${code} in beeld. Druk op Scan.`;
           return;
         }
         latestQrCode=decodedText;
@@ -708,7 +722,7 @@ scanCaptureBtn.onclick=async()=>{
   latestQrCode='';
 
   if(scanContext==='dashboard'){
-    const spool=state.spools.find(x=>String(x.number).toUpperCase()===code);
+    const spool=findSpoolByQr(code);
     if(!spool){
       scannerStatus.textContent='Dit is geen geldige spoelcode. Richt op een spoel en tik opnieuw op Scan.';
       return;
@@ -726,8 +740,8 @@ scanCaptureBtn.onclick=async()=>{
   }
 
   if(scanContext==='refill-link'){
-    const spool=state.spools.find(x=>String(x.number).toUpperCase()===code);
-    const refill=state.refills.find(x=>String(x.number).toUpperCase()===code);
+    const spool=findSpoolByQr(code);
+    const refill=findRefillByQr(code);
     if(refillScanPhase==='spool'){
       if(!spool){
         scannerStatus.textContent='Dit is geen geldige spoel. Richt op de te wisselen spoel en tik opnieuw op Scan.';
