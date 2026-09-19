@@ -1,14 +1,13 @@
-Filament Manager - versie 8.12
+Filament Manager - versie 8.13
 
-Spoelwissel / refill koppelen - automatische QR-verwerking
-----------------------------------------------------------
-- Voor deze functie is de Scan-knop verwijderd uit de scanvensters.
-- Zodra een geldige spoel-QR wordt herkend, wordt de spoel automatisch ingevuld.
-- De spoelscanner sluit automatisch en een nieuwe refillscanner wordt geopend.
-- Zodra een geldige refill-QR wordt herkend, wordt de refill automatisch ingevuld.
-- De refillscanner sluit automatisch.
-- Daarna staan spoel en refill klaar en hoeft alleen nog op Koppelen te worden gedrukt.
-- Ongeldige spoel- of refillcodes worden zichtbaar gemeld.
+QR-bevestiging bij spoelwissel / refill koppelen
+------------------------------------------------
+- De werkende QR-herkenning van v8.12 blijft behouden.
+- Een herkende spoel wordt niet meer automatisch verwerkt.
+- De herkende spoel wordt zichtbaar getoond en moet met Scan worden bevestigd.
+- Daarna opent de aparte refillscanner.
+- Een herkende refill wordt zichtbaar getoond en moet eveneens met Scan worden bevestigd.
+- Pas daarna worden spoel en refill in het formulier ingevuld.
+- Hierdoor kan een per ongeluk herkende verkeerde QR-code worden gecorrigeerd vóór bevestiging.
 
-Andere scanfuncties behouden hun bestaande handmatige Scan-knop.
-Overige functies van v8.11 zijn ongewijzigd.
+Overige functies van v8.12 zijn ongewijzigd.

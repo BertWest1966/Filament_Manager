@@ -658,7 +658,7 @@ async function openScanDialog(context){
   }
 
   if(scanCaptureBtn){
-    scanCaptureBtn.style.display=(context==='refill-link-spool' || context==='refill-link-refill')?'none':'';
+    scanCaptureBtn.style.display='';
     scanCaptureBtn.disabled=false;
   }
   scanDialog.showModal();
@@ -686,59 +686,25 @@ async function startQrScanner(){
         if(scanContext==='refill-link-spool'){
           const spool=findSpoolByQr(code);
           if(!spool){
+            confirmedQrCode='';
             scannerStatus.textContent=`${code} gelezen, maar dit is geen geldige spoel.`;
             return;
           }
-          if(scanCaptureBtn.disabled)return;
-          scanCaptureBtn.disabled=true;
-          quickFillSpool.value=spool.number;
-          refillLinkSpoolNumber=spool.number;
-          scanConfirmation.textContent=`✓ Spoel ${spool.number} succesvol gescand`;
-          scanConfirmation.classList.remove('hidden');
-          scannerStatus.textContent=`Spoel ${spool.number} herkend. Refillscanner wordt geopend...`;
-          fillModeStatus.textContent=`Spoel ${spool.number} gescand. Scan nu de refill.`;
-
-          // Automatisch verwerken; geen tweede druk op Scan.
-          setTimeout(async()=>{
-            await closeScanDialog();
-            await new Promise(resolve=>setTimeout(resolve,250));
-            scanCaptureBtn.disabled=false;
-            await openScanDialog('refill-link-refill');
-          },350);
+          scannerStatus.textContent=`Spoel ${spool.number} in beeld. Druk op Scan om te bevestigen.`;
           return;
         }
 
         if(scanContext==='refill-link-refill'){
           const refill=findRefillByQr(code);
           if(!refill){
+            confirmedQrCode='';
             scannerStatus.textContent=`${code} gelezen, maar deze refill staat niet in de voorraad.`;
             return;
           }
-          if(scanCaptureBtn.disabled)return;
-          scanCaptureBtn.disabled=true;
-
-          quickFillSpool.value=refillLinkSpoolNumber;
-          quickFillRefill.value=refill.number;
-          quickFillSpool.dispatchEvent(new Event('input',{bubbles:true}));
-          quickFillSpool.dispatchEvent(new Event('change',{bubbles:true}));
-          quickFillRefill.dispatchEvent(new Event('input',{bubbles:true}));
-          quickFillRefill.dispatchEvent(new Event('change',{bubbles:true}));
-
-          scanConfirmation.innerHTML=`✓ Spoel ${esc(refillLinkSpoolNumber)} succesvol gescand<br>✓ Refill ${esc(refill.number)} succesvol gescand`;
-          scanConfirmation.classList.remove('hidden');
-          scannerStatus.textContent=`Refill ${refill.number} herkend.`;
-          fillModeStatus.textContent=`Spoel ${refillLinkSpoolNumber} en refill ${refill.number} succesvol gescand. Tik op Koppelen om te bevestigen.`;
-
-          setTimeout(async()=>{
-            await closeScanDialog();
-            quickFillSpool.value=refillLinkSpoolNumber;
-            quickFillRefill.value=refill.number;
-            scanCaptureBtn.disabled=false;
-          },450);
+          scannerStatus.textContent=`Refill ${refill.number} in beeld. Druk op Scan om te bevestigen.`;
           return;
         }
 
-        // Andere scannerfuncties blijven handmatig via Scan werken.
         scannerStatus.textContent=`QR-code spoel ${code} in beeld. Druk op Scan.`;
       },
       ()=>{}
@@ -780,47 +746,26 @@ async function closeScanDialog(){
 scanCloseBtn.onclick=closeScanDialog;
 
 scanCaptureBtn.onclick=async()=>{
-  const scanValue=confirmedQrCode || latestQrCode;
-  if(!scanValue){
-    scannerStatus.textContent='Nog geen QR-code herkend. Richt de camera op de code en probeer opnieuw.';
-    return;
-  }
-  const code=parseQrCode(scanValue);
-
-  if(scanContext==='dashboard'){
-    const spool=findSpoolByQr(code);
-    if(!spool){
-      scannerStatus.textContent=`${code} is geen geldige spoelcode.`;
-      return;
-    }
-    scanConfirmation.textContent=`✓ Spoel ${spool.number} succesvol gescand`;
-    scanConfirmation.classList.remove('hidden');
-    await new Promise(resolve=>setTimeout(resolve,350));
-    await closeScanDialog();
-    dashboardScannedSpoolId=spool.id;
-    if(typeof openDashboardSpoolLevelDialog==='function'){
-      openDashboardSpoolLevelDialog(spool);
-    }
+  const code=confirmedQrCode || parseQrCode(latestQrCode);
+  if(!code){
+    scannerStatus.textContent='Nog geen geldige QR-code herkend.';
     return;
   }
 
   if(scanContext==='refill-link-spool'){
     const spool=findSpoolByQr(code);
     if(!spool){
-      scannerStatus.textContent=`${code} is geen geldige spoelcode.`;
+      scannerStatus.textContent=`${code} is geen geldige spoel.`;
       return;
     }
-    refillLinkSpoolNumber=spool.number;
+    scanCaptureBtn.disabled=true;
     quickFillSpool.value=spool.number;
-    fillModeStatus.textContent=`Spoel ${spool.number} gescand. Scan nu de refill.`;
-    scanConfirmation.textContent=`✓ Spoel ${spool.number} succesvol gescand`;
+    refillLinkSpoolNumber=spool.number;
+    scanConfirmation.textContent=`✓ Spoel ${spool.number} bevestigd`;
     scanConfirmation.classList.remove('hidden');
-
-    // Eerste scannersessie volledig afsluiten.
-    await new Promise(resolve=>setTimeout(resolve,350));
+    fillModeStatus.textContent=`Spoel ${spool.number} bevestigd. Scan nu de refill.`;
+    await new Promise(resolve=>setTimeout(resolve,300));
     await closeScanDialog();
-
-    // Pas na het sluiten een volledig nieuw dialoog + nieuwe scannersessie voor refill.
     await new Promise(resolve=>setTimeout(resolve,250));
     await openScanDialog('refill-link-refill');
     return;
@@ -829,28 +774,33 @@ scanCaptureBtn.onclick=async()=>{
   if(scanContext==='refill-link-refill'){
     const refill=findRefillByQr(code);
     if(!refill){
-      scannerStatus.textContent=`${code} werd gelezen maar is geen refill die in de voorraad staat.`;
+      scannerStatus.textContent=`${code} is geen geldige refill in de voorraad.`;
       return;
     }
-
-    // Waarden invullen terwijl deze tweede sessie nog actief is.
+    scanCaptureBtn.disabled=true;
     quickFillSpool.value=refillLinkSpoolNumber;
     quickFillRefill.value=refill.number;
     quickFillSpool.dispatchEvent(new Event('change',{bubbles:true}));
     quickFillRefill.dispatchEvent(new Event('change',{bubbles:true}));
-
-    scanConfirmation.innerHTML=`✓ Spoel ${esc(refillLinkSpoolNumber)} succesvol gescand<br>✓ Refill ${esc(refill.number)} succesvol gescand`;
+    scanConfirmation.innerHTML=`✓ Spoel ${esc(refillLinkSpoolNumber)} bevestigd<br>✓ Refill ${esc(refill.number)} bevestigd`;
     scanConfirmation.classList.remove('hidden');
-    scannerStatus.textContent='Spoel en refill zijn klaar om te koppelen.';
-    fillModeStatus.textContent=`Spoel ${refillLinkSpoolNumber} en refill ${refill.number} succesvol gescand. Tik op Koppelen om te bevestigen.`;
-
-    await new Promise(resolve=>setTimeout(resolve,500));
+    fillModeStatus.textContent=`Spoel ${refillLinkSpoolNumber} en refill ${refill.number} bevestigd. Tik op Koppelen om te bevestigen.`;
+    await new Promise(resolve=>setTimeout(resolve,400));
     await closeScanDialog();
-
-    // Waarden na sluiten nogmaals expliciet behouden.
     quickFillSpool.value=refillLinkSpoolNumber;
     quickFillRefill.value=refill.number;
     return;
+  }
+
+  if(scanContext==='dashboard'){
+    const spool=findSpoolByQr(code);
+    if(!spool){
+      scannerStatus.textContent=`${code} is geen geldige spoelcode.`;
+      return;
+    }
+    await closeScanDialog();
+    dashboardScannedSpoolId=spool.id;
+    if(typeof openDashboardSpoolLevelDialog==='function') openDashboardSpoolLevelDialog(spool);
   }
 };
 
