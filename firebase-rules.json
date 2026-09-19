@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "users": {
+      "EOsNru7BilUx9GguaBk0QxxY9oo1": {
+        ".read": "auth != null && auth.uid === 'EOsNru7BilUx9GguaBk0QxxY9oo1'",
+        ".write": "auth != null && auth.uid === 'EOsNru7BilUx9GguaBk0QxxY9oo1'"
+      }
+    }
+  }
+}

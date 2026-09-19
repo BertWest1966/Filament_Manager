@@ -1690,3 +1690,15 @@ label.file-button:has(#restoreBackupInput) #restoreBackupInput{
   .stats-tabs button{padding:8px 5px;min-height:40px;font-size:12px}
   .stats-period-total strong{font-size:32px}
 }
+
+
+/* Firebase synchronisatie v10.0 */
+.firebase-sync-bar{display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:1px solid rgba(148,163,184,.18);font-size:13px;min-height:34px}
+.firebase-sync-bar button{margin-left:auto;padding:4px 9px;min-height:28px;font-size:12px}
+.firebase-sync-dot{width:9px;height:9px;min-width:9px;border-radius:50%;background:#94a3b8;box-shadow:0 0 0 2px rgba(148,163,184,.12)}
+.firebase-sync-dot.ok{background:#22c55e}.firebase-sync-dot.error{background:#ef4444}.firebase-sync-dot.busy{background:#f59e0b}
+.firebase-login-grid{display:grid;grid-template-columns:minmax(180px,1fr) minmax(160px,1fr) auto;gap:10px;align-items:end}
+.firebase-login-grid input{width:100%;box-sizing:border-box}
+.firebase-user-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.firebase-test-label{display:inline-flex;align-items:center;border:1px solid #f59e0b;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700;color:#f59e0b}
+@media(max-width:700px){.firebase-login-grid{grid-template-columns:1fr}.firebase-login-grid button{width:100%}.firebase-sync-bar{padding:6px 12px}.firebase-sync-bar button{font-size:11px}.firebase-user-row .dialog-actions{width:100%}.firebase-user-row .dialog-actions button{flex:1}}

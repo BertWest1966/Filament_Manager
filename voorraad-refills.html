@@ -30,14 +30,14 @@ tr{break-inside:avoid;page-break-inside:avoid}
 <body>
 <div class="toolbar"><a href="index.html">← Terug</a><button id="printBtn">Afdrukken</button></div>
 <main class="page">
-<h1>Filament Manager – Voorraad Refills</h1>
+<h1>Filament Manager 10.0 – Voorraad Refills</h1>
 <div class="meta"><span id="printedAt"></span><span id="count"></span></div>
 <table><thead><tr><th>Categorie</th><th>Type</th><th>Kleur</th><th>Nummer</th></tr></thead><tbody id="rows"></tbody></table>
 </main>
 <script>
 (() => {
  const KIND='refills';
- const keys=['filament_manager_v7_1','filament_manager','filament_manager_state'];
+ const keys=['filament_manager_v10_0','filament_manager_firebase_test_v9_0_1','filament_manager_v7_1','filament_manager','filament_manager_state'];
  function getState(){for(const key of keys){try{const raw=localStorage.getItem(key);if(!raw)continue;const parsed=JSON.parse(raw);if(parsed&&Array.isArray(parsed.catalog))return parsed}catch(e){}}return {catalog:[],spools:[],refills:[]}}
  function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
  const state=getState();

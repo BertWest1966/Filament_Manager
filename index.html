@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Filament">
-  <title>Filament Manager v9.0.1</title>
+  <title>Filament Manager v10.0</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=9.0.1">
+  <link rel="stylesheet" href="assets/app.css?v=10.0">
 </head>
 <body>
 <div class="app-shell">
@@ -18,7 +18,7 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 9.0.1</span>
+      <span>Versie 10.0</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M9.5 20v-6h5v6"/></svg></span><span>Dashboard</span></button>
@@ -39,13 +39,19 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 9.0.1</span>
+        <span>Versie 10.0</span>
       </div>
     </header>
 
     <div class="global-search">
       <input id="globalSearch" placeholder="Zoek filament, spoel of refill">
       <div id="globalResults" class="search-results hidden"></div>
+    </div>
+
+    <div class="firebase-sync-bar" id="firebaseSyncBar">
+      <span class="firebase-sync-dot busy" id="firebaseSyncDot" aria-hidden="true"></span>
+      <span id="firebaseSyncBarText">Firebase: starten…</span>
+      <button type="button" id="firebaseOpenSettingsBtn" onclick="setView('meer');document.getElementById('firebaseSyncPanel')?.scrollIntoView({behavior:'smooth',block:'start'})">Instellen</button>
     </div>
 
     <main>
@@ -267,6 +273,28 @@
             <a class="print-link-button" href="voorraad-refills.html">Voorraad Refills (A4)</a>
           </div>
         </div>
+        <div class="panel" id="firebaseSyncPanel">
+          <div class="panel-head">
+            <h2>Firebase synchronisatie</h2>
+            <span class="firebase-test-label">FIREBASE</span>
+          </div>
+          <p id="firebaseSyncStatus" class="note">Firebase: starten…</p>
+          <p class="note">Versie 10.0 synchroniseert automatisch tussen Mac en iPhone. Bij de eerste start wordt een kopie van de bestaande lokale gegevens gebruikt; de brongegevens blijven behouden.</p>
+          <div id="firebaseLoginBox" class="firebase-login-grid">
+            <input id="firebaseEmail" type="email" autocomplete="username" placeholder="E-mailadres">
+            <input id="firebasePassword" type="password" autocomplete="current-password" placeholder="Wachtwoord">
+            <button type="button" class="primary" id="firebaseLoginBtn">Aanmelden</button>
+          </div>
+          <div id="firebaseUserBox" class="hidden">
+            <div class="firebase-user-row">
+              <strong id="firebaseUserText"></strong>
+              <div class="dialog-actions">
+                <button type="button" id="firebasePushLocalBtn">Lokale gegevens → Firebase</button>
+                <button type="button" id="firebaseLogoutBtn">Afmelden</button>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="panel">
           <h2>Back-up</h2>
           <div class="menu-grid">
@@ -476,7 +504,7 @@ window.FMPrint = (() => {
   }[char]));
 
   const getState = () => {
-    const keys = ['filament_manager_v7_1','filament_manager','filament_manager_state'];
+    const keys = ['filament_manager_v10_0','filament_manager_firebase_test_v9_0_1','filament_manager_v7_1','filament_manager','filament_manager_state'];
     for (const key of keys) {
       try {
         const raw = localStorage.getItem(key);
@@ -582,7 +610,7 @@ window.FMPrint = (() => {
   </form>
 </dialog>
 
-<script src="js/app.js?v=9.0.1"></script>
+<script src="js/app.js?v=10.0"></script>
 <script src="js/print-tools.js?v=7.5.5"></script>
 </body>
 </html>

@@ -1,16 +1,39 @@
 
-const KEY='filament_manager_v7_1';
+const KEY='filament_manager_v10_0';
+const SOURCE_KEYS=['filament_manager_firebase_test_v9_0_1','filament_manager_v7_1'];
+const SYNC_DIRTY_KEY='filament_manager_v10_0_dirty_v1';
 const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','Andere'],types:{PLA:['Basic','Matte'],PETG:['Basic'],TPU:['95A'],ABS:['Basic'],ASA:['Basic'],Andere:[]},colors:[],brands:['Bambu Lab'],suppliers:['Bambu Lab']};
 let state=load();
 if(!Array.isArray(state.rollUsage))state.rollUsage=[];
-state.appVersion='9.0';
+state.appVersion='10.0';
 let currentView='dashboard',previousView='dashboard',stockMode='spools',stockSortMode='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,activeLibraryKind='colors',editingLibraryValue=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
-function fresh(){return{appVersion:'9.0',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
-function load(){try{return {...fresh(),...JSON.parse(localStorage.getItem(KEY)||'null')}}catch{return fresh()}}
-function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
+function fresh(){return{appVersion:'10.0',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
+function load(){
+  try{
+    const own=localStorage.getItem(KEY);
+    if(own)return {...fresh(),...JSON.parse(own)};
+    // Eerste start van versie 10.0: maak een kopie van de bestaande lokale gegevens.
+    // Eerst wordt een eventuele eerdere Firebase-testkopie bekeken, daarna de stabiele 9.0.1-opslag.
+    // De brongegevens zelf worden nooit overschreven.
+    for(const sourceKey of SOURCE_KEYS){
+      const source=localStorage.getItem(sourceKey);
+      if(source){
+        const copied={...fresh(),...JSON.parse(source),appVersion:'10.0'};
+        localStorage.setItem(KEY,JSON.stringify(copied));
+        return copied;
+      }
+    }
+  }catch(error){console.warn('Lokale gegevens konden niet worden geladen.',error)}
+  return fresh();
+}
+function persistLocalState(){localStorage.setItem(KEY,JSON.stringify(state))}
+function markSyncDirty(){localStorage.setItem(SYNC_DIRTY_KEY,'1')}
+function clearSyncDirty(){localStorage.removeItem(SYNC_DIRTY_KEY)}
+function isSyncDirty(){return localStorage.getItem(SYNC_DIRTY_KEY)==='1'}
+function save(){persistLocalState();markSyncDirty();renderAll();queueFirebaseWrite()}
 function pushUnique(arr,v){v=String(v||'').trim();if(v&&!arr.some(x=>x.toLowerCase()===v.toLowerCase()))arr.push(v)}
 function filament(id){return state.catalog.find(f=>f.id===id)}
 function label(f){return f?`${f.category} · ${f.type} · ${f.color}`:''}
@@ -243,7 +266,7 @@ document.getElementById('stockSort').onchange=e=>{stockSortMode=e.target.value;r
 
 
 
-const COLLAPSE_KEY='filament_manager_collapsed_v1';
+const COLLAPSE_KEY='filament_manager_v10_0_collapsed_v1';
 
 function loadSeparateCollapseState(){
   try{
@@ -641,7 +664,9 @@ function setDetailSpoolLevel(id,value){
   if(v===100){
     recordRollUsage(s,'Detail naar 100%');
     log(`Spoel ${s.number} aangepast naar 100%`,s.filamentId);
-    localStorage.setItem(KEY,JSON.stringify(state));
+    persistLocalState();
+    markSyncDirty();
+    queueFirebaseWrite();
   }
 }
 function saveDetailFilament(id){
@@ -1064,7 +1089,7 @@ createBackupBtn.onclick=()=>{
       backupFormat:'filament-manager',
       backupVersion:1,
       exportedAt:new Date().toISOString(),
-      appVersion:'9.0',
+      appVersion:'10.0',
       data:state
     };
     const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
@@ -1203,9 +1228,10 @@ restoreBackupInput.onchange=async event=>{
   const previousState=state;
   try{
     state=restored;
-    localStorage.setItem(KEY,JSON.stringify(state));
-    renderAll();
+    state.appVersion='10.0';
+    save();
     add('Opslaan in browser: geslaagd');
+    add('Firebase-synchronisatie: ingepland');
     add('Schermen opnieuw opbouwen: geslaagd');
     backupStatus.textContent=`Back-up teruggezet: ${summary}.`;
     alert('Back-up succesvol teruggezet.');
@@ -1213,7 +1239,7 @@ restoreBackupInput.onchange=async event=>{
     add('Verwerken/opslag: MISLUKT');
     add(`Fout: ${error.name}: ${error.message}`);
     state=previousState;
-    localStorage.setItem(KEY,JSON.stringify(state));
+    persistLocalState();
     try{renderAll()}catch{}
     backupStatus.textContent='Terugzetten mislukt; oude gegevens zijn behouden.';
     alert(`De JSON is geldig, maar verwerken mislukte:\n${error.message}`);
@@ -1587,7 +1613,210 @@ if(printSelectedSpoolLabelsBtnEl)printSelectedSpoolLabelsBtnEl.onclick=()=>print
 if(printSelectedRefillLabelsBtnEl)printSelectedRefillLabelsBtnEl.onclick=()=>printSelectedFromSeparateScreen('refills');
 
 
+
+/* ============================================================
+   Firebase synchronisatie - VERSIE 10.0
+   ------------------------------------------------------------
+   - Versie 10.0 gebruikt een eigen localStorage-sleutel.
+   - Firebase gebruikt een eigen pad voor deze aangemelde gebruiker.
+   - Bij eerste cloudstart zonder data worden de lokale 10.0-gegevens geüpload.
+   - Daarna is Firebase de gedeelde bron en blijft localStorage de lokale cache.
+   ============================================================ */
+const FIREBASE_ALLOWED_UID='EOsNru7BilUx9GguaBk0QxxY9oo1';
+const FIREBASE_CONFIG={
+  apiKey:'AIzaSyD1tdycD-rLDVFQZSReIK4QgHN-m1JGNjA',
+  authDomain:'filamentsynctest.firebaseapp.com',
+  databaseURL:'https://filamentsynctest-default-rtdb.europe-west1.firebasedatabase.app',
+  projectId:'filamentsynctest',
+  storageBucket:'filamentsynctest.firebasestorage.app',
+  messagingSenderId:'672569696347',
+  appId:'1:672569696347:web:247fb11fd3d2f663f31f7e'
+};
+const firebaseSync={
+  auth:null, db:null, ref:null, user:null, ready:false, firstSnapshot:true,
+  unsubscribe:null, writeTimer:null, writing:false, lastWriteJson:'', modules:null
+};
+function stableStringify(value){
+  if(value===null||typeof value!=='object')return JSON.stringify(value);
+  if(Array.isArray(value))return '['+value.map(stableStringify).join(',')+']';
+  return '{'+Object.keys(value).sort().map(k=>JSON.stringify(k)+':'+stableStringify(value[k])).join(',')+'}';
+}
+function hasMeaningfulState(data=state){
+  return ['catalog','spools','refills','orders','history','rollUsage'].some(k=>Array.isArray(data?.[k])&&data[k].length>0);
+}
+function setFirebaseStatus(text,kind='idle'){
+  const status=$('firebaseSyncStatus');
+  const bar=$('firebaseSyncBarText');
+  const dot=$('firebaseSyncDot');
+  if(status)status.textContent=text;
+  if(bar)bar.textContent=text;
+  if(dot){dot.classList.remove('ok','error','busy');if(kind==='ok')dot.classList.add('ok');else if(kind==='error')dot.classList.add('error');else if(kind==='busy')dot.classList.add('busy')}
+}
+function setFirebaseUserUI(user){
+  const login=$('firebaseLoginBox'),userBox=$('firebaseUserBox'),userText=$('firebaseUserText');
+  if(login)login.classList.toggle('hidden',!!user);
+  if(userBox)userBox.classList.toggle('hidden',!user);
+  if(userText)userText.textContent=user?.email?`Aangemeld als ${user.email}`:'';
+}
+function normalizeCloudState(raw){
+  const normalized=normalizeBackupData(raw);
+  normalized.appVersion='10.0';
+  return normalized;
+}
+function applyFirebaseState(raw){
+  try{
+    const incoming=normalizeCloudState(raw);
+    if(stableStringify(incoming)===stableStringify(state)){
+      clearSyncDirty();
+      setFirebaseStatus('Firebase: gesynchroniseerd','ok');
+      return;
+    }
+    state=incoming;
+    persistLocalState();
+    clearSyncDirty();
+    renderAll();
+    setFirebaseStatus('Firebase: wijziging ontvangen','ok');
+  }catch(error){
+    console.error(error);
+    setFirebaseStatus('Firebase: ontvangen gegevens zijn ongeldig','error');
+  }
+}
+async function writeStateToFirebase(reason='Synchroniseren'){
+  if(!firebaseSync.ready||!firebaseSync.ref||!firebaseSync.modules||firebaseSync.writing)return;
+  const payload=structuredClone(state);
+  payload.appVersion='10.0';
+  const json=stableStringify(payload);
+  firebaseSync.lastWriteJson=json;
+  firebaseSync.writing=true;
+  setFirebaseStatus(`Firebase: ${reason.toLowerCase()}…`,'busy');
+  try{
+    await firebaseSync.modules.set(firebaseSync.ref,payload);
+    clearSyncDirty();
+    setFirebaseStatus('Firebase: gesynchroniseerd','ok');
+  }catch(error){
+    console.error(error);
+    markSyncDirty();
+    setFirebaseStatus('Firebase: synchronisatie mislukt — lokale kopie is bewaard','error');
+  }finally{
+    firebaseSync.writing=false;
+  }
+}
+function queueFirebaseWrite(){
+  if(!firebaseSync.ready)return;
+  clearTimeout(firebaseSync.writeTimer);
+  firebaseSync.writeTimer=setTimeout(()=>writeStateToFirebase('Wijzigingen opslaan'),250);
+}
+async function startFirebaseDataListener(user){
+  if(firebaseSync.unsubscribe){firebaseSync.unsubscribe();firebaseSync.unsubscribe=null}
+  firebaseSync.ready=false;
+  firebaseSync.firstSnapshot=true;
+  const {ref,onValue}=firebaseSync.modules;
+  firebaseSync.ref=ref(firebaseSync.db,`users/${user.uid}/filamentManager/state`);
+  setFirebaseStatus('Firebase: gegevens laden…','busy');
+
+  firebaseSync.unsubscribe=onValue(firebaseSync.ref,async snapshot=>{
+    const remote=snapshot.val();
+    const isFirst=firebaseSync.firstSnapshot;
+    firebaseSync.firstSnapshot=false;
+    firebaseSync.ready=true;
+
+    if(remote===null){
+      // Eerste gebruik: de lokale 10.0-gegevens worden de startinhoud van Firebase.
+      await writeStateToFirebase(hasMeaningfulState()?'Eerste lokale gegevens uploaden':'Lege database initialiseren');
+      return;
+    }
+
+    const remoteJson=stableStringify(remote);
+    if(remoteJson===firebaseSync.lastWriteJson){
+      clearSyncDirty();
+      setFirebaseStatus('Firebase: gesynchroniseerd','ok');
+      return;
+    }
+
+    // Indien deze browser nog niet-verzonden lokale wijzigingen heeft, krijgen die bij herverbinden voorrang.
+    if(isFirst&&isSyncDirty()){
+      await writeStateToFirebase('Lokale wijzigingen hervatten');
+      return;
+    }
+
+    applyFirebaseState(remote);
+  },error=>{
+    console.error(error);
+    firebaseSync.ready=false;
+    setFirebaseStatus(`Firebase: ${error.code||'verbindingsfout'} — lokale kopie actief`,'error');
+  });
+}
+async function initFirebaseSync(){
+  setFirebaseStatus('Firebase: starten…','busy');
+  try{
+    const [appMod,authMod,dbMod]=await Promise.all([
+      import('https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js'),
+      import('https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js'),
+      import('https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js')
+    ]);
+    const app=appMod.initializeApp(FIREBASE_CONFIG);
+    const auth=authMod.getAuth(app);
+    const db=dbMod.getDatabase(app);
+    firebaseSync.auth=auth;
+    firebaseSync.db=db;
+    firebaseSync.modules={...authMod,...dbMod};
+    try{await authMod.setPersistence(auth,authMod.browserLocalPersistence)}catch(error){console.warn('Auth-persistentie kon niet expliciet worden ingesteld.',error)}
+
+    authMod.onAuthStateChanged(auth,async user=>{
+      firebaseSync.user=user||null;
+      if(firebaseSync.unsubscribe){firebaseSync.unsubscribe();firebaseSync.unsubscribe=null}
+      firebaseSync.ready=false;
+      firebaseSync.ref=null;
+      firebaseSync.lastWriteJson='';
+      setFirebaseUserUI(user);
+
+      if(!user){
+        setFirebaseStatus('Firebase: niet aangemeld — lokale kopie actief');
+        return;
+      }
+      if(user.uid!==FIREBASE_ALLOWED_UID){
+        setFirebaseStatus('Firebase: dit account heeft geen toegang','error');
+        await authMod.signOut(auth);
+        return;
+      }
+      await startFirebaseDataListener(user);
+    });
+
+    const loginBtn=$('firebaseLoginBtn');
+    if(loginBtn)loginBtn.onclick=async()=>{
+      const email=$('firebaseEmail')?.value.trim()||'';
+      const password=$('firebasePassword')?.value||'';
+      if(!email||!password)return setFirebaseStatus('Firebase: vul e-mailadres en wachtwoord in','error');
+      loginBtn.disabled=true;
+      setFirebaseStatus('Firebase: aanmelden…','busy');
+      try{
+        await authMod.signInWithEmailAndPassword(auth,email,password);
+        if($('firebasePassword'))$('firebasePassword').value='';
+      }catch(error){
+        console.error(error);
+        setFirebaseStatus('Firebase: aanmelden mislukt — controleer e-mailadres en wachtwoord','error');
+      }finally{loginBtn.disabled=false}
+    };
+    const passwordEl=$('firebasePassword');
+    if(passwordEl)passwordEl.addEventListener('keydown',e=>{if(e.key==='Enter')$('firebaseLoginBtn')?.click()});
+    const logoutBtn=$('firebaseLogoutBtn');
+    if(logoutBtn)logoutBtn.onclick=()=>authMod.signOut(auth);
+    const pushBtn=$('firebasePushLocalBtn');
+    if(pushBtn)pushBtn.onclick=async()=>{
+      if(!firebaseSync.user)return setFirebaseStatus('Firebase: meld eerst aan','error');
+      if(!confirm('De huidige lokale gegevens naar Firebase schrijven? Dit vervangt de huidige cloudgegevens.'))return;
+      markSyncDirty();
+      await writeStateToFirebase('Lokale gegevens uploaden');
+    };
+  }catch(error){
+    console.error(error);
+    setFirebaseStatus('Firebase kon niet starten — lokale kopie blijft bruikbaar','error');
+  }
+}
+
 renderAll();
+persistLocalState();
+initFirebaseSync();
 
 if(window.copyDiagnosisBtn){
   copyDiagnosisBtn.onclick=async()=>{
