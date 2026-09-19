@@ -1,6 +1,6 @@
-const CACHE='filament-manager-v10-0-1';
+const CACHE='filament-manager-v10-1-stable-1';
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','./index.html',
   './voorraad-refills.html',
-  './voorraad-spoelen.html','./assets/app.css?v=10.0','./js/app.js?v=10.0','./manifest.webmanifest'])));self.skipWaiting()});
+  './voorraad-spoelen.html','./assets/app.css?v=10.1','./js/app.js?v=10.1','./manifest.webmanifest'])));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(fetch(e.request,{cache:'no-store'}).catch(()=>caches.match(e.request).then(r=>r||caches.match('./index.html'))))});
