@@ -718,7 +718,8 @@ scanCaptureBtn.onclick=async()=>{
       : 'Nog geen QR-code goed in beeld. Richt de camera op de code en probeer opnieuw.';
     return;
   }
-  const code=parseQrCode(latestQrCode);
+  const scannedQrValue=latestQrCode;
+  const code=parseQrCode(scannedQrValue);
   latestQrCode='';
 
   if(scanContext==='dashboard'){
@@ -767,19 +768,30 @@ scanCaptureBtn.onclick=async()=>{
       return;
     }
     if(refillScanPhase==='refill'){
-      if(!refill){
-        scannerStatus.textContent='Dit is geen geldige refill. Richt op de refill en tik opnieuw op Scan.';
+      const detectedRefillCode=parseQrCode(scannedQrValue || code);
+      const detectedRefill=findRefillByQr(detectedRefillCode) || refill;
+      if(!detectedRefill){
+        scannerStatus.textContent=`Refill ${detectedRefillCode || ''} werd gelezen maar niet gevonden in de voorraad.`;
         return;
       }
-      quickFillRefill.value=refill.number;
+
+      // Eerst het formulier invullen; pas daarna de scannersessie sluiten.
+      quickFillRefill.value=detectedRefill.number;
+      quickFillRefill.dispatchEvent(new Event('input',{bubbles:true}));
+      quickFillRefill.dispatchEvent(new Event('change',{bubbles:true}));
+
       refillScanPhase=null;
-      scanConfirmation.innerHTML=`✓ Spoel ${esc(quickFillSpool.value)} succesvol gescand<br>✓ Refill ${esc(refill.number)} succesvol gescand`;
+      scanConfirmation.innerHTML=`✓ Spoel ${esc(quickFillSpool.value)} succesvol gescand<br>✓ Refill ${esc(detectedRefill.number)} succesvol gescand`;
       scanConfirmation.classList.remove('hidden');
       scanInstruction.innerHTML='<strong>Scannen voltooid</strong><span>Spoel en refill zijn herkend.</span>';
       scannerStatus.textContent='Beide QR-codes zijn succesvol gescand.';
-      fillModeStatus.textContent=`Spoel ${quickFillSpool.value} en refill ${refill.number} succesvol gescand. Tik op Koppelen om te bevestigen.`;
+      fillModeStatus.textContent=`Spoel ${quickFillSpool.value} en refill ${detectedRefill.number} succesvol gescand. Tik op Koppelen om te bevestigen.`;
       await new Promise(resolve=>setTimeout(resolve,700));
       await closeScanDialog();
+
+      // Safari/iPhone: na sluiten nogmaals expliciet de gekozen refill herstellen.
+      quickFillRefill.value=detectedRefill.number;
+      quickFillRefill.dispatchEvent(new Event('change',{bubbles:true}));
       return;
     }
   }

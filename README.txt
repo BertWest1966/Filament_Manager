@@ -1,10 +1,11 @@
-Filament Manager - versie 8.8
+Filament Manager - versie 8.9
 
-Correctie refill QR-code
-- QR-inhoud wordt robuuster genormaliseerd.
-- S-nummers en R-nummers worden uit de volledige QR-inhoud gehaald.
-- Spoelen en refills worden via aparte resolvers op nummer opgezocht.
-- Tijdens de refillscan toont de status de werkelijk herkende refillcode.
-- De aparte scannersessies uit v8.7 blijven behouden.
+Correctie spoelwissel / refill koppelen
+---------------------------------------
+- De door de camera herkende refillcode wordt vóór het sluiten van de scanner bewaard.
+- De gevonden refill wordt rechtstreeks in het refillveld geplaatst.
+- Het input/change-event wordt uitgevoerd zodat de formulierstatus mee wordt bijgewerkt.
+- Na het sluiten van de scanner wordt de refillwaarde op iPhone/Safari nogmaals bevestigd.
+- Als een gelezen R-code niet in de actieve refillvoorraad bestaat, wordt dit expliciet gemeld.
 
-Overige functies van v8.7 zijn ongewijzigd.
+Overige functies van v8.8 zijn ongewijzigd.
