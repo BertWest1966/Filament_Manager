@@ -2,11 +2,13 @@
 const KEY='filament_manager_v7_1';
 const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','Andere'],types:{PLA:['Basic','Matte'],PETG:['Basic'],TPU:['95A'],ABS:['Basic'],ASA:['Basic'],Andere:[]},colors:[],brands:['Bambu Lab'],suppliers:['Bambu Lab']};
 let state=load();
+if(!Array.isArray(state.rollUsage))state.rollUsage=[];
+state.appVersion='9.0';
 let currentView='dashboard',previousView='dashboard',stockMode='spools',stockSortMode='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,activeLibraryKind='colors',editingLibraryValue=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
-function fresh(){return{appVersion:'7.2',catalog:[],spools:[],refills:[],orders:[],history:[],libraries:structuredClone(DEFAULTS)}}
+function fresh(){return{appVersion:'9.0',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
 function load(){try{return {...fresh(),...JSON.parse(localStorage.getItem(KEY)||'null')}}catch{return fresh()}}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
 function pushUnique(arr,v){v=String(v||'').trim();if(v&&!arr.some(x=>x.toLowerCase()===v.toLowerCase()))arr.push(v)}
@@ -55,11 +57,38 @@ function totalStock(fid){return spoolStock(fid)+refillCount(fid)}
 function openOrdered(fid){return state.orders.filter(o=>o.status!=='Geleverd').reduce((a,o)=>a+(o.filamentId===fid?Math.max(0,o.quantity-o.received):0),0)}
 function toOrder(f){const total=totalStock(f.id);if(total>=Number(f.min))return 0;return Math.max(0,Math.ceil(Number(f.target)-total-openOrdered(f.id)))}
 function log(message,filamentId=null){state.history.push({id:uid(),date:new Date().toISOString(),message,filamentId})}
+function recordRollUsage(spool,source='100% ingesteld',refillNumber=''){
+  if(!spool)return;
+  if(!Array.isArray(state.rollUsage))state.rollUsage=[];
+  const f=filament(spool.filamentId);
+  if(!f)return;
+  state.rollUsage.push({
+    id:uid(),
+    date:new Date().toISOString(),
+    spoolId:spool.id,
+    spoolNumber:spool.number,
+    filamentId:f.id,
+    category:f.category||'',
+    type:f.type||'',
+    color:f.color||'',
+    brand:f.brand||'',
+    source,
+    refillNumber:refillNumber||''
+  });
+}
+function usageCountBetween(start,end){
+  return (state.rollUsage||[]).filter(x=>{
+    const d=new Date(x.date);
+    return !Number.isNaN(d.getTime()) && (!start||d>=start) && (!end||d<end);
+  }).length;
+}
+
 function setView(view){
   currentView=view;
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));
   document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
   document.querySelector('.global-search')?.classList.toggle('hidden',view==='spoelen'||view==='refills');
+  if(view==='statistiek' && typeof renderStatistics==='function')renderStatistics();
 }
 document.addEventListener('click',e=>{
   const viewBtn=e.target.closest('[data-view]');if(viewBtn){setView(viewBtn.dataset.view);return}
@@ -82,7 +111,24 @@ filamentForm.onsubmit=e=>{e.preventDefault();const o={id:editFilamentId||uid(),c
 
 function openSpool(id=null){if(!state.catalog.length)return alert('Maak eerst een filament aan.');editSpoolId=id;const s=state.spools.find(x=>x.id===id);spoolTitle.textContent=s?'Spoel wijzigen':'Nieuwe spoel';sNumber.value=s?.number||nextNumber('S',state.spools);fillFilamentSelect(sFilament,s?.filamentId||state.catalog[0].id);sLevel.value=String(s?.level??100);sStatus.value=s?.status||'active';spoolDialog.showModal()}
 newSpoolBtn.onclick=()=>openSpool();
-spoolForm.onsubmit=e=>{e.preventDefault();const o={id:editSpoolId||uid(),number:sNumber.value.trim().toUpperCase(),filamentId:sFilament.value,level:Number(sLevel.value),status:sStatus.value};state.spools=editSpoolId?state.spools.map(s=>s.id===editSpoolId?o:s):[...state.spools,o];log(`Spoel ${o.number} op ${o.level}%`,o.filamentId);spoolDialog.close();save()}
+spoolForm.onsubmit=e=>{
+  e.preventDefault();
+  const previous=editSpoolId?state.spools.find(s=>s.id===editSpoolId):null;
+  const o={id:editSpoolId||uid(),number:sNumber.value.trim().toUpperCase(),filamentId:sFilament.value,level:Number(sLevel.value),status:sStatus.value};
+  state.spools=editSpoolId?state.spools.map(s=>s.id===editSpoolId?o:s):[...state.spools,o];
+  if(Number(o.level)===100){
+    if(!previous){
+      recordRollUsage(o,'Nieuwe spoel');
+    }else if(Number(previous.level)!==100){
+      recordRollUsage(o,'Spoel naar 100%');
+    }else if(confirm(`Spoel ${o.number} stond al op 100%.\n\nWil je dit registreren als een nieuwe rol op deze spoel?`)){
+      recordRollUsage(o,'Nieuwe rol op bestaande spoel');
+    }
+  }
+  log(`Spoel ${o.number} op ${o.level}%`,o.filamentId);
+  spoolDialog.close();
+  save();
+}
 
 function openRefill(id=null){if(!state.catalog.length)return alert('Maak eerst een filament aan.');editRefillId=id;const r=state.refills.find(x=>x.id===id);refillTitle.textContent=r?'Refill wijzigen':'Nieuwe refill';rNumber.value=r?.number||nextNumber('R',state.refills);fillFilamentSelect(rFilament,r?.filamentId||state.catalog[0].id);refillDialog.showModal()}
 newRefillBtn.onclick=()=>openRefill();
@@ -99,6 +145,7 @@ function setDashboardLevel(id,value){
   const level=Number(value);
   if(!allowed.includes(level))return;
   s.level=level;
+  if(level===100)recordRollUsage(s,'Dashboard naar 100%');
   save();
 }
 
@@ -154,7 +201,7 @@ function renderDashboard(){
   `).join('')||'<div class="note">Nog geen filamenten.</div>';
 }
 dashboardSearch.oninput=renderDashboard;
-function quickLevel(id){const s=state.spools.find(x=>x.id===id);const v=prompt(`Hoeveelheid op ${s.number}: 0, 25, 50, 75 of 100`,s.level);if(v===null)return;const n=Number(v);if(![0,25,50,75,100].includes(n))return alert('Kies 0, 25, 50, 75 of 100.');s.level=n;log(`Spoel ${s.number} aangepast naar ${n}%`,s.filamentId);save()}
+function quickLevel(id){const s=state.spools.find(x=>x.id===id);const v=prompt(`Hoeveelheid op ${s.number}: 0, 25, 50, 75 of 100`,s.level);if(v===null)return;const n=Number(v);if(![0,25,50,75,100].includes(n))return alert('Kies 0, 25, 50, 75 of 100.');s.level=n;if(n===100)recordRollUsage(s,'Snelle aanpassing naar 100%');log(`Spoel ${s.number} aangepast naar ${n}%`,s.filamentId);save()}
 
 function renderCatalog(){const q=catalogSearch.value.toLowerCase();const items=state.catalog.filter(f=>!q||label(f).toLowerCase().includes(q)).sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));catalogList.innerHTML=items.map(f=>`<div class="item-row category-data-row" data-category="${esc(f.category)}"><div><strong>${filamentLabelHtml(f)}</strong><div class="item-meta">${esc(f.brand)} · min ${f.min} · gewenst ${f.target}</div></div><div class="item-actions"><button onclick="openDetail('${f.id}')">Open</button><button onclick="openFilament('${f.id}')">Wijzig</button><button class="danger-button" onclick="deleteFilament('${f.id}')">Verwijderen</button></div></div>`).join('')||'<div class="note">Geen filamenten.</div>'}
 catalogSearch.oninput=renderCatalog;
@@ -591,6 +638,11 @@ function setDetailSpoolLevel(id,value){
   const v=Number(value);
   if(![100,75,50,25,0].includes(v))return;
   s.level=v;
+  if(v===100){
+    recordRollUsage(s,'Detail naar 100%');
+    log(`Spoel ${s.number} aangepast naar 100%`,s.filamentId);
+    localStorage.setItem(KEY,JSON.stringify(state));
+  }
 }
 function saveDetailFilament(id){
   const f=filament(id);
@@ -891,6 +943,7 @@ dashboardLevelForm.onsubmit=e=>{
   const level=Number(dashboardScannedLevel.value);
   if(![100,75,50,25,0].includes(level))return;
   spool.level=level;
+  if(level===100)recordRollUsage(spool,'QR-scan naar 100%');
   log(`Spoel ${spool.number} aangepast naar ${level}%`,spool.filamentId);
   dashboardLevelDialog.close();
   dashboardScannedSpoolId=null;
@@ -975,6 +1028,7 @@ quickFillBtn.onclick=()=>{
   }
   s.filamentId=r.filamentId;
   s.level=100;
+  recordRollUsage(s,'Refill gekoppeld',r.number);
   state.refills=state.refills.filter(x=>x.id!==r.id);
   log(`Refill ${r.number} gekoppeld aan ${s.number}`,s.filamentId);
   quickFillSpool.value='';
@@ -1010,7 +1064,7 @@ createBackupBtn.onclick=()=>{
       backupFormat:'filament-manager',
       backupVersion:1,
       exportedAt:new Date().toISOString(),
-      appVersion:'7.2.2',
+      appVersion:'9.0',
       data:state
     };
     const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
@@ -1047,6 +1101,7 @@ function normalizeBackupData(raw){
     refills:Array.isArray(source.refills)?source.refills:[],
     orders:Array.isArray(source.orders)?source.orders:[],
     history:Array.isArray(source.history)?source.history:[],
+    rollUsage:Array.isArray(source.rollUsage)?source.rollUsage:[],
     libraries:{
       ...structuredClone(DEFAULTS),
       ...(source.libraries||{}),
@@ -1129,6 +1184,7 @@ restoreBackupInput.onchange=async event=>{
     add(`Refills: ${restored.refills.length}`);
     add(`Bestellingen: ${restored.orders.length}`);
     add(`Historiekregels: ${restored.history.length}`);
+    add(`Verbruiksregistraties: ${restored.rollUsage.length}`);
   }catch(error){
     add('Structuurcontrole: MISLUKT');
     add(`Fout: ${error.name}: ${error.message}`);
@@ -1371,7 +1427,139 @@ printSelectedLabelsBtn.onclick=()=>{
   openLabelPrintWindow(selected,'a4');
 };
 
-function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderStock();renderSpoolScreen();renderRefillScreen();renderOrderList();renderOrders();renderLibraries();renderLog()}
+
+let statsMode='month';
+let statsCursor=new Date();
+statsCursor=new Date(statsCursor.getFullYear(),statsCursor.getMonth(),1);
+
+function capFirst(s){s=String(s||'');return s?s.charAt(0).toUpperCase()+s.slice(1):s}
+function statsRange(mode=statsMode,cursor=statsCursor){
+  const y=cursor.getFullYear(),m=cursor.getMonth();
+  if(mode==='month')return{start:new Date(y,m,1),end:new Date(y,m+1,1)};
+  if(mode==='quarter'){
+    const qm=Math.floor(m/3)*3;
+    return{start:new Date(y,qm,1),end:new Date(y,qm+3,1)};
+  }
+  if(mode==='year')return{start:new Date(y,0,1),end:new Date(y+1,0,1)};
+  return{start:null,end:null};
+}
+function statsEvents(mode=statsMode,cursor=statsCursor){
+  const {start,end}=statsRange(mode,cursor);
+  return (state.rollUsage||[]).filter(x=>{
+    const d=new Date(x.date);
+    return !Number.isNaN(d.getTime()) && (!start||d>=start) && (!end||d<end);
+  });
+}
+function statsPeriodLabel(){
+  const y=statsCursor.getFullYear(),m=statsCursor.getMonth();
+  if(statsMode==='month')return capFirst(new Intl.DateTimeFormat('nl-BE',{month:'long',year:'numeric'}).format(statsCursor));
+  if(statsMode==='quarter'){
+    const qm=Math.floor(m/3)*3,q=Math.floor(qm/3)+1;
+    const a=capFirst(new Intl.DateTimeFormat('nl-BE',{month:'long'}).format(new Date(y,qm,1)));
+    const b=new Intl.DateTimeFormat('nl-BE',{month:'long'}).format(new Date(y,qm+2,1));
+    return `Q${q} ${y}`+' · '+`${a} – ${b}`;
+  }
+  if(statsMode==='year')return String(y);
+  return 'Totaal';
+}
+function sameCurrentStatsPeriod(){
+  if(statsMode==='total')return true;
+  const now=new Date();
+  if(statsMode==='month')return statsCursor.getFullYear()===now.getFullYear()&&statsCursor.getMonth()===now.getMonth();
+  if(statsMode==='quarter')return statsCursor.getFullYear()===now.getFullYear()&&Math.floor(statsCursor.getMonth()/3)===Math.floor(now.getMonth()/3);
+  return statsCursor.getFullYear()===now.getFullYear();
+}
+function moveStatsPeriod(direction){
+  if(statsMode==='month')statsCursor=new Date(statsCursor.getFullYear(),statsCursor.getMonth()+direction,1);
+  else if(statsMode==='quarter')statsCursor=new Date(statsCursor.getFullYear(),statsCursor.getMonth()+3*direction,1);
+  else if(statsMode==='year')statsCursor=new Date(statsCursor.getFullYear()+direction,0,1);
+  renderStatistics();
+}
+function countCurrentRange(mode){
+  const now=new Date();
+  const cursor=new Date(now.getFullYear(),now.getMonth(),1);
+  const {start,end}=statsRange(mode,cursor);
+  return usageCountBetween(start,end);
+}
+function statsTimelineRows(events){
+  const counts=new Map();
+  const add=(key,label)=>{if(!counts.has(key))counts.set(key,{label,count:0});counts.get(key).count++};
+  if(statsMode==='month'){
+    events.forEach(x=>{const d=new Date(x.date);const key=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;add(key,new Intl.DateTimeFormat('nl-BE',{day:'numeric',month:'short'}).format(d));});
+    return [...counts.values()];
+  }
+  if(statsMode==='quarter'){
+    const y=statsCursor.getFullYear(),qm=Math.floor(statsCursor.getMonth()/3)*3;
+    const rows=[];
+    for(let i=0;i<3;i++)rows.push({key:`${y}-${qm+i}`,label:capFirst(new Intl.DateTimeFormat('nl-BE',{month:'long'}).format(new Date(y,qm+i,1))),count:0});
+    events.forEach(x=>{const d=new Date(x.date);const row=rows.find(r=>r.key===`${d.getFullYear()}-${d.getMonth()}`);if(row)row.count++});
+    return rows;
+  }
+  if(statsMode==='year'){
+    const y=statsCursor.getFullYear(),rows=[];
+    for(let m=0;m<12;m++)rows.push({key:`${y}-${m}`,label:capFirst(new Intl.DateTimeFormat('nl-BE',{month:'long'}).format(new Date(y,m,1))),count:0});
+    events.forEach(x=>{const d=new Date(x.date);const row=rows[d.getMonth()];if(row)row.count++});
+    return rows;
+  }
+  events.forEach(x=>{const y=String(new Date(x.date).getFullYear());add(y,y)});
+  return [...counts.entries()].sort((a,b)=>Number(a[0])-Number(b[0])).map(([,v])=>v);
+}
+function renderStatistics(){
+  if(!window.statsMonthTotal)return;
+  statsMonthTotal.textContent=countCurrentRange('month');
+  statsQuarterTotal.textContent=countCurrentRange('quarter');
+  statsYearTotal.textContent=countCurrentRange('year');
+  statsAllTotal.textContent=(state.rollUsage||[]).length;
+
+  document.querySelectorAll('[data-stats-mode]').forEach(b=>b.classList.toggle('active',b.dataset.statsMode===statsMode));
+  statsPeriodLabel.textContent=statsPeriodLabel();
+  statsPeriodSubtitle.textContent=statsMode==='total'?'Alle geregistreerde rollen':'Elke 100%-registratie telt als 1 rol';
+  statsPrevBtn.classList.toggle('hidden',statsMode==='total');
+  statsNextBtn.classList.toggle('hidden',statsMode==='total');
+  statsNextBtn.disabled=sameCurrentStatsPeriod();
+
+  const events=statsEvents().slice().sort((a,b)=>new Date(a.date)-new Date(b.date));
+  statsPeriodTotal.textContent=events.length;
+
+  const timeline=statsTimelineRows(events);
+  statsTimelineTitle.textContent=statsMode==='month'?'Verbruik per dag':statsMode==='total'?'Verbruik per jaar':'Verbruik per maand';
+  statsTimeline.innerHTML=timeline.length?`<table class="stats-table"><thead><tr><th>Periode</th><th class="stats-number">Rollen</th></tr></thead><tbody>${timeline.map(r=>`<tr><td>${esc(r.label)}</td><td class="stats-number"><strong>${r.count}</strong></td></tr>`).join('')}</tbody><tfoot><tr><th>Totaal</th><th class="stats-number">${events.length}</th></tr></tfoot></table>`:'<div class="note stats-empty">Nog geen verbruik geregistreerd in deze periode.</div>';
+
+  const cats=new Map();
+  events.forEach(x=>cats.set(x.category||'Onbekend',(cats.get(x.category||'Onbekend')||0)+1));
+  const catRows=[...cats.entries()].sort((a,b)=>a[0].localeCompare(b[0],'nl'));
+  statsCategoryTable.innerHTML=catRows.length?`<table class="stats-table"><thead><tr><th>Categorie</th><th class="stats-number">Rollen</th></tr></thead><tbody>${catRows.map(([k,v])=>`<tr><td>${esc(k)}</td><td class="stats-number"><strong>${v}</strong></td></tr>`).join('')}</tbody><tfoot><tr><th>Totaal</th><th class="stats-number">${events.length}</th></tr></tfoot></table>`:'<div class="note stats-empty">Geen gegevens.</div>';
+
+  const details=new Map();
+  events.forEach(x=>{
+    const key=[x.category||'Onbekend',x.type||'Onbekend',x.color||'Onbekend'].join('\u0001');
+    if(!details.has(key))details.set(key,{category:x.category||'Onbekend',type:x.type||'Onbekend',color:x.color||'Onbekend',count:0});
+    details.get(key).count++;
+  });
+  const detailRows=[...details.values()].sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));
+  statsDetailTable.innerHTML=detailRows.length?`<table class="stats-table stats-detail-table"><thead><tr><th>Categorie</th><th>Type</th><th>Kleur</th><th class="stats-number">Rollen</th></tr></thead><tbody>${detailRows.map(r=>`<tr><td>${esc(r.category)}</td><td>${esc(r.type)}</td><td>${colorNameHtml(r.color)}</td><td class="stats-number"><strong>${r.count}</strong></td></tr>`).join('')}</tbody><tfoot><tr><th colspan="3">Totaal</th><th class="stats-number">${events.length}</th></tr></tfoot></table>`:'<div class="note stats-empty">Geen gegevens.</div>';
+
+  const newest=events.slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+  statsUsageLog.innerHTML=newest.length?`<table class="stats-table stats-log-table"><thead><tr><th>Datum</th><th>Spoel</th><th>Filament</th><th>Registratie</th><th></th></tr></thead><tbody>${newest.map(x=>`<tr><td>${new Date(x.date).toLocaleString('nl-BE')}</td><td><strong>${esc(x.spoolNumber)}</strong></td><td>${esc(x.category)} · ${esc(x.type)} · ${colorNameHtml(x.color)}</td><td>${esc(x.source||'100% ingesteld')}${x.refillNumber?` · ${esc(x.refillNumber)}`:''}</td><td><button class="stats-delete-button" type="button" onclick="deleteRollUsage('${x.id}')">Verwijder</button></td></tr>`).join('')}</tbody></table>`:'<div class="note stats-empty">Nog geen verbruiksregistraties.</div>';
+}
+function deleteRollUsage(id){
+  const item=(state.rollUsage||[]).find(x=>x.id===id);
+  if(!item)return;
+  if(!confirm(`Verbruiksregistratie van ${item.spoolNumber} verwijderen?`))return;
+  state.rollUsage=state.rollUsage.filter(x=>x.id!==id);
+  log(`Verbruiksregistratie ${item.spoolNumber} verwijderd`,item.filamentId||null);
+  save();
+}
+document.querySelectorAll('[data-stats-mode]').forEach(b=>b.onclick=()=>{
+  statsMode=b.dataset.statsMode;
+  const now=new Date();
+  statsCursor=new Date(now.getFullYear(),now.getMonth(),1);
+  renderStatistics();
+});
+statsPrevBtn.onclick=()=>moveStatsPeriod(-1);
+statsNextBtn.onclick=()=>{if(!sameCurrentStatsPeriod())moveStatsPeriod(1)};
+
+function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderStock();renderSpoolScreen();renderRefillScreen();renderOrderList();renderOrders();renderLibraries();renderLog();renderStatistics()}
 
 const spoolScreenSearchEl=document.getElementById('spoolScreenSearch');
 const refillScreenSearchEl=document.getElementById('refillScreenSearch');

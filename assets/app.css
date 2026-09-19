@@ -1663,3 +1663,30 @@ label.file-button:has(#restoreBackupInput){
 label.file-button:has(#restoreBackupInput) #restoreBackupInput{
   display:none!important;
 }
+
+
+/* v9.0 - statistiek filamentverbruik */
+.stats-summary-grid .summary-card small{display:block;margin-top:2px;font-size:11px;color:var(--muted)}
+.stats-head{align-items:flex-start}
+.stats-tabs{margin:0}
+.stats-tabs button.active{background:var(--accent);color:#fff}
+.stats-period-nav{display:grid;grid-template-columns:46px 1fr 46px;gap:8px;align-items:center;margin:12px 0}
+.stats-period-nav>div{text-align:center;min-width:0}
+.stats-period-nav strong{display:block;font-size:18px}
+.stats-period-nav span{display:block;margin-top:3px;font-size:11px;color:var(--muted)}
+.stats-period-total{display:flex;align-items:end;justify-content:space-between;border-top:1px solid var(--line);padding-top:12px}
+.stats-period-total span{font-size:13px;color:var(--muted)}
+.stats-period-total strong{font-size:36px;line-height:1}
+.stats-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.stats-table{min-width:420px}
+.stats-table tfoot th{border-top:2px solid var(--line);color:var(--text)}
+.stats-number{text-align:right!important;width:72px}
+.stats-empty{padding:12px 0}
+.stats-log-table{min-width:760px}
+.stats-delete-button{min-height:34px;padding:5px 8px;font-size:12px}
+#statistiek h3{margin:0 0 10px}
+@media(max-width:599px){
+  .stats-tabs{width:100%;display:grid;grid-template-columns:repeat(4,1fr);overflow:visible}
+  .stats-tabs button{padding:8px 5px;min-height:40px;font-size:12px}
+  .stats-period-total strong{font-size:32px}
+}

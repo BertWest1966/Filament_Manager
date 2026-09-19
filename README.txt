@@ -1,19 +1,34 @@
-Filament Manager - versie 8.16
+Filament Manager - versie 9.0
 
-Gebaseerd rechtstreeks op de werkende v8.12.
+Basis
+-----
+Versie 9.0 is gebouwd op de stabiele versie 8.16.
+De camera- en QR-scannerlogica van 8.16 is niet gewijzigd.
 
-Belangrijk
-----------
-De QR-scanner en camera-initialisatie van v8.12 zijn NIET gewijzigd.
+Nieuw: filamentverbruik / statistiek
+------------------------------------
+- Nieuwe pagina Meer → Statistiek.
+- Overzicht per maand, kwartaal, jaar en totaal.
+- Samenvatting van deze maand, dit kwartaal, dit jaar en totaal.
+- Uitsplitsing per categorie, type en kleur.
+- Verbruikslogboek met datum/tijd, spoel, filament en bron.
+- Foute registraties kunnen uit het verbruikslogboek worden verwijderd.
 
-Werking scanmodus
------------------
-1. Camera openen.
-2. Spoel en refill worden automatisch herkend zoals in v8.12.
-3. Na beide scans verschijnen de waarden op het hoofdscherm.
-4. Tik op 'Scan bevestigen' als spoel + refill correct zijn.
-5. Tik daarna op 'Koppelen'.
-6. Is een verkeerde QR gescand, kies 'Opnieuw scannen'.
+Registratieregel
+----------------
+Elke expliciete actie waarbij een spoel op 100% wordt gezet telt als 1 rol.
+Dit omvat onder andere:
+- een volledig nieuwe spoel die op 100% wordt aangemaakt;
+- een spoel die van een lager niveau naar 100% gaat;
+- een refill die aan een spoel wordt gekoppeld (ook 100% → 100%);
+- een QR-scan waarbij 100% wordt bevestigd;
+- een handmatige/snellaag-aanpassing naar 100%.
 
-Zo kan een verkeerde scan niet worden gekoppeld zonder expliciete bevestiging,
-terwijl de werkende camera- en refillherkenning van v8.12 behouden blijven.
+Bij het opslaan van een bestaande spoel die al op 100% stond, vraagt de app
+expliciet of dit als een nieuwe rol moet worden geregistreerd. Zo kan 100% → 100%
+worden geteld zonder gewone wijzigingen aan een volle spoel automatisch dubbel te tellen.
+
+Back-up
+-------
+De verbruiksregistraties zitten in dezelfde lokale gegevens en worden meegenomen
+in de bestaande JSON-back-up en bij herstel.

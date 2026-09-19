@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Filament">
-  <title>Filament Manager v8.16</title>
+  <title>Filament Manager v9.0</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=8.16">
+  <link rel="stylesheet" href="assets/app.css?v=9.0">
 </head>
 <body>
 <div class="app-shell">
@@ -18,7 +18,7 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 8.16</span>
+      <span>Versie 9.0</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M9.5 20v-6h5v6"/></svg></span><span>Dashboard</span></button>
@@ -39,7 +39,7 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 8.16</span>
+        <span>Versie 9.0</span>
       </div>
     </header>
 
@@ -182,6 +182,60 @@
         </div>
       </section>
 
+
+      <section id="statistiek" class="view">
+        <div class="summary-grid stats-summary-grid">
+          <div class="summary-card"><span>Deze maand</span><strong id="statsMonthTotal">0</strong><small>rollen</small></div>
+          <div class="summary-card"><span>Dit kwartaal</span><strong id="statsQuarterTotal">0</strong><small>rollen</small></div>
+          <div class="summary-card"><span>Dit jaar</span><strong id="statsYearTotal">0</strong><small>rollen</small></div>
+          <div class="summary-card"><span>Totaal</span><strong id="statsAllTotal">0</strong><small>rollen</small></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head stats-head">
+            <h2>Filamentverbruik</h2>
+            <div class="tabs stats-tabs" id="statsTabs">
+              <button type="button" data-stats-mode="month" class="active">Maand</button>
+              <button type="button" data-stats-mode="quarter">Kwartaal</button>
+              <button type="button" data-stats-mode="year">Jaar</button>
+              <button type="button" data-stats-mode="total">Totaal</button>
+            </div>
+          </div>
+          <div class="stats-period-nav">
+            <button type="button" id="statsPrevBtn" aria-label="Vorige periode">‹</button>
+            <div><strong id="statsPeriodLabel">—</strong><span id="statsPeriodSubtitle"></span></div>
+            <button type="button" id="statsNextBtn" aria-label="Volgende periode">›</button>
+          </div>
+          <div class="stats-period-total">
+            <span>Verbruikte rollen</span>
+            <strong id="statsPeriodTotal">0</strong>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3 id="statsTimelineTitle">Verbruik per periode</h3>
+          <div id="statsTimeline" class="stats-table-wrap"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Per categorie</h3>
+          <div id="statsCategoryTable" class="stats-table-wrap"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Per type en kleur</h3>
+          <div id="statsDetailTable" class="stats-table-wrap"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Verbruikslogboek</h3>
+            <span class="note">Elke registratie op 100% telt als 1 rol.</span>
+          </div>
+          <div id="statsUsageLog" class="stats-table-wrap"></div>
+        </div>
+      </section>
+
       <section id="logboek" class="view">
         <div class="panel">
           <div class="panel-head">
@@ -201,6 +255,7 @@
             <button data-view="voorraad">Voorraad</button>
             <button data-view="catalogus">Catalogus</button>
             <button data-view="bibliotheken">Bibliotheek</button>
+            <button data-view="statistiek">Statistiek</button>
             <button data-view="logboek">Logboek</button>
           </div>
         </div>
@@ -527,7 +582,7 @@ window.FMPrint = (() => {
   </form>
 </dialog>
 
-<script src="js/app.js?v=8.16"></script>
+<script src="js/app.js?v=9.0"></script>
 <script src="js/print-tools.js?v=7.5.5"></script>
 </body>
 </html>
