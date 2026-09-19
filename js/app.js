@@ -1450,7 +1450,7 @@ function statsEvents(mode=statsMode,cursor=statsCursor){
     return !Number.isNaN(d.getTime()) && (!start||d>=start) && (!end||d<end);
   });
 }
-function statsPeriodLabel(){
+function getStatsPeriodLabel(){
   const y=statsCursor.getFullYear(),m=statsCursor.getMonth();
   if(statsMode==='month')return capFirst(new Intl.DateTimeFormat('nl-BE',{month:'long',year:'numeric'}).format(statsCursor));
   if(statsMode==='quarter'){
@@ -1512,7 +1512,7 @@ function renderStatistics(){
   statsAllTotal.textContent=(state.rollUsage||[]).length;
 
   document.querySelectorAll('[data-stats-mode]').forEach(b=>b.classList.toggle('active',b.dataset.statsMode===statsMode));
-  statsPeriodLabel.textContent=statsPeriodLabel();
+  statsPeriodLabel.textContent=getStatsPeriodLabel();
   statsPeriodSubtitle.textContent=statsMode==='total'?'Alle geregistreerde rollen':'Elke 100%-registratie telt als 1 rol';
   statsPrevBtn.classList.toggle('hidden',statsMode==='total');
   statsNextBtn.classList.toggle('hidden',statsMode==='total');
