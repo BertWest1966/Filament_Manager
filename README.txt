@@ -1,10 +1,13 @@
-Filament Manager - versie 8.5
+Filament Manager - versie 8.6
 
-Correctie Back-up
------------------
-- 'Back-up terugzetten' wordt nu rechtstreeks via het echte label.file-button-element gecentreerd.
-- De eerdere #backup-selector werkte niet omdat het Back-up-blok geen id='backup' heeft.
-- Tekst staat horizontaal en verticaal gecentreerd zoals bij 'Back-up maken'.
+Correctie QR-scan spoelwissel / refill koppelen
+-----------------------------------------------
+- Na een succesvolle spoelscan wordt de eerste QR-code volledig gewist.
+- De status verandert naar 'Wachten op QR-code van refill...'.
+- De reeds gescande spoelcode wordt in de refillstap genegeerd.
+- Zodra een nieuwe refillcode wordt herkend verschijnt:
+  'QR-code refill in beeld. Druk op Scan.'
+- Drukken op Scan zonder nieuwe refillcode geeft een duidelijke melding.
+- De bestaande succesmeldingen voor spoel en refill blijven behouden.
 
-Verder zijn geen functies gewijzigd.
-Alle functies uit v8.4 blijven behouden.
+Verder zijn de functies van v8.5 ongewijzigd.

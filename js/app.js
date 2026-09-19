@@ -644,8 +644,22 @@ async function startQrScanner(){
       {facingMode:'environment'},
       {fps:10,aspectRatio:1.0,qrbox:(width,height)=>{const size=Math.floor(Math.min(width,height)*0.72);return {width:size,height:size};}},
       decodedText=>{
+        const code=parseQrCode(decodedText);
+        if(scanContext==='refill-link' && refillScanPhase==='refill'){
+          const spoolCode=String(quickFillSpool.value||'').trim().toUpperCase();
+          if(code===spoolCode){
+            latestQrCode='';
+            scannerStatus.textContent='Wachten op QR-code van refill...';
+            return;
+          }
+          latestQrCode=decodedText;
+          scannerStatus.textContent='QR-code refill in beeld. Druk op Scan.';
+          return;
+        }
         latestQrCode=decodedText;
-        scannerStatus.textContent='QR-code in beeld. Tik op Scan om deze code te gebruiken.';
+        scannerStatus.textContent=scanContext==='dashboard'
+          ? 'QR-code spoel in beeld. Druk op Scan.'
+          : 'QR-code spoel in beeld. Druk op Scan.';
       },
       ()=>{}
     );
@@ -678,7 +692,9 @@ scanCloseBtn.onclick=closeScanDialog;
 
 scanCaptureBtn.onclick=async()=>{
   if(!latestQrCode){
-    scannerStatus.textContent='Nog geen QR-code goed in beeld. Richt de camera op de code en probeer opnieuw.';
+    scannerStatus.textContent=(scanContext==='refill-link' && refillScanPhase==='refill')
+      ? 'Nog geen nieuwe refill QR-code herkend. Richt de camera op de refill en probeer opnieuw.'
+      : 'Nog geen QR-code goed in beeld. Richt de camera op de code en probeer opnieuw.';
     return;
   }
   const code=parseQrCode(latestQrCode);
@@ -712,11 +728,12 @@ scanCaptureBtn.onclick=async()=>{
       }
       quickFillSpool.value=spool.number;
       refillScanPhase='refill';
+      latestQrCode='';
       scanConfirmation.textContent=`✓ Spoel ${spool.number} succesvol gescand`;
       scanConfirmation.classList.remove('hidden');
       scanInstruction.innerHTML='<strong>Scan refill</strong><span>Richt de camera op de QR-code van de refill en druk op Scan.</span>';
       fillModeStatus.textContent=`Spoel ${spool.number} succesvol gescand. Scan nu de refill.`;
-      scannerStatus.textContent='Richt nu op de QR-code van de refill en druk op Scan.';
+      scannerStatus.textContent='Wachten op QR-code van refill...';
       return;
     }
     if(refillScanPhase==='refill'){
