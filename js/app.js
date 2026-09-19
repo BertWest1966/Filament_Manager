@@ -634,6 +634,8 @@ async function openScanDialog(context){
 
 async function startQrScanner(){
   if(qrScannerRunning)return;
+  const reader=document.getElementById('qrReader');
+  if(reader) reader.innerHTML='';
   if(typeof Html5Qrcode==='undefined'){
     scannerStatus.textContent='De scannerbibliotheek kon niet geladen worden. Controleer de internetverbinding.';
     return;
@@ -672,15 +674,20 @@ async function startQrScanner(){
 }
 
 async function stopQrScanner(){
-  if(qrScanner){
+  const scanner=qrScanner;
+  qrScanner=null;
+  if(scanner){
     try{
-      if(qrScannerRunning)await qrScanner.stop();
-      await qrScanner.clear();
+      if(qrScannerRunning)await scanner.stop();
+    }catch{}
+    try{
+      await scanner.clear();
     }catch{}
   }
-  qrScanner=null;
   qrScannerRunning=false;
   latestQrCode='';
+  const reader=document.getElementById('qrReader');
+  if(reader) reader.innerHTML='';
 }
 
 async function closeScanDialog(){
@@ -727,13 +734,22 @@ scanCaptureBtn.onclick=async()=>{
         return;
       }
       quickFillSpool.value=spool.number;
-      refillScanPhase='refill';
-      latestQrCode='';
       scanConfirmation.textContent=`✓ Spoel ${spool.number} succesvol gescand`;
       scanConfirmation.classList.remove('hidden');
+      fillModeStatus.textContent=`Spoel ${spool.number} succesvol gescand. Scanner wordt opnieuw gestart voor de refill.`;
+      scannerStatus.textContent='Spoel verwerkt. Scanner wordt opnieuw gestart voor de refill...';
+
+      // iPhone/Safari: gebruik voor de refill een volledig nieuwe Html5Qrcode-sessie.
+      await stopQrScanner();
+      refillScanPhase='refill';
+      latestQrCode='';
       scanInstruction.innerHTML='<strong>Scan refill</strong><span>Richt de camera op de QR-code van de refill en druk op Scan.</span>';
-      fillModeStatus.textContent=`Spoel ${spool.number} succesvol gescand. Scan nu de refill.`;
-      scannerStatus.textContent='Wachten op QR-code van refill...';
+      scannerStatus.textContent='Camera wordt opnieuw gestart voor de refill...';
+      await new Promise(resolve=>setTimeout(resolve,300));
+      await startQrScanner();
+      if(qrScannerRunning){
+        scannerStatus.textContent='Wachten op QR-code van refill...';
+      }
       return;
     }
     if(refillScanPhase==='refill'){

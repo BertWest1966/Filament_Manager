@@ -1,13 +1,12 @@
-Filament Manager - versie 8.6
+Filament Manager - versie 8.7
 
-Correctie QR-scan spoelwissel / refill koppelen
------------------------------------------------
-- Na een succesvolle spoelscan wordt de eerste QR-code volledig gewist.
-- De status verandert naar 'Wachten op QR-code van refill...'.
-- De reeds gescande spoelcode wordt in de refillstap genegeerd.
-- Zodra een nieuwe refillcode wordt herkend verschijnt:
-  'QR-code refill in beeld. Druk op Scan.'
-- Drukken op Scan zonder nieuwe refillcode geeft een duidelijke melding.
-- De bestaande succesmeldingen voor spoel en refill blijven behouden.
+QR-scan spoelwissel / refill koppelen
+-------------------------------------
+- Spoel en refill worden niet meer in dezelfde doorlopende scannersessie gelezen.
+- Na een succesvolle spoelscan wordt de Html5Qrcode-scanner volledig gestopt en gewist.
+- Daarna wordt een nieuwe scannersessie gestart voor de refill.
+- De refillstap begint dus met een schone camera/scannerstatus.
+- De bestaande meldingen 'Scan spoel', 'Scan refill' en de succesmeldingen blijven behouden.
+- De QR-code wordt nog steeds alleen verwerkt wanneer op Scan wordt gedrukt.
 
-Verder zijn de functies van v8.5 ongewijzigd.
+Verder zijn de functies van v8.6 ongewijzigd.
