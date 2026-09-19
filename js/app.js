@@ -624,6 +624,9 @@ async function openScanDialog(context){
   scanContext=context;
   latestQrCode='';
   scanDialogTitle.textContent=context==='dashboard'?'Spoel scannen':'Spoelwissel / refill koppelen';
+  scanConfirmation.classList.add('hidden');
+  scanConfirmation.textContent='';
+  scanInstruction.innerHTML='<strong>Scan spoel</strong><span>Richt de camera op de QR-code van de spoel en druk op Scan.</span>';
   scannerStatus.textContent='Camera wordt geopend...';
   scanDialog.showModal();
   await startQrScanner();
@@ -687,6 +690,9 @@ scanCaptureBtn.onclick=async()=>{
       scannerStatus.textContent='Dit is geen geldige spoelcode. Richt op een spoel en tik opnieuw op Scan.';
       return;
     }
+    scanConfirmation.textContent=`✓ Spoel ${spool.number} succesvol gescand`;
+    scanConfirmation.classList.remove('hidden');
+    await new Promise(resolve=>setTimeout(resolve,450));
     await closeScanDialog();
     dashboardScannedSpoolId=spool.id;
     const f=filament(spool.filamentId);
@@ -706,8 +712,11 @@ scanCaptureBtn.onclick=async()=>{
       }
       quickFillSpool.value=spool.number;
       refillScanPhase='refill';
-      fillModeStatus.textContent=`Spoel ${spool.number} gekozen (${Number(spool.level)||0}%). Richt nu op de refill en tik opnieuw op Scan.`;
-      scannerStatus.textContent='Spoel gekozen. Richt nu op de QR-code van de refill en tik op Scan.';
+      scanConfirmation.textContent=`✓ Spoel ${spool.number} succesvol gescand`;
+      scanConfirmation.classList.remove('hidden');
+      scanInstruction.innerHTML='<strong>Scan refill</strong><span>Richt de camera op de QR-code van de refill en druk op Scan.</span>';
+      fillModeStatus.textContent=`Spoel ${spool.number} succesvol gescand. Scan nu de refill.`;
+      scannerStatus.textContent='Richt nu op de QR-code van de refill en druk op Scan.';
       return;
     }
     if(refillScanPhase==='refill'){
@@ -717,7 +726,12 @@ scanCaptureBtn.onclick=async()=>{
       }
       quickFillRefill.value=refill.number;
       refillScanPhase=null;
-      fillModeStatus.textContent=`Spoel ${quickFillSpool.value} en refill ${refill.number} gekozen. Tik op Koppelen om te bevestigen.`;
+      scanConfirmation.innerHTML=`✓ Spoel ${esc(quickFillSpool.value)} succesvol gescand<br>✓ Refill ${esc(refill.number)} succesvol gescand`;
+      scanConfirmation.classList.remove('hidden');
+      scanInstruction.innerHTML='<strong>Scannen voltooid</strong><span>Spoel en refill zijn herkend.</span>';
+      scannerStatus.textContent='Beide QR-codes zijn succesvol gescand.';
+      fillModeStatus.textContent=`Spoel ${quickFillSpool.value} en refill ${refill.number} succesvol gescand. Tik op Koppelen om te bevestigen.`;
+      await new Promise(resolve=>setTimeout(resolve,700));
       await closeScanDialog();
       return;
     }

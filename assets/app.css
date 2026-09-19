@@ -1631,3 +1631,9 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
     background:#fff!important;
   }
 }
+
+/* v8.3 - scannerstappen en back-upknoppen */
+.scan-instruction{display:flex;flex-direction:column;gap:3px;margin:8px 0 10px;padding:10px 12px;border-radius:10px;background:#eef6ff;border:1px solid #bfd7ff}
+.scan-instruction strong{font-size:18px}.scan-instruction span{color:#475569}
+.scan-confirmation{margin:8px 0 10px;padding:10px 12px;border-radius:10px;background:#ecfdf5;border:1px solid #86efac;color:#166534;font-weight:700}
+#backup button,#backup label.button,#backup .button,#backup .backup-actions button,#backup .backup-actions label{text-align:center!important;justify-content:center!important;align-items:center!important}

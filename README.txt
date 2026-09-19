@@ -1,12 +1,13 @@
-Filament Manager - versie 8.2
+Filament Manager - versie 8.3
 
-Correctie Mac - Spoelen en Refills
-----------------------------------
-- De oorzaak van de zwarte vlakken is gecorrigeerd.
-- De kleurkolom was in v8.0/v8.1 per ongeluk als flex-element ingesteld.
-- De kleurkolom is opnieuw een normale tabelcel.
-- Het kleine gekleurde bolletje vóór de kleurnaam blijft behouden.
-- De compacte rijhoogte en kolomuitlijning blijven behouden.
-- De iPhone-layout is niet gewijzigd.
+Scannen
+- Duidelijke stap 'Scan spoel'.
+- Bevestiging na geldige spoelscan.
+- Daarna duidelijke stap 'Scan refill'.
+- Bevestiging na geldige refillscan.
+- QR-code wordt alleen verwerkt na druk op Scan.
 
-Alle functies uit v8.1 blijven behouden.
+Back-up
+- Tekst van Back-up maken en Back-up terugzetten horizontaal en verticaal gecentreerd.
+
+Alle functies uit v8.2 blijven behouden.
