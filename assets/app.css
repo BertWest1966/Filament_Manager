@@ -1701,3 +1701,74 @@ label.file-button:has(#restoreBackupInput) #restoreBackupInput{
 .firebase-login-grid input{width:100%;box-sizing:border-box}
 .firebase-user-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 @media(max-width:700px){.firebase-login-grid{grid-template-columns:1fr}.firebase-login-grid button{width:100%}.firebase-sync-bar{padding:6px 12px}.firebase-sync-bar button{font-size:11px}.firebase-user-row .dialog-actions{width:100%}.firebase-user-row .dialog-actions button{flex:1}}
+
+
+/* v10.2 - compacter dashboard op mobiel: hoeveelheid en beschikbare refills */
+#dashboard .dashboard-level-select{
+  box-sizing:border-box;
+  width:68px;
+  min-width:68px;
+  max-width:68px;
+  min-height:34px;
+  padding:4px 20px 4px 6px;
+  font-size:14px;
+  line-height:1;
+  text-align:center;
+  text-align-last:center;
+}
+
+#dashboard .dashboard-refill-cell{
+  text-align:center !important;
+}
+
+#dashboard .dashboard-refill-count{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:30px;
+  height:30px;
+  padding:0 7px;
+  box-sizing:border-box;
+  border:1px solid #d1d5db;
+  border-radius:8px;
+  font-weight:700;
+  line-height:1;
+  background:#fff;
+}
+
+@media(max-width:700px){
+  #dashboard .dashboard-table th:nth-child(2),
+  #dashboard .dashboard-table td:nth-child(2){
+    width:62px;
+  }
+
+  #dashboard .dashboard-table th:nth-child(3),
+  #dashboard .dashboard-table td:nth-child(3){
+    width:72px;
+    text-align:center;
+  }
+
+  #dashboard .dashboard-table th:nth-child(4),
+  #dashboard .dashboard-table td:nth-child(4){
+    width:42px;
+    text-align:center;
+  }
+
+  #dashboard .dashboard-level-select{
+    width:64px;
+    min-width:64px;
+    max-width:64px;
+    min-height:32px;
+    padding:3px 17px 3px 5px;
+    border-radius:8px;
+    font-size:13px;
+  }
+
+  #dashboard .dashboard-refill-count{
+    min-width:28px;
+    height:28px;
+    padding:0 5px;
+    border-radius:7px;
+    font-size:13px;
+  }
+}

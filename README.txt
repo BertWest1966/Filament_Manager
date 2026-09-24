@@ -1,4 +1,4 @@
-Filament Manager - versie 10.1
+Filament Manager - versie 10.2
 ================================
 
 Status
@@ -49,5 +49,12 @@ EOsNru7BilUx9GguaBk0QxxY9oo1
 Databasepad:
 users/EOsNru7BilUx9GguaBk0QxxY9oo1/filamentManager/state
 
-Versie 10.1 gebruikt voor compatibiliteit dezelfde lokale opslagsleutel als de werkende 10.0-build:
+Versie 10.2 gebruikt voor compatibiliteit dezelfde lokale opslagsleutel als de werkende 10.0-build:
 filament_manager_v10_0
+
+Wijziging in 10.2
+-----------------
+- Dashboardweergave op iPhone compacter gemaakt.
+- Hoeveelheid op de spoel gebruikt een smallere keuzeknop.
+- Aantal beschikbare refills staat duidelijk in een compacte badge.
+- Firebase-synchronisatie en opslaglogica zijn niet gewijzigd.
