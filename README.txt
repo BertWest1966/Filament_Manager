@@ -1,4 +1,4 @@
-Filament Manager - versie 10.3
+Filament Manager - versie 10.4
 ================================
 
 Status
@@ -49,18 +49,26 @@ EOsNru7BilUx9GguaBk0QxxY9oo1
 Databasepad:
 users/EOsNru7BilUx9GguaBk0QxxY9oo1/filamentManager/state
 
-Versie 10.3 gebruikt voor compatibiliteit dezelfde lokale opslagsleutel als de werkende 10.0-build:
+Versie 10.4 gebruikt voor compatibiliteit dezelfde lokale opslagsleutel als de werkende 10.0-build:
 filament_manager_v10_0
 
-Wijziging in 10.3
+Wijziging in 10.4
 -----------------
 - Dashboardweergave op iPhone compacter gemaakt.
 - Hoeveelheid op de spoel gebruikt een smallere keuzeknop.
 - Aantal beschikbare refills staat duidelijk in een compacte badge.
 - Firebase-synchronisatie en opslaglogica zijn niet gewijzigd.
 
-Wijziging in 10.3
+Wijziging in 10.4
 -----------------
 - Tekst in de hoeveelheidknop op het dashboard kleiner gemaakt.
 - De compacte breedte van de knop blijft behouden.
 - Refill-badge, Firebase en synchronisatielogica zijn niet gewijzigd.
+
+Wijziging in 10.4
+-----------------
+- Hoeveelheidselector compacter gemaakt op Mac én iPhone.
+- Lettergrootte verlaagd naar 12 px op desktop en 11 px op mobiel.
+- Native browseropmaak van de selector uitgeschakeld zodat de ingestelde lettergrootte effectief wordt toegepast.
+- Eigen compacte pijltjes toegevoegd.
+- Firebase, gegevens en synchronisatie zijn niet gewijzigd.

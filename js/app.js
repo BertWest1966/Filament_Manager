@@ -5,23 +5,23 @@ const SYNC_DIRTY_KEY='filament_manager_v10_0_dirty_v1';
 const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','Andere'],types:{PLA:['Basic','Matte'],PETG:['Basic'],TPU:['95A'],ABS:['Basic'],ASA:['Basic'],Andere:[]},colors:[],brands:['Bambu Lab'],suppliers:['Bambu Lab']};
 let state=load();
 if(!Array.isArray(state.rollUsage))state.rollUsage=[];
-state.appVersion='10.3';
+state.appVersion='10.4';
 let currentView='dashboard',previousView='dashboard',stockMode='spools',stockSortMode='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,activeLibraryKind='colors',editingLibraryValue=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
-function fresh(){return{appVersion:'10.3',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
+function fresh(){return{appVersion:'10.4',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
 function load(){
   try{
     const own=localStorage.getItem(KEY);
     if(own)return {...fresh(),...JSON.parse(own)};
-    // Eerste start van versie 10.3: maak een kopie van de bestaande lokale gegevens.
+    // Eerste start van versie 10.4: maak een kopie van de bestaande lokale gegevens.
     // Voor compatibiliteit wordt eerst een eerdere migratiekopie bekeken, daarna de 9.0.1-opslag.
     // De brongegevens zelf worden nooit overschreven.
     for(const sourceKey of SOURCE_KEYS){
       const source=localStorage.getItem(sourceKey);
       if(source){
-        const copied={...fresh(),...JSON.parse(source),appVersion:'10.3'};
+        const copied={...fresh(),...JSON.parse(source),appVersion:'10.4'};
         localStorage.setItem(KEY,JSON.stringify(copied));
         return copied;
       }
@@ -1089,7 +1089,7 @@ createBackupBtn.onclick=()=>{
       backupFormat:'filament-manager',
       backupVersion:1,
       exportedAt:new Date().toISOString(),
-      appVersion:'10.3',
+      appVersion:'10.4',
       data:state
     };
     const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
@@ -1228,7 +1228,7 @@ restoreBackupInput.onchange=async event=>{
   const previousState=state;
   try{
     state=restored;
-    state.appVersion='10.3';
+    state.appVersion='10.4';
     save();
     add('Opslaan in browser: geslaagd');
     add('Firebase-synchronisatie: ingepland');
@@ -1617,7 +1617,7 @@ if(printSelectedRefillLabelsBtnEl)printSelectedRefillLabelsBtnEl.onclick=()=>pri
 /* ============================================================
    Firebase synchronisatie - VERSIE 10.1
    ------------------------------------------------------------
-   - Versie 10.3 gebruikt een eigen localStorage-sleutel.
+   - Versie 10.4 gebruikt een eigen localStorage-sleutel.
    - Firebase gebruikt een eigen pad voor deze aangemelde gebruiker.
    - Bij eerste cloudstart zonder data worden de lokale 10.0-gegevens geüpload.
    - Daarna is Firebase de gedeelde bron en blijft localStorage de lokale cache.
@@ -1660,7 +1660,7 @@ function setFirebaseUserUI(user){
 }
 function normalizeCloudState(raw){
   const normalized=normalizeBackupData(raw);
-  normalized.appVersion='10.3';
+  normalized.appVersion='10.4';
   return normalized;
 }
 function applyFirebaseState(raw){
@@ -1684,7 +1684,7 @@ function applyFirebaseState(raw){
 async function writeStateToFirebase(reason='Synchroniseren'){
   if(!firebaseSync.ready||!firebaseSync.ref||!firebaseSync.modules||firebaseSync.writing)return;
   const payload=structuredClone(state);
-  payload.appVersion='10.3';
+  payload.appVersion='10.4';
   const json=stableStringify(payload);
   firebaseSync.lastWriteJson=json;
   firebaseSync.writing=true;
