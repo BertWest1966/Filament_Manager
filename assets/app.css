@@ -118,7 +118,7 @@ dialog::backdrop{background:rgba(0,0,0,.35)}
 #dashboard .panel-head input{
   min-height:38px;
   padding:7px 9px;
-  font-size:14px;
+  font-size:12px;
 }
 
 #dashboard .category-title{
@@ -1761,7 +1761,7 @@ label.file-button:has(#restoreBackupInput) #restoreBackupInput{
     min-height:32px;
     padding:3px 17px 3px 5px;
     border-radius:8px;
-    font-size:13px;
+    font-size:11px;
   }
 
   #dashboard .dashboard-refill-count{
