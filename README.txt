@@ -1,4 +1,4 @@
-Filament Manager - versie 10.5
+Filament Manager - versie 10.6
 ================================
 
 Status
@@ -49,23 +49,23 @@ EOsNru7BilUx9GguaBk0QxxY9oo1
 Databasepad:
 users/EOsNru7BilUx9GguaBk0QxxY9oo1/filamentManager/state
 
-Versie 10.5 gebruikt voor compatibiliteit dezelfde lokale opslagsleutel als de werkende 10.0-build:
+Versie 10.6 gebruikt voor compatibiliteit dezelfde lokale opslagsleutel als de werkende 10.0-build:
 filament_manager_v10_0
 
-Wijziging in 10.5
+Wijziging in 10.6
 -----------------
 - Dashboardweergave op iPhone compacter gemaakt.
 - Hoeveelheid op de spoel gebruikt een smallere keuzeknop.
 - Aantal beschikbare refills staat duidelijk in een compacte badge.
 - Firebase-synchronisatie en opslaglogica zijn niet gewijzigd.
 
-Wijziging in 10.5
+Wijziging in 10.6
 -----------------
 - Tekst in de hoeveelheidknop op het dashboard kleiner gemaakt.
 - De compacte breedte van de knop blijft behouden.
 - Refill-badge, Firebase en synchronisatielogica zijn niet gewijzigd.
 
-Wijziging in 10.5
+Wijziging in 10.6
 -----------------
 - Hoeveelheidselector compacter gemaakt op Mac én iPhone.
 - Lettergrootte verlaagd naar 12 px op desktop en 11 px op mobiel.
@@ -73,11 +73,18 @@ Wijziging in 10.5
 - Eigen compacte pijltjes toegevoegd.
 - Firebase, gegevens en synchronisatie zijn niet gewijzigd.
 
-Wijziging in 10.5
+Wijziging in 10.6
 -----------------
 - Op spoel-etiketten worden categorie en type afgedrukt in de categoriekleur.
 - Dezelfde kleuren als op het dashboard worden gebruikt:
   PLA blauw, PETG groen, TPU paars, ASA oranje, ABS rood, PA/Nylon petrol en PC paars.
 - Kleur, leverancier, referentie, spoelnummer en QR-code blijven zwart.
+- Refill-etiketten blijven ongewijzigd.
+- Firebase en synchronisatie zijn niet gewijzigd.
+
+Wijziging in 10.6
+-----------------
+- Op spoel-etiketten worden nu categorie + type, kleur, leverancier, referentie en het woord "spoel" in de categoriekleur afgedrukt.
+- QR-code en groot spoelnummer blijven zwart voor maximale leesbaarheid en scanbaarheid.
 - Refill-etiketten blijven ongewijzigd.
 - Firebase en synchronisatie zijn niet gewijzigd.
