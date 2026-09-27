@@ -1296,7 +1296,7 @@ function labelHtml(i){
     <img src="${qrImageUrl(i.kind,i.number)}" alt="QR">
     <div class="number">${esc(i.number)}</div>
     <div class="divider"></div>
-    <div class="main" style="color:${String(i.kind).toLowerCase()===\'spoel\'?printCategoryColor(i.category):\'#000000\'}">${esc(i.category)} ${esc(i.type)}</div>
+    <div class="main" style="color:${String(i.kind).toLowerCase()==='spoel'?printCategoryColor(i.category):'#000000'}">${esc(i.category)} ${esc(i.type)}</div>
     <div class="line">${esc(i.color)}</div>
     <div class="line">${esc(i.supplier)}</div>
     <div class="small">${i.reference?`Ref. ${esc(i.reference)}`:''}</div>

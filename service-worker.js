@@ -1,4 +1,4 @@
-const CACHE='filament-manager-v10-5-stable-1';
+const CACHE='filament-manager-v10-5-fixed-1';
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','./index.html',
   './voorraad-refills.html',
   './voorraad-spoelen.html','./assets/app.css?v=10.5','./js/app.js?v=10.5','./manifest.webmanifest'])));self.skipWaiting()});
