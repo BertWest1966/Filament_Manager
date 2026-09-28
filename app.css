@@ -1,0 +1,1806 @@
+
+:root{--bg:#f3f4f6;--card:#fff;--text:#111827;--muted:#6b7280;--line:#d1d5db;--accent:#111827;--danger:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.app-shell{min-height:100vh}
+.desktop-sidebar{display:none}
+.main-shell{min-width:0}
+.mobile-header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line);padding:calc(12px + env(safe-area-inset-top)) 14px 12px}
+.mobile-header strong{display:block;font-size:20px}.mobile-header span{font-size:12px;color:var(--muted)}
+.global-search{position:sticky;top:64px;z-index:18;padding:8px 10px;background:var(--bg)}
+.global-search input{width:100%;height:48px}
+.search-results{position:absolute;left:10px;right:10px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 25px rgba(0,0,0,.12)}
+.search-result{padding:10px;border-bottom:1px solid #eee}
+main{padding:10px 10px 90px;max-width:1200px;margin:auto}
+.view{display:none}.view.active{display:block}
+.summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
+.summary-card,.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+.summary-card span{display:block;font-size:12px;color:var(--muted)}.summary-card strong{font-size:28px}
+.panel{margin-bottom:10px}
+.panel-head,.toolbar,.dialog-actions{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.panel-head input,.toolbar input{flex:1;min-width:180px}
+input,select,button,.file-button{min-height:46px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff}
+.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.file-button input{display:none}
+.mobile-bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;display:grid;grid-template-columns:repeat(5,1fr);background:#fff;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.mobile-bottom-nav button{border:none;border-radius:0;background:none;color:var(--muted);font-size:11px;padding:6px}
+.mobile-bottom-nav button span{display:block;font-size:20px}.mobile-bottom-nav button.active{color:var(--text);font-weight:700}
+.category-title{font-size:18px;font-weight:800;border-bottom:2px solid var(--text);padding-bottom:4px;margin-top:14px}
+.type-title{font-weight:700;margin:10px 0 4px}
+table{width:100%;border-collapse:collapse}th,td{padding:8px 4px;border-bottom:1px solid #eee;font-size:13px;text-align:left}
+th{color:var(--muted)}
+.dashboard-table th:nth-child(2),.dashboard-table td:nth-child(2){width:78px}
+.dashboard-table th:nth-child(3),.dashboard-table td:nth-child(3){width:82px;text-align:center}
+.dashboard-table th:nth-child(4),.dashboard-table td:nth-child(4){width:52px;text-align:right}
+.item-row,.library-row{display:grid;grid-template-columns:1fr;gap:8px;padding:11px 0;border-bottom:1px solid #eee}
+.item-meta,.note{font-size:12px;color:var(--muted)}
+.item-actions{display:flex;gap:6px;flex-wrap:wrap}
+.tabs,.library-tabs{display:flex;gap:6px;overflow:auto;margin-bottom:10px}
+.tabs button.active,.library-tabs button.active{background:var(--accent);color:#fff}
+.menu-grid{display:grid;grid-template-columns:1fr;gap:8px}
+.form-grid{display:grid;grid-template-columns:1fr;gap:10px}
+label{display:grid;gap:5px;font-size:13px}
+dialog{border:none;border-radius:14px;padding:0;width:calc(100% - 24px);max-width:720px}
+dialog::backdrop{background:rgba(0,0,0,.35)}
+.dialog-card{padding:16px}
+.level-btn{min-height:36px;padding:6px 9px;font-weight:700}
+@media(min-width:900px){
+  .app-shell{display:grid;grid-template-columns:220px 1fr}
+  .desktop-sidebar{display:block;position:sticky;top:0;height:100vh;background:#111827;color:#fff;padding:18px}
+  .desktop-sidebar .brand strong{display:block;font-size:18px}.desktop-sidebar .brand span{font-size:11px;color:#cbd5e1}
+  .desktop-sidebar nav{display:grid;gap:6px;margin-top:24px}
+  .desktop-sidebar nav button{background:transparent;color:#e5e7eb;border-color:transparent;text-align:left}
+  .desktop-sidebar nav button.active{background:#fff;color:#111827}
+  .mobile-header,.mobile-bottom-nav{display:none}
+  .global-search{top:0;padding:14px 22px}
+  main{padding:22px}
+  .summary-grid{grid-template-columns:repeat(4,1fr)}
+  .item-row,.library-row{grid-template-columns:1fr auto}
+  .form-grid{grid-template-columns:repeat(2,1fr)}
+  .menu-grid{grid-template-columns:repeat(2,1fr)}
+}
+\n.label-select{width:20px;height:20px;accent-color:var(--accent)}
+.qr-sticker{width:280px;max-width:100%;margin:12px auto;padding:14px;border:2px solid #111;border-radius:10px;text-align:center;background:#fff;color:#111}
+.qr-sticker img{display:block;width:190px;height:190px;max-width:100%;margin:0 auto}
+.qr-number{font-size:32px;font-weight:900;letter-spacing:2px;margin-top:5px}
+.qr-divider{border-top:1px solid #111;margin:8px 0}
+.qr-main{font-size:18px;font-weight:800}.qr-line{font-size:15px;font-weight:700;line-height:1.3}.qr-small{font-size:12px;margin-top:3px}.qr-kind{font-size:12px;font-weight:800;margin-top:8px;text-transform:uppercase}
+#qrSticker{position:absolute;left:0;top:0;width:60mm;border:1.5px solid #000;padding:4mm}#qrSticker img{width:40mm;height:40mm}.qr-number{font-size:22pt}.qr-main{font-size:12pt}.qr-line{font-size:10pt}.qr-small,.qr-kind{font-size:8pt}}
+
+.qr-print-format{margin-top:12px}
+
+.diagnostic-panel{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.diagnostic-panel summary{cursor:pointer;font-weight:700}
+.diagnostic-panel pre{white-space:pre-wrap;word-break:break-word;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:10px;max-height:320px;overflow:auto;font-size:12px}
+.diagnostic-panel button{margin-top:8px}
+
+.qr-reader{
+  width:100%;
+  max-width:520px;
+  margin:12px auto;
+  border-radius:12px;
+  overflow:hidden;
+  background:#111;
+}
+.qr-reader video{width:100%!important}
+.qr-reader button,.qr-reader select{min-height:44px;font-size:16px}
+
+/* v7.4 compact dashboard */
+#dashboard .summary-grid{
+  gap:6px;
+  margin-bottom:8px;
+}
+#dashboard .summary-card{
+  padding:8px 10px;
+  border-radius:9px;
+}
+#dashboard .summary-card span{
+  font-size:11px;
+}
+#dashboard .summary-card strong{
+  font-size:22px;
+  line-height:1;
+}
+
+#dashboard .panel{
+  padding:9px 10px;
+}
+#dashboard .panel-head{
+  margin-bottom:4px;
+}
+#dashboard .panel-head h2{
+  font-size:18px;
+  margin:0;
+}
+#dashboard .panel-head input{
+  min-height:38px;
+  padding:7px 9px;
+  font-size:12px;
+}
+
+#dashboard .category-title{
+  font-size:16px;
+  line-height:1.1;
+  padding-bottom:3px;
+  margin-top:10px;
+}
+#dashboard .type-title{
+  font-size:13px;
+  line-height:1.1;
+  margin:7px 0 2px;
+}
+
+#dashboard .dashboard-table{
+  table-layout:fixed;
+}
+#dashboard .dashboard-table th,
+#dashboard .dashboard-table td{
+  padding:4px 3px;
+  font-size:12px;
+  line-height:1.15;
+  height:31px;
+}
+#dashboard .dashboard-table th{
+  font-size:10px;
+  font-weight:700;
+  white-space:nowrap;
+}
+#dashboard .dashboard-table th:first-child,
+#dashboard .dashboard-table td:first-child{
+  width:auto;
+}
+#dashboard .dashboard-table th:nth-child(2),
+#dashboard .dashboard-table td:nth-child(2){
+  width:66px;
+}
+#dashboard .dashboard-table th:nth-child(3),
+#dashboard .dashboard-table td:nth-child(3){
+  width:68px;
+}
+#dashboard .dashboard-table th:nth-child(4),
+#dashboard .dashboard-table td:nth-child(4){
+  width:42px;
+}
+
+#dashboard .dashboard-table button,
+#dashboard .level-btn{
+  min-height:26px;
+  height:26px;
+  padding:2px 5px;
+  border-radius:6px;
+  font-size:11px;
+  line-height:1;
+}
+#dashboard .dashboard-table td:first-child{
+  cursor:pointer;
+}
+#dashboard .dashboard-table tr:active{
+  background:#f3f4f6;
+}
+
+@media(min-width:900px){
+  #dashboard .dashboard-table th,
+  #dashboard .dashboard-table td{
+    font-size:13px;
+    height:30px;
+  }
+  #dashboard .dashboard-table th{
+    font-size:11px;
+  }
+}
+
+/* v7.5.6 integrated A4 print preview */
+.inventory-print-overlay{position:fixed;inset:0;z-index:9999;overflow:auto;background:#e5e7eb}
+.inventory-print-overlay.hidden{display:none!important}
+.inventory-print-shell{min-height:100%}
+.inventory-print-toolbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px;background:#fff;border-bottom:1px solid var(--line)}
+.inventory-print-toolbar>div{display:flex;gap:8px}
+.inventory-print-preview{width:210mm;min-height:297mm;margin:12px auto;padding:12mm 12mm 15mm;background:#fff;color:#000;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;font-size:9pt;box-shadow:0 2px 14px rgba(0,0,0,.18)}
+.inventory-print-preview h1{font-size:17pt;margin:0 0 2mm}
+.inventory-print-preview .print-meta{display:flex;justify-content:space-between;gap:8mm;margin-bottom:5mm;font-size:8.5pt}
+.inventory-print-preview table{width:100%;border-collapse:collapse;table-layout:fixed}
+.inventory-print-preview th{font-size:8.5pt;text-align:left;border-bottom:1.5px solid #000;padding:1.7mm 1.5mm}
+.inventory-print-preview td{border-bottom:.5px solid #aaa;padding:1.45mm 1.5mm;line-height:1.1}
+.inventory-print-preview th:nth-child(1),.inventory-print-preview td:nth-child(1){width:18%}
+.inventory-print-preview th:nth-child(2),.inventory-print-preview td:nth-child(2){width:20%}
+.inventory-print-preview th:nth-child(3),.inventory-print-preview td:nth-child(3){width:44%}
+.inventory-print-preview th:nth-child(4),.inventory-print-preview td:nth-child(4){width:18%}
+.inventory-print-preview .print-footer{margin-top:5mm;border-top:.5px solid #999;padding-top:1mm;font-size:7.5pt;display:flex;justify-content:space-between}
+@media(max-width:900px){.inventory-print-preview{width:calc(100vw - 16px);min-height:auto;margin:8px;padding:16px;font-size:12px;box-shadow:none}.inventory-print-preview h1{font-size:20px}.inventory-print-preview th,.inventory-print-preview td{padding:6px 4px}}
+@media print{body>*{display:none!important}#inventoryPrintOverlay{display:block!important;position:static!important;background:#fff!important;overflow:visible!important}#inventoryPrintOverlay .no-print{display:none!important}#inventoryPrintPreview{display:block!important;width:auto!important;min-height:auto!important;margin:0!important;padding:0!important;box-shadow:none!important}@page{size:A4 portrait;margin:12mm 12mm 15mm}}
+
+.print-link-button{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:46px;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:#fff;
+  color:var(--text);
+  text-decoration:none;
+  font-weight:700;
+}
+.print-link-button:active{background:#f3f4f6}
+
+.app-toast{
+  position:fixed;left:50%;
+  bottom:calc(82px + env(safe-area-inset-bottom));
+  transform:translate(-50%,20px);
+  z-index:2000;
+  min-width:min(320px,calc(100vw - 24px));
+  max-width:calc(100vw - 24px);
+  padding:12px 14px;border-radius:10px;
+  background:#166534;color:#fff;
+  font-size:14px;font-weight:700;line-height:1.3;text-align:center;
+  box-shadow:0 8px 24px rgba(0,0,0,.22);
+  opacity:0;pointer-events:none;
+  transition:opacity .18s ease,transform .18s ease;
+}
+.app-toast.show{opacity:1;transform:translate(-50%,0)}
+@media(min-width:900px){.app-toast{bottom:24px}}
+
+.danger-button{
+  border-color:#b91c1c;
+  color:#b91c1c;
+  background:#fff;
+}
+.danger-button:active{
+  background:#fee2e2;
+}
+
+/* Compacte hiërarchie dashboard */
+#dashboard .category-title,
+#dashboard .category-heading{margin-left:0;font-weight:800}
+#dashboard .type-title,
+#dashboard .type-heading{margin-left:16px}
+#dashboard .dashboard-table td:first-child{padding-left:32px}
+
+/* Categoriekleuren */
+:root{
+  --cat-pla:#2563eb;
+  --cat-petg:#059669;
+  --cat-tpu:#7c3aed;
+  --cat-asa:#ea580c;
+  --cat-abs:#dc2626;
+  --cat-pa:#0f766e;
+  --cat-pc:#9333ea;
+  --cat-default:#475569;
+}
+.category-accent{color:var(--cat-color,var(--cat-default))!important}
+.category-border{border-left:4px solid var(--cat-color,var(--cat-default))!important}
+
+/* v7.5.11 - categoriekleur voor ALLE filamentgegevens op ALLE tabbladen */
+.category-colored-row,
+.category-colored-row td,
+.category-colored-row th,
+.category-colored-row .filament-data,
+.category-colored-row .filament-name,
+.category-colored-row .filament-type,
+.category-colored-row .filament-color,
+.category-colored-row .spool-number,
+.category-colored-row .refill-number,
+.category-colored-row .stock-value,
+.category-colored-row .muted{
+  color:var(--cat-color,var(--cat-default)) !important;
+}
+.category-colored-row button,
+.category-colored-row input,
+.category-colored-row select,
+.category-colored-row textarea,
+.category-colored-row option,
+.category-colored-row label{
+  color:initial;
+}
+.category-colored-row{
+  border-left:4px solid var(--cat-color,var(--cat-default));
+}
+
+/* v7.5.12 - categoriekleur werkelijk doorgeven aan de volledige groep */
+.category-group,
+.category-data-row{
+  --cat-color:var(--cat-default);
+  color:var(--cat-color) !important;
+}
+.category-group .category-title{
+  color:var(--cat-color) !important;
+  border-bottom:2px solid var(--cat-color) !important;
+}
+.category-group .type-title,
+.category-group th,
+.category-group td,
+.category-group td *,
+.category-group button,
+.category-data-row,
+.category-data-row strong,
+.category-data-row .item-meta,
+.category-data-row .filament-data,
+.category-data-row button{
+  color:var(--cat-color) !important;
+}
+.category-group .type-title{padding-left:16px}
+.category-group .dashboard-table td:first-child{padding-left:32px}
+
+/* invoervelden/selectievakjes blijven normale bediening */
+.category-group input,
+.category-group select,
+.category-data-row input,
+.category-data-row select{
+  color:initial !important;
+}
+
+
+/* v7.5.22 - Dashboard hiërarchie */
+#dashboard .dashboard-hierarchy .category-title{
+  margin-left:0;
+  font-weight:800;
+}
+#dashboard .dashboard-hierarchy .type-title{
+  margin-left:28px;
+  padding-left:0;
+  font-weight:700;
+}
+#dashboard .dashboard-hierarchy-table{
+  margin-left:56px;
+  width:calc(100% - 56px);
+}
+#dashboard .dashboard-hierarchy-table th:first-child{
+  color:transparent;
+}
+#dashboard .dashboard-color-name{
+  font-weight:600;
+}
+#dashboard .dashboard-hierarchy[data-category] .type-title,
+#dashboard .dashboard-hierarchy[data-category] .dashboard-color-name{
+  color:inherit;
+}
+@media(max-width:700px){
+  #dashboard .dashboard-hierarchy .type-title{margin-left:18px}
+  #dashboard .dashboard-hierarchy-table{
+    margin-left:36px;
+    width:calc(100% - 36px);
+  }
+}
+
+
+/* v7.5.23 - Aparte schermen Spoelen en Refills; Voorraad blijft bestaan */
+#spoelen .separate-stock-category,
+#refills .separate-stock-category{
+  margin-bottom:24px;
+}
+#spoelen .separate-stock-category .category-title,
+#refills .separate-stock-category .category-title{
+  font-weight:800;
+}
+#spoelen .separate-stock-category .type-title,
+#refills .separate-stock-category .type-title{
+  margin-left:28px;
+  font-weight:700;
+}
+#spoelen .separate-stock-list,
+#refills .separate-stock-list{
+  margin-left:56px;
+}
+#spoelen .separate-stock-row,
+#refills .separate-stock-row{
+  display:grid;
+  grid-template-columns:minmax(120px,1fr) 90px 70px auto;
+  gap:10px;
+  align-items:center;
+  padding:8px 0;
+  border-bottom:1px solid var(--border);
+}
+#spoelen .separate-stock-color,
+#refills .separate-stock-color{
+  font-weight:600;
+}
+#spoelen .separate-stock-actions,
+#refills .separate-stock-actions{
+  display:flex;
+  gap:6px;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+}
+
+/* Categorie, type en kleur gebruiken allemaal de categoriekleur */
+#spoelen .separate-stock-category[data-category] .category-title,
+#spoelen .separate-stock-category[data-category] .type-title,
+#spoelen .separate-stock-category[data-category] .separate-stock-color,
+#refills .separate-stock-category[data-category] .category-title,
+#refills .separate-stock-category[data-category] .type-title,
+#refills .separate-stock-category[data-category] .separate-stock-color{
+  color:var(--cat-color);
+}
+
+@media(max-width:700px){
+  #spoelen .separate-stock-category .type-title,
+  #refills .separate-stock-category .type-title{
+    margin-left:18px;
+  }
+  #spoelen .separate-stock-list,
+  #refills .separate-stock-list{
+    margin-left:36px;
+  }
+  #spoelen .separate-stock-row,
+  #refills .separate-stock-row{
+    grid-template-columns:minmax(90px,1fr) 72px 54px;
+  }
+  #spoelen .separate-stock-actions,
+  #refills .separate-stock-actions{
+    grid-column:1 / -1;
+    justify-content:flex-start;
+  }
+}
+
+
+/* v7.5.26 - Spoelen/Refills visueel gelijk aan Dashboard */
+#spoelen .separate-stock-category .category-title,
+#refills .separate-stock-category .category-title{
+  margin-left:0;
+  font-weight:800;
+}
+#spoelen .separate-stock-category .type-title,
+#refills .separate-stock-category .type-title{
+  margin-left:28px;
+  padding-left:0;
+  font-weight:700;
+}
+#spoelen .separate-dashboard-table,
+#refills .separate-dashboard-table{
+  margin-left:56px;
+  width:calc(100% - 56px);
+}
+#spoelen .separate-dashboard-table th:first-child,
+#refills .separate-dashboard-table th:first-child{
+  color:transparent;
+}
+#spoelen .separate-dashboard-table td:first-child,
+#refills .separate-dashboard-table td:first-child{
+  padding-left:4px;
+  font-weight:600;
+}
+#spoelen .separate-dashboard-table th:nth-child(2),
+#spoelen .separate-dashboard-table td:nth-child(2),
+#refills .separate-dashboard-table th:nth-child(2),
+#refills .separate-dashboard-table td:nth-child(2){
+  width:90px;
+}
+#spoelen .separate-dashboard-table th:nth-child(3),
+#spoelen .separate-dashboard-table td:nth-child(3){
+  width:82px;
+  text-align:center;
+}
+#spoelen .separate-dashboard-table th:last-child,
+#spoelen .separate-dashboard-table td:last-child,
+#refills .separate-dashboard-table th:last-child,
+#refills .separate-dashboard-table td:last-child{
+  width:210px;
+  text-align:right;
+}
+#spoelen .separate-stock-actions,
+#refills .separate-stock-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:6px;
+  flex-wrap:wrap;
+}
+#spoelen .separate-stock-category[data-category] .type-title,
+#spoelen .separate-stock-category[data-category] .separate-stock-color,
+#refills .separate-stock-category[data-category] .type-title,
+#refills .separate-stock-category[data-category] .separate-stock-color{
+  color:var(--cat-color);
+}
+
+/* nummer-sortering blijft een compacte tabel */
+#spoelen .separate-flat-table,
+#refills .separate-flat-table{
+  margin-left:0;
+  width:100%;
+}
+#spoelen .separate-flat-table th:first-child,
+#refills .separate-flat-table th:first-child{
+  color:var(--muted);
+}
+
+@media(max-width:700px){
+  #spoelen .separate-stock-category .type-title,
+  #refills .separate-stock-category .type-title{
+    margin-left:18px;
+  }
+  #spoelen .separate-dashboard-table,
+  #refills .separate-dashboard-table{
+    margin-left:36px;
+    width:calc(100% - 36px);
+  }
+  #spoelen .separate-dashboard-table th:last-child,
+  #spoelen .separate-dashboard-table td:last-child,
+  #refills .separate-dashboard-table th:last-child,
+  #refills .separate-dashboard-table td:last-child{
+    width:auto;
+  }
+}
+
+
+/* v7.5.27 - Dashboard percentagekeuze + mobiel aantal bij Bestellen */
+.dashboard-level-select{
+  min-width:72px;
+  width:auto;
+  padding:6px 28px 6px 9px;
+  border-radius:8px;
+  font-weight:600;
+}
+
+#manualOrderQty{
+  width:100%;
+  min-height:48px;
+  font-size:16px;
+}
+
+@media(max-width:700px){
+  #manualOrderDialog select,
+  #manualOrderDialog input{
+    font-size:16px;
+  }
+  #manualOrderDialog{
+    max-width:calc(100vw - 24px);
+  }
+}
+
+
+/* v7.5.29 - compacte éénregelige rijen voor Spoelen en Refills */
+#spoelen .separate-dashboard-table .select-col,
+#refills .separate-dashboard-table .select-col{
+  width:38px;
+  min-width:38px;
+  text-align:center;
+}
+#spoelen .compact-actions,
+#refills .compact-actions{
+  white-space:nowrap;
+}
+#spoelen .compact-actions button,
+#refills .compact-actions button{
+  margin-left:4px;
+}
+
+@media(max-width:700px){
+  #spoelen .separate-dashboard-table,
+  #refills .separate-dashboard-table{
+    table-layout:auto;
+    margin-left:18px;
+    width:calc(100% - 18px);
+  }
+
+  #spoelen .separate-dashboard-table th,
+  #spoelen .separate-dashboard-table td,
+  #refills .separate-dashboard-table th,
+  #refills .separate-dashboard-table td{
+    padding:8px 3px;
+    font-size:12px;
+    vertical-align:middle;
+  }
+
+  #spoelen .separate-dashboard-table .select-col,
+  #refills .separate-dashboard-table .select-col{
+    width:32px;
+    min-width:32px;
+    padding-left:0;
+    padding-right:2px;
+  }
+
+  #spoelen .separate-dashboard-table .select-col input,
+  #refills .separate-dashboard-table .select-col input{
+    width:22px;
+    height:22px;
+    margin:0;
+  }
+
+  #spoelen .separate-dashboard-table th:nth-child(2),
+  #spoelen .separate-dashboard-table td:nth-child(2),
+  #refills .separate-dashboard-table th:nth-child(2),
+  #refills .separate-dashboard-table td:nth-child(2){
+    width:auto;
+  }
+
+  #spoelen .separate-dashboard-table th:nth-child(3),
+  #spoelen .separate-dashboard-table td:nth-child(3),
+  #refills .separate-dashboard-table th:nth-child(3),
+  #refills .separate-dashboard-table td:nth-child(3){
+    width:68px;
+  }
+
+  #spoelen .separate-dashboard-table th:nth-child(4),
+  #spoelen .separate-dashboard-table td:nth-child(4){
+    width:58px;
+    text-align:center;
+  }
+
+  #spoelen .separate-dashboard-table th:last-child,
+  #spoelen .separate-dashboard-table td:last-child,
+  #refills .separate-dashboard-table th:last-child,
+  #refills .separate-dashboard-table td:last-child{
+    width:150px;
+    text-align:right;
+  }
+
+  #spoelen .compact-actions,
+  #refills .compact-actions{
+    white-space:nowrap;
+  }
+
+  #spoelen .compact-actions button,
+  #refills .compact-actions button{
+    display:inline-block;
+    width:auto;
+    min-width:0;
+    padding:7px 7px;
+    margin-left:2px;
+    font-size:11px;
+  }
+}
+
+
+/* v7.5.30 - inklapbare categorieën en types op Spoelen/Refills */
+#spoelen .collapsible-heading,
+#refills .collapsible-heading{
+  width:100%;
+  border:none;
+  border-radius:0;
+  background:transparent;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  text-align:left;
+  cursor:pointer;
+  color:var(--cat-color);
+}
+
+#spoelen .category-collapse-button,
+#refills .category-collapse-button{
+  padding:8px 0 6px;
+  border-bottom:2px solid var(--cat-color);
+  font-size:18px;
+  font-weight:800;
+}
+
+#spoelen .type-collapse-button,
+#refills .type-collapse-button{
+  margin-left:28px;
+  width:calc(100% - 28px);
+  padding:8px 0 5px;
+  font-weight:700;
+}
+
+#spoelen .collapse-label,
+#refills .collapse-label{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+#spoelen .collapse-arrow,
+#refills .collapse-arrow{
+  display:inline-flex;
+  width:16px;
+  justify-content:center;
+  font-size:20px;
+  line-height:1;
+}
+
+#spoelen .collapse-count,
+#refills .collapse-count{
+  margin-left:auto;
+  padding-right:4px;
+  font-size:12px;
+  font-weight:600;
+  white-space:nowrap;
+  opacity:.9;
+}
+
+#spoelen .collapsible-type-block,
+#refills .collapsible-type-block{
+  margin-top:2px;
+}
+
+@media(max-width:700px){
+  #spoelen .category-collapse-button,
+  #refills .category-collapse-button{
+    padding-top:7px;
+    padding-bottom:6px;
+  }
+
+  #spoelen .type-collapse-button,
+  #refills .type-collapse-button{
+    margin-left:18px;
+    width:calc(100% - 18px);
+  }
+
+  #spoelen .collapse-count,
+  #refills .collapse-count{
+    font-size:11px;
+  }
+}
+
+
+/* v7.5.32 - desktop/Mac dark layout. Mobiel blijft ongewijzigd. */
+@media (min-width:901px){
+  body{
+    background:#05080b;
+    color:#eef2f6;
+  }
+
+  .main-shell{
+    background:#05080b;
+    min-height:100vh;
+  }
+
+  aside,
+  .sidebar{
+    background:#080d12 !important;
+    border-right:1px solid #26303a !important;
+    color:#eef2f6;
+  }
+
+  aside strong,
+  aside span,
+  aside button,
+  .sidebar strong,
+  .sidebar span,
+  .sidebar button{
+    color:#eef2f6;
+  }
+
+  aside nav button,
+  .sidebar nav button{
+    background:transparent;
+    border-color:transparent;
+  }
+
+  aside nav button.active,
+  .sidebar nav button.active{
+    background:#0b4fb3 !important;
+    color:#fff !important;
+  }
+
+  .mobile-header{
+    background:#05080b;
+    color:#fff;
+    border-bottom:1px solid #26303a;
+  }
+
+  .global-search{
+    background:#05080b;
+  }
+
+  .global-search input,
+  #spoelen .toolbar input,
+  #refills .toolbar input,
+  #spoelen .toolbar select,
+  #refills .toolbar select{
+    background:#080d12;
+    color:#eef2f6;
+    border-color:#34404c;
+  }
+
+  .global-search input::placeholder,
+  #spoelen input::placeholder,
+  #refills input::placeholder{
+    color:#8b96a3;
+  }
+
+  #spoelen,
+  #refills{
+    max-width:1180px;
+    margin:0 auto;
+  }
+
+  #spoelen .toolbar,
+  #refills .toolbar{
+    gap:8px;
+    align-items:center;
+  }
+
+  #spoelen .toolbar button,
+  #refills .toolbar button{
+    min-height:38px;
+    padding:7px 12px;
+  }
+
+  #spoelen .toolbar input,
+  #refills .toolbar input{
+    flex:1 1 340px;
+  }
+
+  #spoelen .panel,
+  #refills .panel{
+    background:#080d12;
+    border:1px solid #26303a;
+    box-shadow:none;
+    color:#eef2f6;
+  }
+
+  #spoelen .collapsible-stock-category,
+  #refills .collapsible-stock-category{
+    margin:0 0 5px;
+  }
+
+  #spoelen .category-collapse-button,
+  #refills .category-collapse-button{
+    min-height:34px;
+    padding:5px 10px;
+    border:1px solid color-mix(in srgb,var(--cat-color) 55%,#202a34);
+    border-radius:5px;
+    background:color-mix(in srgb,var(--cat-color) 25%,#081018);
+    color:color-mix(in srgb,var(--cat-color) 75%,white);
+    font-size:16px;
+  }
+
+  #spoelen .type-collapse-button,
+  #refills .type-collapse-button{
+    min-height:31px;
+    margin:2px 0 0 28px;
+    width:calc(100% - 28px);
+    padding:4px 10px;
+    border:1px solid color-mix(in srgb,var(--cat-color) 42%,#202a34);
+    border-radius:4px;
+    background:color-mix(in srgb,var(--cat-color) 17%,#081018);
+    color:color-mix(in srgb,var(--cat-color) 70%,white);
+  }
+
+  #spoelen .collapse-count,
+  #refills .collapse-count{
+    color:inherit;
+  }
+
+  #spoelen .separate-dashboard-table,
+  #refills .separate-dashboard-table{
+    width:calc(100% - 48px);
+    margin:0 0 4px 48px;
+    background:#080d12;
+    color:#eef2f6;
+    table-layout:fixed;
+    border-collapse:collapse;
+  }
+
+  #spoelen .separate-dashboard-table th,
+  #refills .separate-dashboard-table th{
+    padding:5px 7px;
+    color:#aeb8c3;
+    background:#080d12;
+    border-bottom:1px solid #26303a;
+    font-size:12px;
+  }
+
+  #spoelen .separate-dashboard-table td,
+  #refills .separate-dashboard-table td{
+    padding:5px 7px;
+    height:34px;
+    border-bottom:1px solid #1c252e;
+    background:#080d12;
+    color:#eef2f6;
+    font-size:13px;
+  }
+
+  #spoelen .separate-dashboard-table tr:hover td,
+  #refills .separate-dashboard-table tr:hover td{
+    background:#0d141b;
+  }
+
+  #spoelen .separate-stock-color,
+  #refills .separate-stock-color,
+  #spoelen .separate-dashboard-table strong,
+  #refills .separate-dashboard-table strong{
+    color:color-mix(in srgb,var(--cat-color) 72%,white);
+  }
+
+  #spoelen .separate-dashboard-table .select-col,
+  #refills .separate-dashboard-table .select-col{
+    width:34px;
+    min-width:34px;
+  }
+
+  #spoelen .compact-actions,
+  #refills .compact-actions{
+    text-align:right;
+    white-space:nowrap;
+  }
+
+  #spoelen .compact-actions button,
+  #refills .compact-actions button{
+    min-height:28px;
+    padding:4px 8px;
+    margin-left:4px;
+    background:#0b1117;
+    border-color:#2c7bc9;
+    color:#55aaff;
+    font-size:11px;
+  }
+
+  #spoelen .compact-actions .danger-button,
+  #refills .compact-actions .danger-button{
+    border-color:#d32929;
+    color:#ff5252;
+    background:#150909;
+  }
+
+  #spoelen .primary,
+  #refills .primary{
+    background:#0b4fb3;
+    border-color:#1767d5;
+    color:#fff;
+  }
+
+  #spoelen .separate-flat-table,
+  #refills .separate-flat-table{
+    margin-left:0;
+    width:100%;
+  }
+}
+
+
+/* v7.5.33 - volledige donkere Mac/desktop interface; mobiel/iPhone blijft ongewijzigd */
+@media (min-width:901px){
+  :root{
+    --desktop-bg:#05080b;
+    --desktop-panel:#090e13;
+    --desktop-panel-2:#0d131a;
+    --desktop-line:#26313b;
+    --desktop-text:#edf2f7;
+    --desktop-muted:#9aa6b2;
+  }
+
+  body,.main-shell,main{background:var(--desktop-bg)!important;color:var(--desktop-text)!important}
+  .view{color:var(--desktop-text)}
+  .panel,.summary-card,.card,.modal-card,.menu-card,.settings-card{
+    background:var(--desktop-panel)!important;
+    color:var(--desktop-text)!important;
+    border-color:var(--desktop-line)!important;
+    box-shadow:none!important;
+  }
+
+  .summary-card span,.note,.muted,.small,.help-text{color:var(--desktop-muted)!important}
+  .summary-card strong,h1,h2,h3,label{color:var(--desktop-text)}
+
+  .toolbar,.panel-head{background:transparent!important;color:var(--desktop-text)}
+  input,select,textarea{
+    background:#0a1016!important;
+    color:var(--desktop-text)!important;
+    border-color:#34414d!important;
+  }
+  input::placeholder,textarea::placeholder{color:#7f8b97!important}
+
+  table{color:var(--desktop-text)}
+  th{color:#aab5c0!important;background:var(--desktop-panel)!important}
+  td{background:var(--desktop-panel)!important;border-color:#1d2730!important}
+  tr:hover td{background:#0d151c!important}
+
+  /* Generieke lijsten/rijen op Dashboard, Catalogus, Voorraad, Bestellen enz. */
+  .list-row,.stock-row,.catalog-row,.order-row,.library-row,.log-row,
+  .inventory-row,.filament-row,.result-row{
+    background:var(--desktop-panel)!important;
+    color:var(--desktop-text)!important;
+    border-color:#1d2730!important;
+  }
+
+  button:not(.primary):not(.danger-button){
+    background:#0b1117;
+    color:#dce5ed;
+    border-color:#34414d;
+  }
+  button.primary,.primary{
+    background:#0b4fb3!important;
+    color:#fff!important;
+    border-color:#1767d5!important;
+  }
+  .danger-button{
+    background:#150909!important;
+    color:#ff5b5b!important;
+    border-color:#d32929!important;
+  }
+
+  /* Dashboard zelf ook donker */
+  #dashboard .panel,
+  #dashboard .summary-card{
+    background:var(--desktop-panel)!important;
+  }
+  #dashboard .dashboard-table td,
+  #dashboard .dashboard-table th{
+    background:var(--desktop-panel)!important;
+  }
+
+  /* Catalogus / oude Voorraad / bestellijsten */
+  #catalogus .panel,#voorraad .panel,#bestellijst .panel,#bestellingen .panel,
+  #bibliotheken .panel,#logboek .panel,#meer .panel,#scannen .panel{
+    background:var(--desktop-panel)!important;
+    color:var(--desktop-text)!important;
+    border-color:var(--desktop-line)!important;
+  }
+
+  #catalogus .panel *,#voorraad .panel *,#bestellijst .panel *,
+  #bestellingen .panel *,#bibliotheken .panel *,#logboek .panel *,
+  #meer .panel *,#scannen .panel *{
+    border-color:var(--desktop-line);
+  }
+
+  /* Witte blokken die door component-CSS nog expliciet wit waren */
+  #catalogus [style*="background"],
+  #voorraad [style*="background"],
+  #bestellijst [style*="background"],
+  #bestellingen [style*="background"]{
+    color:inherit;
+  }
+
+  .search-results{
+    background:#0b1117!important;
+    color:var(--desktop-text)!important;
+    border-color:var(--desktop-line)!important;
+  }
+
+  .modal,.overlay{color:var(--desktop-text)}
+}
+
+
+/* v7.5.34 - Mac/desktop terug lichte achtergrond; iPhone ongewijzigd */
+@media (min-width:901px){
+  body,.main-shell,main{
+    background:#f4f5f7!important;
+    color:#111827!important;
+  }
+
+  .mobile-header{
+    background:#fff!important;
+    color:#111827!important;
+    border-bottom:1px solid #d7dde5!important;
+  }
+
+  .global-search{background:#f4f5f7!important}
+
+  .panel,.summary-card,.card,.modal-card,.menu-card,.settings-card,
+  #dashboard .panel,#dashboard .summary-card,
+  #catalogus .panel,#voorraad .panel,#bestellijst .panel,#bestellingen .panel,
+  #bibliotheken .panel,#logboek .panel,#meer .panel,#scannen .panel,
+  #spoelen .panel,#refills .panel{
+    background:#fff!important;
+    color:#111827!important;
+    border-color:#d7dde5!important;
+  }
+
+  .summary-card span,.note,.muted,.small,.help-text{color:#64748b!important}
+  .summary-card strong,h1,h2,h3,label{color:#111827!important}
+
+  .toolbar,.panel-head{background:transparent!important;color:#111827!important}
+
+  input,select,textarea,
+  .global-search input,
+  #spoelen .toolbar input,#refills .toolbar input,
+  #spoelen .toolbar select,#refills .toolbar select{
+    background:#fff!important;
+    color:#111827!important;
+    border-color:#cbd5e1!important;
+  }
+  input::placeholder,textarea::placeholder,
+  .global-search input::placeholder,
+  #spoelen input::placeholder,#refills input::placeholder{
+    color:#94a3b8!important;
+  }
+
+  table{color:#111827!important}
+  th{
+    color:#475569!important;
+    background:#fff!important;
+  }
+  td,
+  #dashboard .dashboard-table td,#dashboard .dashboard-table th,
+  #spoelen .separate-dashboard-table td,#spoelen .separate-dashboard-table th,
+  #refills .separate-dashboard-table td,#refills .separate-dashboard-table th{
+    background:#fff!important;
+    border-color:#e5e7eb!important;
+  }
+  tr:hover td{background:#f8fafc!important}
+
+  .list-row,.stock-row,.catalog-row,.order-row,.library-row,.log-row,
+  .inventory-row,.filament-row,.result-row{
+    background:#fff!important;
+    color:#111827!important;
+    border-color:#e5e7eb!important;
+  }
+
+  button:not(.primary):not(.danger-button){
+    background:#fff!important;
+    color:#0f766e!important;
+    border-color:#cbd5e1!important;
+  }
+  button.primary,.primary{
+    background:#111827!important;
+    color:#fff!important;
+    border-color:#111827!important;
+  }
+  .danger-button{
+    background:#fff!important;
+    color:#dc2626!important;
+    border-color:#ef4444!important;
+  }
+
+  .search-results{
+    background:#fff!important;
+    color:#111827!important;
+    border-color:#d7dde5!important;
+  }
+
+  /* De compacte categorie/type-opbouw blijft, maar op lichte achtergrond. */
+  #spoelen .category-collapse-button,#refills .category-collapse-button{
+    background:color-mix(in srgb,var(--cat-color) 10%,white)!important;
+    border-color:color-mix(in srgb,var(--cat-color) 45%,#d7dde5)!important;
+    color:var(--cat-color)!important;
+  }
+  #spoelen .type-collapse-button,#refills .type-collapse-button{
+    background:color-mix(in srgb,var(--cat-color) 6%,white)!important;
+    border-color:color-mix(in srgb,var(--cat-color) 30%,#e5e7eb)!important;
+    color:var(--cat-color)!important;
+  }
+  #spoelen .separate-stock-color,#refills .separate-stock-color,
+  #spoelen .separate-dashboard-table strong,#refills .separate-dashboard-table strong{
+    color:var(--cat-color)!important;
+  }
+  #spoelen .compact-actions button,#refills .compact-actions button{
+    background:#fff!important;
+    color:#0f766e!important;
+    border-color:#94a3b8!important;
+  }
+  #spoelen .compact-actions .danger-button,#refills .compact-actions .danger-button{
+    background:#fff!important;
+    color:#dc2626!important;
+    border-color:#ef4444!important;
+  }
+}
+
+/* v7.5.40 - compactere Mac-layout voor Dashboard, Spoelen en Refill.
+   Alleen desktop; iPhone/mobile blijft ongewijzigd. */
+@media (min-width:901px){
+  .app-shell{grid-template-columns:205px 1fr}
+  .desktop-sidebar{padding:16px 14px}
+  .desktop-sidebar nav{gap:4px;margin-top:20px}
+  .desktop-sidebar nav button{
+    min-height:38px!important;padding:7px 10px!important;
+    border-radius:7px!important;font-size:14px!important;
+  }
+  .desktop-sidebar nav button.active{
+    background:#0f766e!important;border-color:#0f766e!important;
+    color:#fff!important;font-weight:700;
+  }
+
+  main{max-width:1320px;margin-left:0;margin-right:auto;padding-left:18px;padding-right:18px}
+  #dashboard,#spoelen,#refills{width:100%;max-width:1180px;margin-left:0;margin-right:auto}
+
+  #spoelen .toolbar,#refills .toolbar{gap:6px;flex-wrap:nowrap}
+  #spoelen .toolbar button,#refills .toolbar button,
+  #spoelen .toolbar input,#refills .toolbar input,
+  #spoelen .toolbar select,#refills .toolbar select{
+    min-height:36px!important;height:36px;padding:6px 9px!important;font-size:13px!important
+  }
+  #spoelen .toolbar input,#refills .toolbar input{min-width:260px}
+
+  #spoelen .category-collapse-button,#refills .category-collapse-button{
+    min-height:31px;padding:4px 8px!important;font-size:15px!important;
+    background:color-mix(in srgb,var(--cat-color) 14%,white)!important
+  }
+  #spoelen .type-collapse-button,#refills .type-collapse-button{
+    min-height:29px;padding:3px 8px!important;font-size:13px!important;
+    background:color-mix(in srgb,var(--cat-color) 10%,white)!important
+  }
+
+  #spoelen .separate-dashboard-table,#refills .separate-dashboard-table{
+    width:calc(100% - 42px)!important;margin-left:42px!important;table-layout:fixed!important
+  }
+  #spoelen .separate-dashboard-table th,#spoelen .separate-dashboard-table td,
+  #refills .separate-dashboard-table th,#refills .separate-dashboard-table td{
+    padding:4px 6px!important;height:32px!important;font-size:12px!important
+  }
+  #spoelen .separate-dashboard-table .select-col,#refills .separate-dashboard-table .select-col{
+    width:34px!important;min-width:34px!important
+  }
+  #spoelen .separate-dashboard-table th:nth-child(2),#spoelen .separate-dashboard-table td:nth-child(2),
+  #refills .separate-dashboard-table th:nth-child(2),#refills .separate-dashboard-table td:nth-child(2){width:28%!important}
+  #spoelen .separate-dashboard-table th:nth-child(3),#spoelen .separate-dashboard-table td:nth-child(3),
+  #refills .separate-dashboard-table th:nth-child(3),#refills .separate-dashboard-table td:nth-child(3){width:20%!important}
+  #spoelen .separate-dashboard-table th:nth-child(4),#spoelen .separate-dashboard-table td:nth-child(4){
+    width:16%!important;text-align:center
+  }
+  #spoelen .separate-dashboard-table th:last-child,#spoelen .separate-dashboard-table td:last-child,
+  #refills .separate-dashboard-table th:last-child,#refills .separate-dashboard-table td:last-child{
+    width:155px!important;text-align:right
+  }
+  #spoelen .compact-actions button,#refills .compact-actions button{
+    min-height:26px!important;padding:3px 7px!important;font-size:11px!important
+  }
+
+  #dashboard .summary-grid{gap:6px;margin-bottom:7px}
+  #dashboard .summary-card{padding:7px 9px!important}
+  #dashboard .panel{padding:8px 10px!important}
+  #dashboard .panel-head{gap:8px;flex-wrap:nowrap}
+  #dashboard .panel-head input{min-height:35px!important;height:35px;padding:6px 9px!important}
+  #dashboard .category-title{
+    padding:5px 8px!important;margin-top:7px!important;
+    border:1px solid color-mix(in srgb,var(--cat-color) 45%,#d7dde5)!important;
+    border-radius:5px;background:color-mix(in srgb,var(--cat-color) 14%,white)!important
+  }
+  #dashboard .type-title{
+    margin:3px 0 1px 24px!important;padding:4px 8px!important;width:calc(100% - 24px);
+    border-radius:4px;background:color-mix(in srgb,var(--cat-color) 9%,white)!important
+  }
+  #dashboard .dashboard-table{width:calc(100% - 42px);margin-left:42px;table-layout:fixed}
+  #dashboard .dashboard-table th,#dashboard .dashboard-table td{
+    height:29px!important;padding:3px 6px!important
+  }
+  #dashboard .dashboard-table th:first-child,#dashboard .dashboard-table td:first-child{width:auto}
+  #dashboard .dashboard-table th:nth-child(2),#dashboard .dashboard-table td:nth-child(2){width:105px}
+  #dashboard .dashboard-table th:nth-child(3),#dashboard .dashboard-table td:nth-child(3){width:100px}
+  #dashboard .dashboard-table th:nth-child(4),#dashboard .dashboard-table td:nth-child(4){width:62px}
+}
+
+
+/* v7.5.41 - compacte desktopbreedte Dashboard, Spoelen en Refill */
+@media (min-width:901px){
+
+  /* De drie hoofdschermen krijgen een echte desktopwerkbreedte. */
+  #dashboard,
+  #spoelen,
+  #refills{
+    width:min(100%,1000px)!important;
+    max-width:1000px!important;
+    margin-left:0!important;
+    margin-right:auto!important;
+  }
+
+  /* Bedieningsbalk volgt exact dezelfde breedte. */
+  #spoelen .toolbar,
+  #refills .toolbar{
+    width:100%!important;
+    max-width:1000px!important;
+  }
+
+  #spoelen .toolbar input,
+  #refills .toolbar input{
+    flex:1 1 auto!important;
+    min-width:220px!important;
+  }
+
+  #spoelen .toolbar select,
+  #refills .toolbar select{
+    flex:0 0 190px!important;
+    width:190px!important;
+  }
+
+  /* Paneel en categorie/type-balken niet langer over de volledige monitor. */
+  #spoelen .panel,
+  #refills .panel,
+  #dashboard .panel{
+    width:100%!important;
+    max-width:1000px!important;
+  }
+
+  /* Hiërarchie compacter. */
+  #spoelen .type-collapse-button,
+  #refills .type-collapse-button{
+    margin-left:24px!important;
+    width:calc(100% - 24px)!important;
+  }
+
+  #spoelen .separate-dashboard-table,
+  #refills .separate-dashboard-table{
+    width:calc(100% - 48px)!important;
+    margin-left:48px!important;
+    margin-right:0!important;
+  }
+
+  /* Checkbox vlak naast kleur; vaste compacte kolommen. */
+  #spoelen .separate-dashboard-table .select-col,
+  #refills .separate-dashboard-table .select-col{
+    width:30px!important;
+    min-width:30px!important;
+    max-width:30px!important;
+    padding-left:2px!important;
+    padding-right:3px!important;
+  }
+
+  #spoelen .separate-dashboard-table th:nth-child(2),
+  #spoelen .separate-dashboard-table td:nth-child(2),
+  #refills .separate-dashboard-table th:nth-child(2),
+  #refills .separate-dashboard-table td:nth-child(2){
+    width:220px!important;
+  }
+
+  #spoelen .separate-dashboard-table th:nth-child(3),
+  #spoelen .separate-dashboard-table td:nth-child(3),
+  #refills .separate-dashboard-table th:nth-child(3),
+  #refills .separate-dashboard-table td:nth-child(3){
+    width:150px!important;
+  }
+
+  #spoelen .separate-dashboard-table th:nth-child(4),
+  #spoelen .separate-dashboard-table td:nth-child(4){
+    width:105px!important;
+  }
+
+  #spoelen .separate-dashboard-table th:last-child,
+  #spoelen .separate-dashboard-table td:last-child,
+  #refills .separate-dashboard-table th:last-child,
+  #refills .separate-dashboard-table td:last-child{
+    width:145px!important;
+  }
+
+  /* Lagere rijen. */
+  #spoelen .separate-dashboard-table th,
+  #spoelen .separate-dashboard-table td,
+  #refills .separate-dashboard-table th,
+  #refills .separate-dashboard-table td{
+    height:29px!important;
+    padding-top:3px!important;
+    padding-bottom:3px!important;
+  }
+
+  #spoelen .compact-actions button,
+  #refills .compact-actions button{
+    min-height:24px!important;
+    padding:2px 6px!important;
+  }
+
+  /* Dashboard dezelfde compacte werkbreedte en hiërarchie. */
+  #dashboard .dashboard-table{
+    width:calc(100% - 48px)!important;
+    margin-left:48px!important;
+  }
+
+  #dashboard .type-title{
+    margin-left:24px!important;
+    width:calc(100% - 24px)!important;
+  }
+}
+
+
+/* v7.5.42 - lagere rijen op Mac voor Dashboard, Spoelen en Refill.
+   Mobiel/iPhone blijft ongewijzigd. */
+@media (min-width:901px){
+
+  /* Checkbox iets dichter naar de kleur. */
+  #spoelen .separate-dashboard-table .select-col,
+  #refills .separate-dashboard-table .select-col{
+    width:26px!important;
+    min-width:26px!important;
+    max-width:26px!important;
+    padding-left:0!important;
+    padding-right:2px!important;
+  }
+
+  /* Nog compactere tabelrijen. */
+  #spoelen .separate-dashboard-table th,
+  #spoelen .separate-dashboard-table td,
+  #refills .separate-dashboard-table th,
+  #refills .separate-dashboard-table td{
+    height:25px!important;
+    padding-top:2px!important;
+    padding-bottom:2px!important;
+    line-height:1.15!important;
+  }
+
+  #spoelen .compact-actions button,
+  #refills .compact-actions button{
+    min-height:22px!important;
+    padding:1px 6px!important;
+    line-height:1.15!important;
+  }
+
+  /* Dashboard eveneens iets lager. */
+  #dashboard .dashboard-table th,
+  #dashboard .dashboard-table td{
+    height:25px!important;
+    padding-top:2px!important;
+    padding-bottom:2px!important;
+    line-height:1.15!important;
+  }
+
+  #dashboard .category-title{
+    padding-top:4px!important;
+    padding-bottom:4px!important;
+  }
+
+  #dashboard .type-title{
+    padding-top:3px!important;
+    padding-bottom:3px!important;
+  }
+}
+
+
+/* v7.5.43 - desktop: Spoelen/Refill dezelfde rijhoogte als Dashboard + menu-iconen */
+@media (min-width:901px){
+  .desktop-sidebar nav button{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:9px!important;
+  }
+  .desktop-sidebar .nav-icon{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:18px;
+    min-width:18px;
+    font-size:15px;
+    line-height:1;
+  }
+
+  /* Zelfde tabelritme als Dashboard */
+  #spoelen .separate-dashboard-table th,
+  #spoelen .separate-dashboard-table td,
+  #refills .separate-dashboard-table th,
+  #refills .separate-dashboard-table td{
+    height:25px!important;
+    min-height:25px!important;
+    padding-top:2px!important;
+    padding-bottom:2px!important;
+    line-height:1.15!important;
+  }
+
+  #spoelen .category-collapse-button,
+  #refills .category-collapse-button{
+    min-height:27px!important;
+    padding-top:4px!important;
+    padding-bottom:4px!important;
+  }
+
+  #spoelen .type-collapse-button,
+  #refills .type-collapse-button{
+    min-height:25px!important;
+    padding-top:3px!important;
+    padding-bottom:3px!important;
+  }
+
+  #spoelen .compact-actions button,
+  #refills .compact-actions button{
+    min-height:22px!important;
+    height:22px!important;
+    padding:1px 6px!important;
+  }
+}
+
+
+/* v7.5.44 - uniforme lijniconen in desktopmenu */
+@media (min-width:901px){
+  .desktop-sidebar .nav-icon{
+    width:20px!important;
+    min-width:20px!important;
+    height:20px!important;
+    color:#0f766e;
+  }
+  .desktop-sidebar .nav-icon svg{
+    display:block;
+    width:20px;
+    height:20px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.8;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
+  .desktop-sidebar nav button.active .nav-icon{
+    color:#fff;
+  }
+  .desktop-sidebar nav button{
+    gap:10px!important;
+  }
+}
+
+
+/* v7.5.45 - donkerdere tekst in het Mac-zijmenu */
+@media (min-width:901px){
+  .desktop-sidebar nav button{
+    color:#0b5f59!important;
+  }
+  .desktop-sidebar nav button .nav-icon{
+    color:#0b756d!important;
+  }
+  .desktop-sidebar nav button.active{
+    color:#fff!important;
+  }
+  .desktop-sidebar nav button.active .nav-icon{
+    color:#fff!important;
+  }
+}
+
+
+/* v7.5.46 - menutekst expliciet donker groen */
+@media (min-width:901px){
+  .desktop-sidebar nav button > span:not(.nav-icon){
+    color:#0b5f59!important;
+  }
+
+  .desktop-sidebar nav button.active > span:not(.nav-icon){
+    color:#fff!important;
+  }
+}
+
+
+/* v8.0.0 - kleurherkenning, scanbediening en mobiele formulieren */
+.filament-color-dot{
+  display:inline-block;
+  width:.78em;
+  height:.78em;
+  min-width:.78em;
+  margin-right:.38em;
+  border-radius:50%;
+  vertical-align:-.03em;
+  background:var(--filament-color,#94a3b8);
+  border:1px solid rgba(15,23,42,.28);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
+}
+.search-result strong{
+  display:flex;
+  align-items:center;
+}
+/* Tabelcellen moeten table-cell blijven; het kleurbolletje zelf is inline-block. */
+.dashboard-color-name,
+.separate-stock-color{
+  display:table-cell;
+}
+.filament-detail-card .detail-section{margin-top:16px}
+.detail-stock-row{
+  display:grid;
+  grid-template-columns:minmax(70px,auto) 1fr auto;
+  gap:10px;
+  align-items:center;
+  padding:8px 0;
+  border-bottom:1px solid var(--line);
+}
+.editable-summary select{width:100%;margin-top:4px}
+.scan-spool-info{
+  padding:12px;
+  margin:8px 0 14px;
+  border:1px solid var(--line);
+  border-radius:10px;
+}
+.scan-spool-number{font-size:24px;font-weight:800;margin-bottom:4px}
+#scanDialog .dialog-card{max-width:560px}
+#scanDialog #qrReader{margin:10px 0}
+@media (max-width:900px){
+  input,select,textarea,
+  dialog input,dialog select,dialog textarea{
+    font-size:16px!important;
+  }
+  dialog{
+    width:calc(100vw - 24px)!important;
+    max-width:calc(100vw - 24px)!important;
+    margin:auto!important;
+  }
+  .dialog-card{
+    max-width:100%;
+    overflow-x:hidden;
+    box-sizing:border-box;
+  }
+  .dialog-card input,.dialog-card select,.dialog-card textarea{
+    width:100%;
+    max-width:100%;
+    box-sizing:border-box;
+  }
+  .detail-stock-row{grid-template-columns:auto 1fr}
+  .detail-stock-row select{grid-column:1/-1}
+}
+
+
+/* v8.1 - Mac: kleurbolletje compact houden in Spoelen en Refills */
+@media (min-width:901px){
+  .separate-stock-table .filament-color-dot,
+  .separate-stock-list .filament-color-dot,
+  #spoelen .filament-color-dot,
+  #refills .filament-color-dot{
+    display:inline-block!important;
+    width:9px!important;
+    min-width:9px!important;
+    max-width:9px!important;
+    height:9px!important;
+    min-height:9px!important;
+    max-height:9px!important;
+    margin:0 6px 0 0!important;
+    padding:0!important;
+    border-radius:50%!important;
+    vertical-align:middle!important;
+    background:var(--filament-color,#94a3b8)!important;
+    box-sizing:border-box!important;
+    position:static!important;
+    flex:0 0 9px!important;
+  }
+
+  #spoelen td,
+  #refills td{
+    vertical-align:middle!important;
+  }
+}
+
+
+/* v8.2 - herstel tabelopbouw Spoelen/Refills op Mac */
+@media (min-width:901px){
+  #spoelen td.separate-stock-color,
+  #refills td.separate-stock-color,
+  #dashboard td.dashboard-color-name{
+    display:table-cell!important;
+    background:#fff!important;
+  }
+}
+
+/* v8.3 - scannerstappen en back-upknoppen */
+.scan-instruction{display:flex;flex-direction:column;gap:3px;margin:8px 0 10px;padding:10px 12px;border-radius:10px;background:#eef6ff;border:1px solid #bfd7ff}
+.scan-instruction strong{font-size:18px}.scan-instruction span{color:#475569}
+.scan-confirmation{margin:8px 0 10px;padding:10px 12px;border-radius:10px;background:#ecfdf5;border:1px solid #86efac;color:#166534;font-weight:700}
+#backup button,#backup label.button,#backup .button,#backup .backup-actions button,#backup .backup-actions label{text-align:center!important;justify-content:center!important;align-items:center!important}
+
+
+/* v8.4 - Back-up terugzetten exact centreren */
+#backup .file-button,
+#backup label[for="restoreBackupInput"],
+#backup label:has(#restoreBackupInput),
+#backup .backup-restore-button{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+}
+
+
+/* v8.5 - definitieve centrering Back-up terugzetten */
+label.file-button:has(#restoreBackupInput){
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  box-sizing:border-box!important;
+  cursor:pointer;
+}
+label.file-button:has(#restoreBackupInput) #restoreBackupInput{
+  display:none!important;
+}
+
+
+/* v9.0 - statistiek filamentverbruik */
+.stats-summary-grid .summary-card small{display:block;margin-top:2px;font-size:11px;color:var(--muted)}
+.stats-head{align-items:flex-start}
+.stats-tabs{margin:0}
+.stats-tabs button.active{background:var(--accent);color:#fff}
+.stats-period-nav{display:grid;grid-template-columns:46px 1fr 46px;gap:8px;align-items:center;margin:12px 0}
+.stats-period-nav>div{text-align:center;min-width:0}
+.stats-period-nav strong{display:block;font-size:18px}
+.stats-period-nav span{display:block;margin-top:3px;font-size:11px;color:var(--muted)}
+.stats-period-total{display:flex;align-items:end;justify-content:space-between;border-top:1px solid var(--line);padding-top:12px}
+.stats-period-total span{font-size:13px;color:var(--muted)}
+.stats-period-total strong{font-size:36px;line-height:1}
+.stats-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.stats-table{min-width:420px}
+.stats-table tfoot th{border-top:2px solid var(--line);color:var(--text)}
+.stats-number{text-align:right!important;width:72px}
+.stats-empty{padding:12px 0}
+.stats-log-table{min-width:760px}
+.stats-delete-button{min-height:34px;padding:5px 8px;font-size:12px}
+#statistiek h3{margin:0 0 10px}
+@media(max-width:599px){
+  .stats-tabs{width:100%;display:grid;grid-template-columns:repeat(4,1fr);overflow:visible}
+  .stats-tabs button{padding:8px 5px;min-height:40px;font-size:12px}
+  .stats-period-total strong{font-size:32px}
+}
+
+
+/* Firebase synchronisatie v10.1 */
+.firebase-sync-bar{display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:1px solid rgba(148,163,184,.18);font-size:13px;min-height:34px}
+.firebase-sync-bar button{margin-left:auto;padding:4px 9px;min-height:28px;font-size:12px}
+.firebase-sync-dot{width:9px;height:9px;min-width:9px;border-radius:50%;background:#94a3b8;box-shadow:0 0 0 2px rgba(148,163,184,.12)}
+.firebase-sync-dot.ok{background:#22c55e}.firebase-sync-dot.error{background:#ef4444}.firebase-sync-dot.busy{background:#f59e0b}
+.firebase-login-grid{display:grid;grid-template-columns:minmax(180px,1fr) minmax(160px,1fr) auto;gap:10px;align-items:end}
+.firebase-login-grid input{width:100%;box-sizing:border-box}
+.firebase-user-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media(max-width:700px){.firebase-login-grid{grid-template-columns:1fr}.firebase-login-grid button{width:100%}.firebase-sync-bar{padding:6px 12px}.firebase-sync-bar button{font-size:11px}.firebase-user-row .dialog-actions{width:100%}.firebase-user-row .dialog-actions button{flex:1}}
+
+
+/* v10.2 - compacter dashboard op mobiel: hoeveelheid en beschikbare refills */
+#dashboard .dashboard-level-select{
+  box-sizing:border-box;
+  width:68px;
+  min-width:68px;
+  max-width:68px;
+  min-height:34px;
+  padding:4px 20px 4px 6px;
+  font-size:14px;
+  line-height:1;
+  text-align:center;
+  text-align-last:center;
+}
+
+#dashboard .dashboard-refill-cell{
+  text-align:center !important;
+}
+
+#dashboard .dashboard-refill-count{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:30px;
+  height:30px;
+  padding:0 7px;
+  box-sizing:border-box;
+  border:1px solid #d1d5db;
+  border-radius:8px;
+  font-weight:700;
+  line-height:1;
+  background:#fff;
+}
+
+@media(max-width:700px){
+  #dashboard .dashboard-table th:nth-child(2),
+  #dashboard .dashboard-table td:nth-child(2){
+    width:62px;
+  }
+
+  #dashboard .dashboard-table th:nth-child(3),
+  #dashboard .dashboard-table td:nth-child(3){
+    width:72px;
+    text-align:center;
+  }
+
+  #dashboard .dashboard-table th:nth-child(4),
+  #dashboard .dashboard-table td:nth-child(4){
+    width:42px;
+    text-align:center;
+  }
+
+  #dashboard .dashboard-level-select{
+    width:64px;
+    min-width:64px;
+    max-width:64px;
+    min-height:32px;
+    padding:3px 17px 3px 5px;
+    border-radius:8px;
+    font-size:11px;
+  }
+
+  #dashboard .dashboard-refill-count{
+    min-width:28px;
+    height:28px;
+    padding:0 5px;
+    border-radius:7px;
+    font-size:13px;
+  }
+}
+
+
+/* v10.4 - hoeveelheidselector compacter op Mac én iPhone */
+#dashboard .dashboard-level-select{
+  -webkit-appearance:none !important;
+  appearance:none !important;
+  width:66px !important;
+  min-width:66px !important;
+  max-width:66px !important;
+  min-height:32px !important;
+  padding:3px 17px 3px 5px !important;
+  font-size:12px !important;
+  font-weight:600 !important;
+  line-height:1 !important;
+  text-align:center !important;
+  text-align-last:center !important;
+  background-color:#fff;
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - 11px) 44%,
+    calc(100% - 7px) 44%;
+  background-size:4px 4px, 4px 4px;
+  background-repeat:no-repeat;
+}
+
+@media(max-width:700px){
+  #dashboard .dashboard-level-select{
+    font-size:11px !important;
+  }
+}

@@ -1,4 +1,4 @@
-Filament Manager - versie 10.7
+Filament Manager - versie 10.8
 ================================
 
 Status
@@ -49,23 +49,23 @@ EOsNru7BilUx9GguaBk0QxxY9oo1
 Databasepad:
 users/EOsNru7BilUx9GguaBk0QxxY9oo1/filamentManager/state
 
-Versie 10.7 gebruikt voor compatibiliteit dezelfde lokale opslagsleutel als de werkende 10.0-build:
+Versie 10.8 gebruikt voor compatibiliteit dezelfde lokale opslagsleutel als de werkende 10.0-build:
 filament_manager_v10_0
 
-Wijziging in 10.7
+Wijziging in 10.8
 -----------------
 - Dashboardweergave op iPhone compacter gemaakt.
 - Hoeveelheid op de spoel gebruikt een smallere keuzeknop.
 - Aantal beschikbare refills staat duidelijk in een compacte badge.
 - Firebase-synchronisatie en opslaglogica zijn niet gewijzigd.
 
-Wijziging in 10.7
+Wijziging in 10.8
 -----------------
 - Tekst in de hoeveelheidknop op het dashboard kleiner gemaakt.
 - De compacte breedte van de knop blijft behouden.
 - Refill-badge, Firebase en synchronisatielogica zijn niet gewijzigd.
 
-Wijziging in 10.7
+Wijziging in 10.8
 -----------------
 - Hoeveelheidselector compacter gemaakt op Mac én iPhone.
 - Lettergrootte verlaagd naar 12 px op desktop en 11 px op mobiel.
@@ -73,7 +73,7 @@ Wijziging in 10.7
 - Eigen compacte pijltjes toegevoegd.
 - Firebase, gegevens en synchronisatie zijn niet gewijzigd.
 
-Wijziging in 10.7
+Wijziging in 10.8
 -----------------
 - Op spoel-etiketten worden categorie en type afgedrukt in de categoriekleur.
 - Dezelfde kleuren als op het dashboard worden gebruikt:
@@ -82,16 +82,27 @@ Wijziging in 10.7
 - Refill-etiketten blijven ongewijzigd.
 - Firebase en synchronisatie zijn niet gewijzigd.
 
-Wijziging in 10.7
+Wijziging in 10.8
 -----------------
 - Op spoel-etiketten worden nu categorie + type, kleur, leverancier, referentie en het woord "spoel" in de categoriekleur afgedrukt.
 - QR-code en groot spoelnummer blijven zwart voor maximale leesbaarheid en scanbaarheid.
 - Refill-etiketten blijven ongewijzigd.
 - Firebase en synchronisatie zijn niet gewijzigd.
 
-Wijziging in 10.7
+Wijziging in 10.8
 -----------------
 - De categoriekleur op etiketten wordt nu ook toegepast op refill-etiketten.
 - Op zowel spoel- als refill-etiketten staan categorie + type, kleur, leverancier, referentie en het woord "spoel"/"refill" in de categoriekleur.
 - QR-code en groot nummer blijven zwart voor leesbaarheid en scanbaarheid.
+- Firebase en synchronisatie zijn niet gewijzigd.
+
+Wijziging in 10.8
+-----------------
+- Nieuwe gevulde spoelen worden geblokkeerd wanneer hetzelfde filament al op een andere actieve, niet-lege spoel aanwezig is.
+- Een lege bestaande spoel kan niet opnieuw gevuld worden wanneer hetzelfde filament nog op een andere actieve, niet-lege spoel zit.
+- Deze controle geldt voor handmatig niveau wijzigen, detailweergave, QR-niveauaanpassing en het koppelen van een refill.
+- Bij blokkering toont de app op welk spoelnummer het filament al aanwezig is.
+- Bestaande dubbele situaties worden niet automatisch gewijzigd en kunnen worden opgebruikt.
+- Bestaande dubbele spoelen blijven normaal bewerkbaar zolang ze niet van leeg naar gevuld gaan of van filament veranderen.
+- Refillvoorraad mag nog steeds meerdere refills van hetzelfde filament bevatten.
 - Firebase en synchronisatie zijn niet gewijzigd.
