@@ -5,23 +5,23 @@ const SYNC_DIRTY_KEY='filament_manager_v10_0_dirty_v1';
 const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','Andere'],types:{PLA:['Basic','Matte'],PETG:['Basic'],TPU:['95A'],ABS:['Basic'],ASA:['Basic'],Andere:[]},colors:[],brands:['Bambu Lab'],suppliers:['Bambu Lab']};
 let state=load();
 if(!Array.isArray(state.rollUsage))state.rollUsage=[];
-state.appVersion='10.8';
+state.appVersion='10.8.1';
 let currentView='dashboard',previousView='dashboard',stockMode='spools',stockSortMode='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,activeLibraryKind='colors',editingLibraryValue=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
-function fresh(){return{appVersion:'10.8',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
+function fresh(){return{appVersion:'10.8.1',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
 function load(){
   try{
     const own=localStorage.getItem(KEY);
     if(own)return {...fresh(),...JSON.parse(own)};
-    // Eerste start van versie 10.8: maak een kopie van de bestaande lokale gegevens.
+    // Eerste start van versie 10.8.1: maak een kopie van de bestaande lokale gegevens.
     // Voor compatibiliteit wordt eerst een eerdere migratiekopie bekeken, daarna de 9.0.1-opslag.
     // De brongegevens zelf worden nooit overschreven.
     for(const sourceKey of SOURCE_KEYS){
       const source=localStorage.getItem(sourceKey);
       if(source){
-        const copied={...fresh(),...JSON.parse(source),appVersion:'10.8'};
+        const copied={...fresh(),...JSON.parse(source),appVersion:'10.8.1'};
         localStorage.setItem(KEY,JSON.stringify(copied));
         return copied;
       }
@@ -76,6 +76,21 @@ function colorNameHtml(color){return `${colorDotHtml(color)}${esc(color)}`;}
 function nextNumber(prefix,list){const nums=list.map(x=>Number(String(x.number||'').replace(/\D/g,''))).filter(Number.isFinite);return prefix+String((nums.length?Math.max(...nums):0)+1).padStart(4,'0')}
 function spoolStock(fid){return state.spools.filter(s=>s.status==='active'&&s.filamentId===fid).reduce((a,s)=>a+Number(s.level||0)/100,0)}
 function refillCount(fid){return state.refills.filter(r=>r.filamentId===fid).length}
+function otherSpoolContainingFilament(filamentId,excludeSpoolId=null){
+  return state.spools.find(s=>
+    s.id!==excludeSpoolId &&
+    s.status==='active' &&
+    s.filamentId===filamentId &&
+    Number(s.level)>0
+  )||null;
+}
+function blockIfFilamentAlreadyOnSpool(filamentId,excludeSpoolId,targetSpoolNumber='deze spoel'){
+  const other=otherSpoolContainingFilament(filamentId,excludeSpoolId);
+  if(!other)return false;
+  const f=filament(filamentId);
+  alert(`Dit filament staat al op spoel ${other.number}.\n\n${f?label(f):'Dit filament'} kan niet aan ${targetSpoolNumber} worden gekoppeld zolang spoel ${other.number} nog filament bevat.`);
+  return true;
+}
 function totalStock(fid){return spoolStock(fid)+refillCount(fid)}
 function openOrdered(fid){return state.orders.filter(o=>o.status!=='Geleverd').reduce((a,o)=>a+(o.filamentId===fid?Math.max(0,o.quantity-o.received):0),0)}
 function toOrder(f){const total=totalStock(f.id);if(total>=Number(f.min))return 0;return Math.max(0,Math.ceil(Number(f.target)-total-openOrdered(f.id)))}
@@ -138,6 +153,11 @@ spoolForm.onsubmit=e=>{
   e.preventDefault();
   const previous=editSpoolId?state.spools.find(s=>s.id===editSpoolId):null;
   const o={id:editSpoolId||uid(),number:sNumber.value.trim().toUpperCase(),filamentId:sFilament.value,level:Number(sLevel.value),status:sStatus.value};
+  const isNew=!previous;
+  const filamentChanged=!!previous && previous.filamentId!==o.filamentId;
+  if(o.status==='active' && (isNew || filamentChanged)){
+    if(blockIfFilamentAlreadyOnSpool(o.filamentId,o.id,`spoel ${o.number}`))return;
+  }
   state.spools=editSpoolId?state.spools.map(s=>s.id===editSpoolId?o:s):[...state.spools,o];
   if(Number(o.level)===100){
     if(!previous){
@@ -167,6 +187,10 @@ function setDashboardLevel(id,value){
   const allowed=[100,75,50,25,0];
   const level=Number(value);
   if(!allowed.includes(level))return;
+  if(Number(s.level)===0 && level>0 && blockIfFilamentAlreadyOnSpool(s.filamentId,s.id,`spoel ${s.number}`)){
+    renderDashboard();
+    return;
+  }
   s.level=level;
   if(level===100)recordRollUsage(s,'Dashboard naar 100%');
   save();
@@ -1047,6 +1071,7 @@ quickFillBtn.onclick=()=>{
     alert(`Verkeerde refill.\n\nSpoel ${s.number}: ${label(spoolFilament)}\nRefill ${r.number}: ${label(refillFilament)}\n\nDe refill moet exact hetzelfde filament zijn als het filament op de spoel.\nGebruik voor een ander filament een nieuw spoelnummer.`);
     return;
   }
+  if(blockIfFilamentAlreadyOnSpool(r.filamentId,s.id,`spoel ${s.number}`))return;
   if(Number(s.level)!==0){
     const ok=confirm(`Spoel ${s.number} staat nog op ${Number(s.level)||0}%. Toch deze refill koppelen?`);
     if(!ok)return;
@@ -1089,7 +1114,7 @@ createBackupBtn.onclick=()=>{
       backupFormat:'filament-manager',
       backupVersion:1,
       exportedAt:new Date().toISOString(),
-      appVersion:'10.8',
+      appVersion:'10.8.1',
       data:state
     };
     const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
@@ -1228,7 +1253,7 @@ restoreBackupInput.onchange=async event=>{
   const previousState=state;
   try{
     state=restored;
-    state.appVersion='10.8';
+    state.appVersion='10.8.1';
     save();
     add('Opslaan in browser: geslaagd');
     add('Firebase-synchronisatie: ingepland');
@@ -1633,7 +1658,7 @@ if(printSelectedRefillLabelsBtnEl)printSelectedRefillLabelsBtnEl.onclick=()=>pri
 /* ============================================================
    Firebase synchronisatie - VERSIE 10.1
    ------------------------------------------------------------
-   - Versie 10.8 gebruikt een eigen localStorage-sleutel.
+   - Versie 10.8.1 gebruikt een eigen localStorage-sleutel.
    - Firebase gebruikt een eigen pad voor deze aangemelde gebruiker.
    - Bij eerste cloudstart zonder data worden de lokale 10.0-gegevens geüpload.
    - Daarna is Firebase de gedeelde bron en blijft localStorage de lokale cache.
@@ -1676,7 +1701,7 @@ function setFirebaseUserUI(user){
 }
 function normalizeCloudState(raw){
   const normalized=normalizeBackupData(raw);
-  normalized.appVersion='10.8';
+  normalized.appVersion='10.8.1';
   return normalized;
 }
 function applyFirebaseState(raw){
@@ -1700,7 +1725,7 @@ function applyFirebaseState(raw){
 async function writeStateToFirebase(reason='Synchroniseren'){
   if(!firebaseSync.ready||!firebaseSync.ref||!firebaseSync.modules||firebaseSync.writing)return;
   const payload=structuredClone(state);
-  payload.appVersion='10.8';
+  payload.appVersion='10.8.1';
   const json=stableStringify(payload);
   firebaseSync.lastWriteJson=json;
   firebaseSync.writing=true;
