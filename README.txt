@@ -1,4 +1,4 @@
-Filament Manager - versie 10.8.2
+Filament Manager - versie 10.8.3
 ================================
 
 Status
@@ -49,23 +49,23 @@ EOsNru7BilUx9GguaBk0QxxY9oo1
 Databasepad:
 users/EOsNru7BilUx9GguaBk0QxxY9oo1/filamentManager/state
 
-Versie 10.8.2 gebruikt voor compatibiliteit dezelfde lokale opslagsleutel als de werkende 10.0-build:
+Versie 10.8.3 gebruikt voor compatibiliteit dezelfde lokale opslagsleutel als de werkende 10.0-build:
 filament_manager_v10_0
 
-Wijziging in 10.8.2
+Wijziging in 10.8.3
 -----------------
 - Dashboardweergave op iPhone compacter gemaakt.
 - Hoeveelheid op de spoel gebruikt een smallere keuzeknop.
 - Aantal beschikbare refills staat duidelijk in een compacte badge.
 - Firebase-synchronisatie en opslaglogica zijn niet gewijzigd.
 
-Wijziging in 10.8.2
+Wijziging in 10.8.3
 -----------------
 - Tekst in de hoeveelheidknop op het dashboard kleiner gemaakt.
 - De compacte breedte van de knop blijft behouden.
 - Refill-badge, Firebase en synchronisatielogica zijn niet gewijzigd.
 
-Wijziging in 10.8.2
+Wijziging in 10.8.3
 -----------------
 - Hoeveelheidselector compacter gemaakt op Mac én iPhone.
 - Lettergrootte verlaagd naar 12 px op desktop en 11 px op mobiel.
@@ -73,7 +73,7 @@ Wijziging in 10.8.2
 - Eigen compacte pijltjes toegevoegd.
 - Firebase, gegevens en synchronisatie zijn niet gewijzigd.
 
-Wijziging in 10.8.2
+Wijziging in 10.8.3
 -----------------
 - Op spoel-etiketten worden categorie en type afgedrukt in de categoriekleur.
 - Dezelfde kleuren als op het dashboard worden gebruikt:
@@ -82,21 +82,21 @@ Wijziging in 10.8.2
 - Refill-etiketten blijven ongewijzigd.
 - Firebase en synchronisatie zijn niet gewijzigd.
 
-Wijziging in 10.8.2
+Wijziging in 10.8.3
 -----------------
 - Op spoel-etiketten worden nu categorie + type, kleur, leverancier, referentie en het woord "spoel" in de categoriekleur afgedrukt.
 - QR-code en groot spoelnummer blijven zwart voor maximale leesbaarheid en scanbaarheid.
 - Refill-etiketten blijven ongewijzigd.
 - Firebase en synchronisatie zijn niet gewijzigd.
 
-Wijziging in 10.8.2
+Wijziging in 10.8.3
 -----------------
 - De categoriekleur op etiketten wordt nu ook toegepast op refill-etiketten.
 - Op zowel spoel- als refill-etiketten staan categorie + type, kleur, leverancier, referentie en het woord "spoel"/"refill" in de categoriekleur.
 - QR-code en groot nummer blijven zwart voor leesbaarheid en scanbaarheid.
 - Firebase en synchronisatie zijn niet gewijzigd.
 
-Wijziging in 10.8.2
+Wijziging in 10.8.3
 -----------------
 - Nieuwe gevulde spoelen worden geblokkeerd wanneer hetzelfde filament al op een andere actieve, niet-lege spoel aanwezig is.
 - Een lege bestaande spoel kan niet opnieuw gevuld worden wanneer hetzelfde filament nog op een andere actieve, niet-lege spoel zit.
@@ -107,7 +107,7 @@ Wijziging in 10.8.2
 - Refillvoorraad mag nog steeds meerdere refills van hetzelfde filament bevatten.
 - Firebase en synchronisatie zijn niet gewijzigd.
 
-Correctie 10.8.2
+Correctie 10.8.3
 ----------------
 - De duplicatencontrole werkt nu volledig lokaal.
 - Bij een nieuwe spoel of bij het wijzigen van het filament van een bestaande spoel wordt gecontroleerd of hetzelfde filament nog op een andere niet-lege actieve spoel staat.
@@ -115,7 +115,7 @@ Correctie 10.8.2
 - Refill koppelen en een lege spoel opnieuw vullen worden eveneens geblokkeerd wanneer hetzelfde filament al op een andere niet-lege actieve spoel aanwezig is.
 - Firebase is hiervoor niet nodig en is niet aangepast.
 
-Correctie 10.8.2
+Correctie 10.8.3
 ----------------
 - De controle vergelijkt nu de echte filamentidentiteit in plaats van alleen het interne filament-ID.
 - Identiteit = categorie + type + kleur + merk + leverancier + leveranciersreferentie.
@@ -123,3 +123,12 @@ Correctie 10.8.2
 - In het spoelvenster wordt een verboden filamentkeuze meteen gemeld en teruggedraaid.
 - De controle bij Opslaan blijft als tweede beveiliging actief.
 - Werkt volledig lokaal; Firebase is hiervoor niet nodig.
+
+Wijziging in 10.8.3
+-------------------
+- Op het scherm Spoelwissel / refill koppelen wordt onder het spoelnummer nu het gescande filament getoond.
+- Onder het refillnummer wordt eveneens het filament getoond.
+- De visuele controle toont categorie + type + kleur, inclusief kleurbolletje.
+- De info verschijnt zowel bij scannen als bij manueel invullen van een geldig nummer.
+- Hierdoor kan vóór 'Scan bevestigen' en 'Koppelen' visueel gecontroleerd worden of spoel en refill bij hetzelfde filament horen.
+- Firebase en gegevensstructuur zijn niet gewijzigd.

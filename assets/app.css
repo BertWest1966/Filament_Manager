@@ -1804,3 +1804,31 @@ label.file-button:has(#restoreBackupInput) #restoreBackupInput{
     font-size:11px !important;
   }
 }
+
+
+/* v10.8.3 - visuele filamentcontrole bij spoel/refill-scan */
+.scan-filament-info{
+  margin-top:7px;
+  padding:8px 10px;
+  border:1px solid #d7dde5;
+  border-radius:9px;
+  background:#f8fafc;
+  color:#475569;
+  font-size:13px;
+  line-height:1.25;
+  font-weight:600;
+}
+.scan-filament-info strong{
+  color:#0f172a;
+  font-weight:800;
+}
+.scan-filament-info .filament-color-dot{
+  margin-left:2px;
+}
+@media(max-width:700px){
+  .scan-filament-info{
+    margin-top:6px;
+    padding:7px 9px;
+    font-size:12px;
+  }
+}
