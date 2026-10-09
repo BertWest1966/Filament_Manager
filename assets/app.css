@@ -1832,3 +1832,16 @@ label.file-button:has(#restoreBackupInput) #restoreBackupInput{
     font-size:12px;
   }
 }
+
+/* v10.9: compacte, uitklapbare zoekresultaten */
+.global-search .search-results{max-height:min(68vh,650px);overflow-y:auto;overscroll-behavior:contain;z-index:40}
+.fm-search-filament{border-bottom:1px solid var(--line,#dce0e4)}
+.fm-search-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:12px;text-align:left;border:0;background:transparent;color:inherit;cursor:pointer}
+.fm-search-name{display:block;min-width:0;font-weight:650}
+.fm-search-name small{display:block;font-size:12px;font-weight:400;opacity:.75;margin-top:4px}
+.fm-search-detail{padding:2px 14px 14px;border-top:1px solid rgba(128,128,128,.2)}
+.fm-search-subtitle{font-weight:650;font-size:13px;margin:12px 0 6px}
+.fm-search-spool{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(128,128,128,.15)}
+.fm-search-spool button{font-weight:650;text-decoration:underline;text-underline-offset:2px}
+.fm-search-refills{display:flex;flex-wrap:wrap;gap:7px}
+.fm-search-refill{display:inline-block;padding:6px 9px;border-radius:7px;background:rgba(128,128,128,.15);font-size:13px;font-weight:600}

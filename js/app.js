@@ -5,23 +5,23 @@ const SYNC_DIRTY_KEY='filament_manager_v10_0_dirty_v1';
 const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','Andere'],types:{PLA:['Basic','Matte'],PETG:['Basic'],TPU:['95A'],ABS:['Basic'],ASA:['Basic'],Andere:[]},colors:[],brands:['Bambu Lab'],suppliers:['Bambu Lab']};
 let state=load();
 if(!Array.isArray(state.rollUsage))state.rollUsage=[];
-state.appVersion='10.8.3';
+state.appVersion='10.9';
 let currentView='dashboard',previousView='dashboard',stockMode='spools',stockSortMode='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,activeLibraryKind='colors',editingLibraryValue=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
-function fresh(){return{appVersion:'10.8.3',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
+function fresh(){return{appVersion:'10.9',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
 function load(){
   try{
     const own=localStorage.getItem(KEY);
     if(own)return {...fresh(),...JSON.parse(own)};
-    // Eerste start van versie 10.8.3: maak een kopie van de bestaande lokale gegevens.
+    // Eerste start van versie 10.9: maak een kopie van de bestaande lokale gegevens.
     // Voor compatibiliteit wordt eerst een eerdere migratiekopie bekeken, daarna de 9.0.1-opslag.
     // De brongegevens zelf worden nooit overschreven.
     for(const sourceKey of SOURCE_KEYS){
       const source=localStorage.getItem(sourceKey);
       if(source){
-        const copied={...fresh(),...JSON.parse(source),appVersion:'10.8.3'};
+        const copied={...fresh(),...JSON.parse(source),appVersion:'10.9'};
         localStorage.setItem(KEY,JSON.stringify(copied));
         return copied;
       }
@@ -33,7 +33,7 @@ function persistLocalState(){localStorage.setItem(KEY,JSON.stringify(state))}
 function markSyncDirty(){localStorage.setItem(SYNC_DIRTY_KEY,'1')}
 function clearSyncDirty(){localStorage.removeItem(SYNC_DIRTY_KEY)}
 function isSyncDirty(){return localStorage.getItem(SYNC_DIRTY_KEY)==='1'}
-function save(){persistLocalState();markSyncDirty();renderAll();queueFirebaseWrite()}
+function save(){persistLocalState();markSyncDirty();renderAll();if(globalSearch.value.trim())renderGlobalSearch();queueFirebaseWrite()}
 function pushUnique(arr,v){v=String(v||'').trim();if(v&&!arr.some(x=>x.toLowerCase()===v.toLowerCase()))arr.push(v)}
 function filament(id){return state.catalog.find(f=>f.id===id)}
 function label(f){return f?`${f.category} · ${f.type} · ${f.color}`:''}
@@ -1173,7 +1173,7 @@ createBackupBtn.onclick=()=>{
       backupFormat:'filament-manager',
       backupVersion:1,
       exportedAt:new Date().toISOString(),
-      appVersion:'10.8.3',
+      appVersion:'10.9',
       data:state
     };
     const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
@@ -1312,7 +1312,7 @@ restoreBackupInput.onchange=async event=>{
   const previousState=state;
   try{
     state=restored;
-    state.appVersion='10.8.3';
+    state.appVersion='10.9';
     save();
     add('Opslaan in browser: geslaagd');
     add('Firebase-synchronisatie: ingepland');
@@ -1330,17 +1330,44 @@ restoreBackupInput.onchange=async event=>{
   }
 }
 
-globalSearch.oninput=()=>{
-  const q=globalSearch.value.toLowerCase();
-  if(!q){globalResults.classList.add('hidden');return}
-  const rows=[];
-  state.catalog.forEach(f=>{if(label(f).toLowerCase().includes(q))rows.push({html:filamentLabelHtml(f),m:'Filament',a:()=>openDetail(f.id)})});
-  state.spools.forEach(s=>{if(s.number.toLowerCase().includes(q)){const f=filament(s.filamentId);rows.push({html:`${esc(s.number)}${f?` · ${filamentLabelHtml(f)}`:''}`,m:'Spoel',a:()=>openSpool(s.id)})}});
-  state.refills.forEach(r=>{if(r.number.toLowerCase().includes(q)){const f=filament(r.filamentId);rows.push({html:`${esc(r.number)}${f?` · ${filamentLabelHtml(f)}`:''}`,m:'Refill',a:()=>openRefill(r.id)})}});
-  globalResults.innerHTML=rows.map((r,i)=>`<div class="search-result" data-i="${i}"><strong>${r.html}</strong><div class="item-meta">${r.m}</div></div>`).join('')||'<div class="search-result">Geen resultaten</div>';
+// v10.9: zoekresultaten per filament, met uitklapbare spoelen en refillnummers.
+let expandedSearchFilamentId=null;
+function renderGlobalSearch(){
+  const q=globalSearch.value.trim().toLocaleLowerCase('nl');
+  if(!q){globalResults.classList.add('hidden');globalResults.innerHTML='';return;}
+  const matches=state.catalog.filter(f=>{
+    const relatedSpools=state.spools.filter(s=>s.filamentId===f.id);
+    const relatedRefills=state.refills.filter(r=>r.filamentId===f.id);
+    return label(f).toLocaleLowerCase('nl').includes(q)||
+      relatedSpools.some(s=>String(s.number).toLocaleLowerCase('nl').includes(q))||
+      relatedRefills.some(r=>String(r.number).toLocaleLowerCase('nl').includes(q));
+  }).sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));
+  globalResults.innerHTML=matches.map(f=>{
+    const spools=state.spools.filter(s=>s.filamentId===f.id&&s.status==='active').sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));
+    const refills=state.refills.filter(r=>r.filamentId===f.id).sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));
+    const expanded=expandedSearchFilamentId===f.id;
+    return `<div class="fm-search-filament">
+      <button type="button" class="fm-search-heading" data-search-expand="${esc(f.id)}" aria-expanded="${expanded}">
+        <span class="fm-search-name">${filamentLabelHtml(f)}<small>${spools.length} spoel(en) · ${refills.length} refill(s)</small></span>
+        <span aria-hidden="true">${expanded?'▴':'▾'}</span>
+      </button>
+      ${expanded?`<div class="fm-search-detail">
+        <div class="fm-search-subtitle">Spoelen</div>
+        ${spools.length?spools.map(s=>`<div class="fm-search-spool"><button type="button" data-search-spool="${esc(s.id)}">${esc(s.number)}</button><span>${Number(s.level)||0}%</span></div>`).join(''):'<div class="item-meta">Geen actieve spoelen</div>'}
+        <div class="fm-search-subtitle">Beschikbare refills</div>
+        <div class="fm-search-refills">${refills.length?refills.map(r=>`<span class="fm-search-refill">${esc(r.number)}</span>`).join(''):'<span class="item-meta">Geen refills</span>'}</div>
+      </div>`:''}
+    </div>`;
+  }).join('')||'<div class="search-result">Geen filamenten gevonden</div>';
   globalResults.classList.remove('hidden');
-  globalResults.querySelectorAll('[data-i]').forEach(x=>x.onclick=()=>rows[Number(x.dataset.i)].a());
+  globalResults.querySelectorAll('[data-search-expand]').forEach(btn=>btn.onclick=()=>{
+    const id=btn.dataset.searchExpand;
+    expandedSearchFilamentId=expandedSearchFilamentId===id?null:id;
+    renderGlobalSearch();
+  });
+  globalResults.querySelectorAll('[data-search-spool]').forEach(btn=>btn.onclick=()=>openSpool(btn.dataset.searchSpool));
 }
+globalSearch.oninput=()=>{expandedSearchFilamentId=null;renderGlobalSearch()};
 
 
 function qrPayload(kind,number){return `filament-manager:${kind}:${number}`}
@@ -1717,7 +1744,7 @@ if(printSelectedRefillLabelsBtnEl)printSelectedRefillLabelsBtnEl.onclick=()=>pri
 /* ============================================================
    Firebase synchronisatie - VERSIE 10.1
    ------------------------------------------------------------
-   - Versie 10.8.3 gebruikt een eigen localStorage-sleutel.
+   - Versie 10.9 gebruikt een eigen localStorage-sleutel.
    - Firebase gebruikt een eigen pad voor deze aangemelde gebruiker.
    - Bij eerste cloudstart zonder data worden de lokale 10.0-gegevens geüpload.
    - Daarna is Firebase de gedeelde bron en blijft localStorage de lokale cache.
@@ -1760,7 +1787,7 @@ function setFirebaseUserUI(user){
 }
 function normalizeCloudState(raw){
   const normalized=normalizeBackupData(raw);
-  normalized.appVersion='10.8.3';
+  normalized.appVersion='10.9';
   return normalized;
 }
 function applyFirebaseState(raw){
@@ -1784,7 +1811,7 @@ function applyFirebaseState(raw){
 async function writeStateToFirebase(reason='Synchroniseren'){
   if(!firebaseSync.ready||!firebaseSync.ref||!firebaseSync.modules||firebaseSync.writing)return;
   const payload=structuredClone(state);
-  payload.appVersion='10.8.3';
+  payload.appVersion='10.9';
   const json=stableStringify(payload);
   firebaseSync.lastWriteJson=json;
   firebaseSync.writing=true;
