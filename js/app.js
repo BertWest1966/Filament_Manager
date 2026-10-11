@@ -5,23 +5,23 @@ const SYNC_DIRTY_KEY='filament_manager_v10_0_dirty_v1';
 const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','Andere'],types:{PLA:['Basic','Matte'],PETG:['Basic'],TPU:['95A'],ABS:['Basic'],ASA:['Basic'],Andere:[]},colors:[],brands:['Bambu Lab'],suppliers:['Bambu Lab']};
 let state=load();
 if(!Array.isArray(state.rollUsage))state.rollUsage=[];
-state.appVersion='10.9.2';
+state.appVersion='10.9.3';
 let currentView='dashboard',previousView='dashboard',stockMode='spools',stockSortMode='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,activeLibraryKind='colors',editingLibraryValue=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
-function fresh(){return{appVersion:'10.9.2',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
+function fresh(){return{appVersion:'10.9.3',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
 function load(){
   try{
     const own=localStorage.getItem(KEY);
     if(own)return {...fresh(),...JSON.parse(own)};
-    // Eerste start van versie 10.9.2: maak een kopie van de bestaande lokale gegevens.
+    // Eerste start van versie 10.9.3: maak een kopie van de bestaande lokale gegevens.
     // Voor compatibiliteit wordt eerst een eerdere migratiekopie bekeken, daarna de 9.0.1-opslag.
     // De brongegevens zelf worden nooit overschreven.
     for(const sourceKey of SOURCE_KEYS){
       const source=localStorage.getItem(sourceKey);
       if(source){
-        const copied={...fresh(),...JSON.parse(source),appVersion:'10.9.2'};
+        const copied={...fresh(),...JSON.parse(source),appVersion:'10.9.3'};
         localStorage.setItem(KEY,JSON.stringify(copied));
         return copied;
       }
@@ -1194,7 +1194,7 @@ createBackupBtn.onclick=()=>{
       backupFormat:'filament-manager',
       backupVersion:1,
       exportedAt:new Date().toISOString(),
-      appVersion:'10.9.2',
+      appVersion:'10.9.3',
       data:state
     };
     const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
@@ -1333,7 +1333,7 @@ restoreBackupInput.onchange=async event=>{
   const previousState=state;
   try{
     state=restored;
-    state.appVersion='10.9.2';
+    state.appVersion='10.9.3';
     save();
     add('Opslaan in browser: geslaagd');
     add('Firebase-synchronisatie: ingepland');
@@ -1351,7 +1351,7 @@ restoreBackupInput.onchange=async event=>{
   }
 }
 
-// v10.9.2: zoekresultaten per filament, met uitklapbare spoelen en refillnummers.
+// v10.9.3: zoekresultaten per filament, met uitklapbare spoelen en refillnummers.
 let expandedSearchFilamentId=null;
 function renderGlobalSearch(){
   const q=globalSearch.value.trim().toLocaleLowerCase('nl');
@@ -1678,6 +1678,53 @@ function statsTimelineRows(events){
   events.forEach(x=>{const y=String(new Date(x.date).getFullYear());add(y,y)});
   return [...counts.entries()].sort((a,b)=>Number(a[0])-Number(b[0])).map(([,v])=>v);
 }
+// v10.9.3: grafieken zonder externe bibliotheken, gebaseerd op dezelfde verbruiksgegevens als de tabellen.
+function statsBarChart(rows){
+  if(!rows.length)return '<p class="note stats-empty">Geen gegevens voor deze periode.</p>';
+  const max=Math.max(1,...rows.map(r=>r.count));
+  // In de maandweergave worden alleen dagen met werkelijk verbruik getoond.
+  const barWidth=rows.length>18?27:rows.length>10?34:48;
+  const width=Math.max(290,rows.length*barWidth+40);
+  const height=170, top=22, bottom=37, left=27, plotHeight=height-top-bottom;
+  let svg=`<svg class="stats-bars-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Staafdiagram met ${rows.length} perioden" xmlns="http://www.w3.org/2000/svg">`;
+  for(let i=0;i<=3;i++){
+    const y=top+plotHeight*(1-i/3);
+    svg+=`<line x1="${left}" y1="${y}" x2="${width-8}" y2="${y}" stroke="currentColor" stroke-opacity=".10"/><text x="${left-5}" y="${y+4}" text-anchor="end" font-size="10" fill="currentColor" opacity=".65">${Math.round(max*i/3)}</text>`;
+  }
+  rows.forEach((r,i)=>{
+    const slot=(width-left-10)/rows.length;
+    const x=left+i*slot+slot*.2, w=slot*.6;
+    const bh=r.count/max*(plotHeight-8);
+    const y=top+plotHeight-bh;
+    const showLabel=rows.length<=12||i%Math.ceil(rows.length/10)===0||i===rows.length-1;
+    svg+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${Math.max(0,bh).toFixed(1)}" rx="3" fill="#2563eb"><title>${esc(r.label)}: ${r.count} rollen</title></rect>`;
+    if(r.count)svg+=`<text x="${(x+w/2).toFixed(1)}" y="${Math.max(13,y-5).toFixed(1)}" text-anchor="middle" fill="currentColor" font-size="11">${r.count}</text>`;
+    if(showLabel)svg+=`<text x="${(x+w/2).toFixed(1)}" y="${height-15}" text-anchor="middle" fill="currentColor" font-size="10">${esc(rows.length>12?r.label.replace(/\D/g,'').slice(0,2)||r.label:r.label.slice(0,8))}</text>`;
+  });
+  return svg+'</svg>';
+}
+function statsDonutChart(rows){
+  if(!rows.length)return '<p class="note stats-empty">Geen gegevens voor deze periode.</p>';
+  const colors=['#2563eb','#14b8a6','#f59e0b','#8b5cf6','#ef4444','#0d9488','#64748b','#ec4899'];
+  const total=rows.reduce((n,r)=>n+r[1],0);
+  const circumference=2*Math.PI*41;
+  let offset=0;
+  const segments=rows.map(([label,value],i)=>{
+    const fraction=value/total, dash=fraction*circumference;
+    const circle=`<circle cx="55" cy="55" r="41" fill="none" stroke="${colors[i%colors.length]}" stroke-width="19" stroke-dasharray="${dash.toFixed(3)} ${(circumference-dash).toFixed(3)}" stroke-dashoffset="${(-offset).toFixed(3)}"><title>${esc(label)}: ${value} rollen</title></circle>`;
+    offset+=dash;return circle;
+  }).join('');
+  const legend=rows.map(([label,value],i)=>`<div class="stats-legend-line"><span class="stats-legend-dot" style="background:${colors[i%colors.length]}"></span><span>${esc(label)}</span><strong>${value}</strong></div>`).join('');
+  return `<div class="stats-donut-layout"><svg class="stats-donut" viewBox="0 0 110 110" role="img" aria-label="Verdeling over categorieën"><g transform="rotate(-90 55 55)">${segments}</g><text x="55" y="51" text-anchor="middle" font-weight="700" font-size="18" fill="currentColor">${total}</text><text x="55" y="65" text-anchor="middle" font-size="10" fill="currentColor">rollen</text></svg><div class="stats-legend">${legend}</div></div>`;
+}
+function statsTypeBars(events){
+  const map=new Map();
+  events.forEach(x=>{const label=`${x.category||'Onbekend'} ${x.type||'Onbekend'}`.trim();map.set(label,(map.get(label)||0)+1)});
+  const rows=[...map.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'nl'));
+  if(!rows.length)return '<p class="note stats-empty">Geen gegevens voor deze periode.</p>';
+  const max=Math.max(...rows.map(r=>r[1]));
+  return `<div class="stats-type-bars">${rows.map(([name,count])=>`<div class="stats-type-row"><div class="stats-type-title"><span>${esc(name)}</span><strong>${count}</strong></div><div class="stats-type-track"><div class="stats-type-fill" style="width:${100*count/max}%"></div></div></div>`).join('')}</div>`;
+}
 function renderStatistics(){
   if(!window.statsMonthTotal)return;
   statsMonthTotal.textContent=countCurrentRange('month');
@@ -1697,11 +1744,13 @@ function renderStatistics(){
 
   const timeline=statsTimelineRows(events);
   statsTimelineTitle.textContent=statsMode==='month'?'Verbruik per dag':statsMode==='total'?'Verbruik per jaar':'Verbruik per maand';
+  document.getElementById('statsTimelineChart').innerHTML=statsBarChart(timeline);
   statsTimeline.innerHTML=timeline.length?`<table class="stats-table"><thead><tr><th>Periode</th><th class="stats-number">Rollen</th></tr></thead><tbody>${timeline.map(r=>`<tr><td>${esc(r.label)}</td><td class="stats-number"><strong>${r.count}</strong></td></tr>`).join('')}</tbody><tfoot><tr><th>Totaal</th><th class="stats-number">${events.length}</th></tr></tfoot></table>`:'<div class="note stats-empty">Nog geen verbruik geregistreerd in deze periode.</div>';
 
   const cats=new Map();
   events.forEach(x=>cats.set(x.category||'Onbekend',(cats.get(x.category||'Onbekend')||0)+1));
   const catRows=[...cats.entries()].sort((a,b)=>a[0].localeCompare(b[0],'nl'));
+  document.getElementById('statsCategoryChart').innerHTML=statsDonutChart(catRows);
   statsCategoryTable.innerHTML=catRows.length?`<table class="stats-table"><thead><tr><th>Categorie</th><th class="stats-number">Rollen</th></tr></thead><tbody>${catRows.map(([k,v])=>`<tr><td>${esc(k)}</td><td class="stats-number"><strong>${v}</strong></td></tr>`).join('')}</tbody><tfoot><tr><th>Totaal</th><th class="stats-number">${events.length}</th></tr></tfoot></table>`:'<div class="note stats-empty">Geen gegevens.</div>';
 
   const details=new Map();
@@ -1711,10 +1760,11 @@ function renderStatistics(){
     details.get(key).count++;
   });
   const detailRows=[...details.values()].sort((a,b)=>a.category.localeCompare(b.category,'nl')||a.type.localeCompare(b.type,'nl')||a.color.localeCompare(b.color,'nl'));
-  statsDetailTable.innerHTML=detailRows.length?`<table class="stats-table stats-detail-table"><thead><tr><th>Categorie</th><th>Type</th><th>Kleur</th><th class="stats-number">Rollen</th></tr></thead><tbody>${detailRows.map(r=>`<tr><td>${esc(r.category)}</td><td>${esc(r.type)}</td><td>${colorNameHtml(r.color)}</td><td class="stats-number"><strong>${r.count}</strong></td></tr>`).join('')}</tbody><tfoot><tr><th colspan="3">Totaal</th><th class="stats-number">${events.length}</th></tr></tfoot></table>`:'<div class="note stats-empty">Geen gegevens.</div>';
+  document.getElementById('statsTypeChart').innerHTML=statsTypeBars(events);
+  statsDetailTable.innerHTML=detailRows.length?`<div class="stats-mobile-items">${detailRows.map(r=>`<div class="stats-mobile-item"><div>${esc(r.category)} · ${esc(r.type)} · ${colorNameHtml(r.color)}</div><strong>${r.count}</strong></div>`).join('')}<div class="stats-mobile-total"><strong>Totaal</strong><strong>${events.length}</strong></div></div><table class="stats-table stats-detail-table"><thead><tr><th>Categorie</th><th>Type</th><th>Kleur</th><th class="stats-number">Rollen</th></tr></thead><tbody>${detailRows.map(r=>`<tr><td>${esc(r.category)}</td><td>${esc(r.type)}</td><td>${colorNameHtml(r.color)}</td><td class="stats-number"><strong>${r.count}</strong></td></tr>`).join('')}</tbody><tfoot><tr><th colspan="3">Totaal</th><th class="stats-number">${events.length}</th></tr></tfoot></table>`:'<div class="note stats-empty">Geen gegevens.</div>';
 
   const newest=events.slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
-  statsUsageLog.innerHTML=newest.length?`<table class="stats-table stats-log-table"><thead><tr><th>Datum</th><th>Spoel</th><th>Filament</th><th>Registratie</th><th></th></tr></thead><tbody>${newest.map(x=>`<tr><td>${new Date(x.date).toLocaleString('nl-BE')}</td><td><strong>${esc(x.spoolNumber)}</strong></td><td>${esc(x.category)} · ${esc(x.type)} · ${colorNameHtml(x.color)}</td><td>${esc(x.source||'100% ingesteld')}${x.refillNumber?` · ${esc(x.refillNumber)}`:''}</td><td><button class="stats-delete-button" type="button" onclick="deleteRollUsage('${x.id}')">Verwijder</button></td></tr>`).join('')}</tbody></table>`:'<div class="note stats-empty">Nog geen verbruiksregistraties.</div>';
+  statsUsageLog.innerHTML=newest.length?`<div class="stats-mobile-items">${newest.map(x=>`<div class="stats-log-mobile"><div class="stats-log-mobile-top"><strong>${esc(x.spoolNumber)}</strong><span>${new Date(x.date).toLocaleString('nl-BE')}</span></div><div>${esc(x.category)} · ${esc(x.type)} · ${colorNameHtml(x.color)}</div><div class="note">${esc(x.source||'100% ingesteld')}${x.refillNumber?` · ${esc(x.refillNumber)}`:''}</div><button class="stats-delete-button" type="button" onclick="deleteRollUsage('${x.id}')">Verwijder</button></div>`).join('')}</div><table class="stats-table stats-log-table"><thead><tr><th>Datum</th><th>Spoel</th><th>Filament</th><th>Registratie</th><th></th></tr></thead><tbody>${newest.map(x=>`<tr><td>${new Date(x.date).toLocaleString('nl-BE')}</td><td><strong>${esc(x.spoolNumber)}</strong></td><td>${esc(x.category)} · ${esc(x.type)} · ${colorNameHtml(x.color)}</td><td>${esc(x.source||'100% ingesteld')}${x.refillNumber?` · ${esc(x.refillNumber)}`:''}</td><td><button class="stats-delete-button" type="button" onclick="deleteRollUsage('${x.id}')">Verwijder</button></td></tr>`).join('')}</tbody></table>`:'<div class="note stats-empty">Nog geen verbruiksregistraties.</div>';
 }
 function deleteRollUsage(id){
   const item=(state.rollUsage||[]).find(x=>x.id===id);
@@ -1765,7 +1815,7 @@ if(printSelectedRefillLabelsBtnEl)printSelectedRefillLabelsBtnEl.onclick=()=>pri
 /* ============================================================
    Firebase synchronisatie - VERSIE 10.1
    ------------------------------------------------------------
-   - Versie 10.9.2 gebruikt een eigen localStorage-sleutel.
+   - Versie 10.9.3 gebruikt een eigen localStorage-sleutel.
    - Firebase gebruikt een eigen pad voor deze aangemelde gebruiker.
    - Bij eerste cloudstart zonder data worden de lokale 10.0-gegevens geüpload.
    - Daarna is Firebase de gedeelde bron en blijft localStorage de lokale cache.
@@ -1808,7 +1858,7 @@ function setFirebaseUserUI(user){
 }
 function normalizeCloudState(raw){
   const normalized=normalizeBackupData(raw);
-  normalized.appVersion='10.9.2';
+  normalized.appVersion='10.9.3';
   return normalized;
 }
 function applyFirebaseState(raw){
@@ -1832,7 +1882,7 @@ function applyFirebaseState(raw){
 async function writeStateToFirebase(reason='Synchroniseren'){
   if(!firebaseSync.ready||!firebaseSync.ref||!firebaseSync.modules||firebaseSync.writing)return;
   const payload=structuredClone(state);
-  payload.appVersion='10.9.2';
+  payload.appVersion='10.9.3';
   const json=stableStringify(payload);
   firebaseSync.lastWriteJson=json;
   firebaseSync.writing=true;

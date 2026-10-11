@@ -1,4 +1,4 @@
-Filament Manager - versie 10.9.2
+Filament Manager - versie 10.9.3
 ================================
 
 Status
@@ -139,3 +139,6 @@ Meerdere actieve spoelen mogen hetzelfde filament bevatten. Bij het aanmaken van
 
 Wijziging v10.9.2:
 Bij het wijzigen van het filament van een bestaande spoel verschijnt eerst een bevestiging met het vorige en het nieuwe filament, de oude en nieuwe hoeveelheid en het bestaande spoelnummer. Bij annuleren wordt de wijziging niet opgeslagen. Is de spoel volgens het systeem nog niet leeg, dan vermeldt de melding dit expliciet. De aparte bevestiging als hetzelfde filament al op andere spoelen staat blijft behouden.
+
+
+Versie 10.9.3: grafieken (periode, categorie en type) boven de bijbehorende tabellen. Tabellen van periode en categorie passen zonder horizontaal scrollen op iPhone; detailoverzicht en logboek tonen daar compacte kaarten. Desktop-tabellen blijven behouden. Zelfde Firebase-account, datamodel en localStorage-sleutel.
