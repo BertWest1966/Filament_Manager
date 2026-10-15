@@ -5,23 +5,23 @@ const SYNC_DIRTY_KEY='filament_manager_v10_0_dirty_v1';
 const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','Andere'],types:{PLA:['Basic','Matte'],PETG:['Basic'],TPU:['95A'],ABS:['Basic'],ASA:['Basic'],Andere:[]},colors:[],brands:['Bambu Lab'],suppliers:['Bambu Lab']};
 let state=load();
 if(!Array.isArray(state.rollUsage))state.rollUsage=[];
-state.appVersion='10.9.3';
+state.appVersion='11.0';
 let currentView='dashboard',previousView='dashboard',stockMode='spools',stockSortMode='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,activeLibraryKind='colors',editingLibraryValue=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
-function fresh(){return{appVersion:'10.9.3',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
+function fresh(){return{appVersion:'11.0',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
 function load(){
   try{
     const own=localStorage.getItem(KEY);
     if(own)return {...fresh(),...JSON.parse(own)};
-    // Eerste start van versie 10.9.3: maak een kopie van de bestaande lokale gegevens.
+    // Eerste start van versie 11.0: maak een kopie van de bestaande lokale gegevens.
     // Voor compatibiliteit wordt eerst een eerdere migratiekopie bekeken, daarna de 9.0.1-opslag.
     // De brongegevens zelf worden nooit overschreven.
     for(const sourceKey of SOURCE_KEYS){
       const source=localStorage.getItem(sourceKey);
       if(source){
-        const copied={...fresh(),...JSON.parse(source),appVersion:'10.9.3'};
+        const copied={...fresh(),...JSON.parse(source),appVersion:'11.0'};
         localStorage.setItem(KEY,JSON.stringify(copied));
         return copied;
       }
@@ -236,8 +236,53 @@ function setDashboardLevel(id,value){
   }
   s.level=level;
   if(level===100)recordRollUsage(s,'Dashboard naar 100%');
+  log(`Spoel ${s.number} aangepast naar ${level}% via Dashboard`,s.filamentId);
   save();
 }
+
+// v11.0: visueel voorraadbeeld, waarschuwingen en historiek per blijvend spoelnummer.
+function renderFm11Dashboard(){
+  const bars=$('fm11CategoryBars'),lowList=$('fm11LowList'),histSelect=$('fm11HistorySpool');
+  if(!bars||!lowList||!histSelect)return;
+  const cats=new Map();
+  state.catalog.forEach(f=>{
+    const existing=cats.get(f.category)||{stock:0,refills:0};
+    existing.stock+=spoolStock(f.id);
+    existing.refills+=refillCount(f.id);
+    cats.set(f.category,existing);
+  });
+  const ordered=[...cats.entries()].sort((a,b)=>b[1].stock+b[1].refills-a[1].stock-a[1].refills);
+  const max=Math.max(1,...ordered.map(([,x])=>x.stock+x.refills));
+  bars.innerHTML=ordered.map(([cat,x])=>{
+    const pct=Math.max(0,Math.min(100,(x.stock+x.refills)/max*100));
+    return `<div class="fm11-bar-row"><span class="fm11-bar-name">${esc(cat)}</span><div class="fm11-track"><span style="width:${pct.toFixed(1)}%"></span></div><span class="fm11-bar-value">${(x.stock+x.refills).toLocaleString('nl-BE',{maximumFractionDigits:2})} rol</span></div>`;
+  }).join('')||'<div class="fm11-muted">Nog geen voorraadgegevens.</div>';
+  $('fm11Status').textContent=`${state.catalog.length} filamenten · ${state.refills.length} refills`;
+  const low=state.spools.filter(s=>s.status==='active'&&Number(s.level)<=25&&refillCount(s.filamentId)===0)
+    .sort((a,b)=>Number(a.level)-Number(b.level)||a.number.localeCompare(b.number,'nl',{numeric:true}));
+  $('fm11LowCount').textContent=String(low.length);
+  lowList.innerHTML=low.length?low.map(s=>{
+    const f=filament(s.filamentId);
+    return `<div class="fm11-low-item"><div><strong>${esc(s.number)}</strong><span>${f?filamentLabelHtml(f):'Filament onbekend'}</span></div><div class="fm11-low-right"><b>${Number(s.level)||0}%</b><button type="button" onclick="openSpool('${s.id}')">Open</button></div></div>`;
+  }).join(''):'<div class="fm11-ok">Geen spoelen met 25% of minder zonder refill.</div>';
+  const selected=histSelect.value;
+  const allNumbers=[...new Set([...state.spools.map(s=>s.number),...state.history.flatMap(h=>String(h.message||'').match(/\bS\d{3,}\b/gi)||[]),...state.rollUsage.map(r=>r.spoolNumber).filter(Boolean)])].sort((a,b)=>a.localeCompare(b,'nl',{numeric:true}));
+  histSelect.innerHTML='<option value="">Selecteer een spoelnummer</option>'+allNumbers.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  histSelect.value=allNumbers.includes(selected)?selected:'';
+  renderFm11History();
+}
+function renderFm11History(){
+  const select=$('fm11HistorySpool'),box=$('fm11HistoryList');
+  if(!select||!box)return;
+  const num=select.value;
+  if(!num){box.innerHTML='<div class="fm11-muted">Selecteer een spoel om de geschiedenis te bekijken.</div>';return;}
+  const spool=state.spools.find(s=>s.number===num);
+  const older=state.history.filter(h=>new RegExp(`(^|[^A-Za-z0-9])${num}([^A-Za-z0-9]|$)`,'i').test(h.message||'')).map(h=>({date:h.date,desc:h.message,source:'log'}));
+  const usage=(state.rollUsage||[]).filter(r=>r.spoolNumber===num||spool&&r.spoolId===spool.id).map(r=>({date:r.date,desc:`Nieuwe rol geregistreerd: ${r.category||''} ${r.type||''} ${r.color||''} (${r.source||'100%'})`,source:'verbruik'}));
+  const entries=[...older,...usage].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  box.innerHTML=entries.length?entries.map(e=>`<div class="fm11-history-item"><time>${new Date(e.date).toLocaleString('nl-BE')}</time><span>${esc(e.desc)}</span></div>`).join(''):'<div class="fm11-muted">Geen geregistreerde gebeurtenissen voor deze spoel. Oudere wijzigingen kunnen ontbreken als ze destijds niet werden gelogd.</div>';
+}
+document.getElementById('fm11HistorySpool').addEventListener('change',renderFm11History);
 
 function renderDashboard(){
   sumSpools.textContent=state.spools.filter(s=>s.status==='active').length;
@@ -1194,7 +1239,7 @@ createBackupBtn.onclick=()=>{
       backupFormat:'filament-manager',
       backupVersion:1,
       exportedAt:new Date().toISOString(),
-      appVersion:'10.9.3',
+      appVersion:'11.0',
       data:state
     };
     const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
@@ -1333,7 +1378,7 @@ restoreBackupInput.onchange=async event=>{
   const previousState=state;
   try{
     state=restored;
-    state.appVersion='10.9.3';
+    state.appVersion='11.0';
     save();
     add('Opslaan in browser: geslaagd');
     add('Firebase-synchronisatie: ingepland');
@@ -1351,7 +1396,7 @@ restoreBackupInput.onchange=async event=>{
   }
 }
 
-// v10.9.3: zoekresultaten per filament, met uitklapbare spoelen en refillnummers.
+// v11.0: zoekresultaten per filament, met uitklapbare spoelen en refillnummers.
 let expandedSearchFilamentId=null;
 function renderGlobalSearch(){
   const q=globalSearch.value.trim().toLocaleLowerCase('nl');
@@ -1678,7 +1723,7 @@ function statsTimelineRows(events){
   events.forEach(x=>{const y=String(new Date(x.date).getFullYear());add(y,y)});
   return [...counts.entries()].sort((a,b)=>Number(a[0])-Number(b[0])).map(([,v])=>v);
 }
-// v10.9.3: grafieken zonder externe bibliotheken, gebaseerd op dezelfde verbruiksgegevens als de tabellen.
+// v11.0: grafieken zonder externe bibliotheken, gebaseerd op dezelfde verbruiksgegevens als de tabellen.
 function statsBarChart(rows){
   if(!rows.length)return '<p class="note stats-empty">Geen gegevens voor deze periode.</p>';
   const max=Math.max(1,...rows.map(r=>r.count));
@@ -1783,7 +1828,7 @@ document.querySelectorAll('[data-stats-mode]').forEach(b=>b.onclick=()=>{
 statsPrevBtn.onclick=()=>moveStatsPeriod(-1);
 statsNextBtn.onclick=()=>{if(!sameCurrentStatsPeriod())moveStatsPeriod(1)};
 
-function renderAll(){refreshDatalists();renderDashboard();renderCatalog();renderStock();renderSpoolScreen();renderRefillScreen();renderOrderList();renderOrders();renderLibraries();renderLog();renderStatistics()}
+function renderAll(){refreshDatalists();renderDashboard();renderFm11Dashboard();renderCatalog();renderStock();renderSpoolScreen();renderRefillScreen();renderOrderList();renderOrders();renderLibraries();renderLog();renderStatistics()}
 
 const spoolScreenSearchEl=document.getElementById('spoolScreenSearch');
 const refillScreenSearchEl=document.getElementById('refillScreenSearch');
@@ -1815,7 +1860,7 @@ if(printSelectedRefillLabelsBtnEl)printSelectedRefillLabelsBtnEl.onclick=()=>pri
 /* ============================================================
    Firebase synchronisatie - VERSIE 10.1
    ------------------------------------------------------------
-   - Versie 10.9.3 gebruikt een eigen localStorage-sleutel.
+   - Versie 11.0 gebruikt een eigen localStorage-sleutel.
    - Firebase gebruikt een eigen pad voor deze aangemelde gebruiker.
    - Bij eerste cloudstart zonder data worden de lokale 10.0-gegevens geüpload.
    - Daarna is Firebase de gedeelde bron en blijft localStorage de lokale cache.
@@ -1858,7 +1903,7 @@ function setFirebaseUserUI(user){
 }
 function normalizeCloudState(raw){
   const normalized=normalizeBackupData(raw);
-  normalized.appVersion='10.9.3';
+  normalized.appVersion='11.0';
   return normalized;
 }
 function applyFirebaseState(raw){
@@ -1882,7 +1927,7 @@ function applyFirebaseState(raw){
 async function writeStateToFirebase(reason='Synchroniseren'){
   if(!firebaseSync.ready||!firebaseSync.ref||!firebaseSync.modules||firebaseSync.writing)return;
   const payload=structuredClone(state);
-  payload.appVersion='10.9.3';
+  payload.appVersion='11.0';
   const json=stableStringify(payload);
   firebaseSync.lastWriteJson=json;
   firebaseSync.writing=true;

@@ -1878,3 +1878,30 @@ label.file-button:has(#restoreBackupInput) #restoreBackupInput{
   #statistiek .stats-donut{width:130px;height:130px;flex-basis:130px}
   #statistiek .stats-chart{margin-bottom:12px}
 }
+
+/* Filament Manager v11.0 responsive visual dashboard */
+.fm11-overview{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px;margin:14px 0}
+.fm11-panel{background:var(--card-bg,#fff);border:1px solid var(--border,#dfe4e8);border-radius:14px;padding:16px;min-width:0;margin-bottom:14px}
+.fm11-overview .fm11-panel{margin-bottom:0}
+.fm11-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.fm11-heading h2{margin:0;font-size:1.05rem}
+.fm11-muted{font-size:.85rem;color:var(--muted,#667085)}
+.fm11-count{font-weight:700;background:#fff0eb;color:#9a3412;border-radius:20px;padding:4px 11px}
+.fm11-bars{display:grid;gap:12px}
+.fm11-bar-row{display:grid;grid-template-columns:72px minmax(20px,1fr) 72px;align-items:center;gap:10px;font-size:.88rem}
+.fm11-bar-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fm11-track{height:11px;background:#e9eef3;border-radius:12px;overflow:hidden}
+.fm11-track span{display:block;height:100%;background:linear-gradient(90deg,#299883,#4b83da);border-radius:12px}
+.fm11-bar-value{text-align:right;font-variant-numeric:tabular-nums;font-size:.79rem}
+.fm11-low-list{display:grid;gap:8px;margin-top:12px;max-height:260px;overflow:auto}
+.fm11-low-item{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px;border:1px solid var(--border,#e5e7eb);border-radius:10px}
+.fm11-low-item>div:first-child{display:grid;gap:5px;min-width:0}
+.fm11-low-item span{font-size:.82rem;overflow-wrap:anywhere}
+.fm11-low-right{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.fm11-ok{font-size:.88rem;color:#18764a;padding:12px;background:rgba(22,163,74,.08);border-radius:8px}
+.fm11-history-controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px}
+.fm11-history-controls select{max-width:260px;min-width:180px}
+.fm11-history-list{display:grid;gap:8px;max-height:420px;overflow:auto}
+.fm11-history-item{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px;padding:10px 12px;background:rgba(127,140,150,.06);border-radius:8px;font-size:.88rem}
+.fm11-history-item time{color:var(--muted,#667085);font-variant-numeric:tabular-nums}
+@media(max-width:760px){.fm11-overview{grid-template-columns:minmax(0,1fr)}.fm11-panel{padding:12px;margin-bottom:10px}.fm11-low-list{max-height:200px}.fm11-history-item{grid-template-columns:1fr;gap:3px}.fm11-bar-row{grid-template-columns:58px minmax(15px,1fr) 62px;gap:6px}.fm11-bar-value{font-size:.73rem}.fm11-heading h2{font-size:1rem}}

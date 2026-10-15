@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Filament">
-  <title>Filament Manager v10.9.3</title>
+  <title>Filament Manager v11.0</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=10.9.3">
+  <link rel="stylesheet" href="assets/app.css?v=11.0">
 </head>
 <body>
 <div class="app-shell">
@@ -18,7 +18,7 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 10.9.3</span>
+      <span>Versie 11.0</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M9.5 20v-6h5v6"/></svg></span><span>Dashboard</span></button>
@@ -39,7 +39,7 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 10.9.3</span>
+        <span>Versie 11.0</span>
       </div>
     </header>
 
@@ -61,6 +61,22 @@
           <div class="summary-card"><span>Refills</span><strong id="sumRefills">0</strong></div>
           <div class="summary-card"><span>Lege spoelen</span><strong id="sumEmpty">0</strong></div>
           <div class="summary-card"><span>Onder minimum</span><strong id="sumLow">0</strong></div>
+        </div>
+        <div class="fm11-overview" aria-label="Visueel voorraaddashboard">
+          <div class="fm11-panel fm11-spotlight">
+            <div class="fm11-heading"><h2>Voorraad in beeld</h2><span id="fm11Status" class="fm11-muted">Actuele voorraad</span></div>
+            <div id="fm11CategoryBars" class="fm11-bars"></div>
+          </div>
+          <div class="fm11-panel fm11-alerts">
+            <div class="fm11-heading"><h2>Bijna lege spoelen</h2><span id="fm11LowCount" class="fm11-count">0</span></div>
+            <p class="fm11-muted">25% of minder, zonder beschikbare refill voor dit filament.</p>
+            <div id="fm11LowList" class="fm11-low-list"></div>
+          </div>
+        </div>
+        <div class="fm11-panel fm11-history-panel">
+          <div class="fm11-heading"><h2>Geschiedenis per spoel</h2><span class="fm11-muted">Ook op iPhone</span></div>
+          <div class="fm11-history-controls"><label for="fm11HistorySpool">Kies een spoel</label><select id="fm11HistorySpool"><option value="">Selecteer een spoelnummer</option></select></div>
+          <div id="fm11HistoryList" class="fm11-history-list"><div class="fm11-muted">Selecteer een spoel om de geschiedenis te bekijken.</div></div>
         </div>
         <div class="panel">
           <div class="panel-head">
@@ -618,7 +634,7 @@ window.FMPrint = (() => {
   </form>
 </dialog>
 
-<script src="js/app.js?v=10.9.3"></script>
+<script src="js/app.js?v=11.0"></script>
 <script src="js/print-tools.js?v=7.5.5"></script>
 </body>
 </html>
