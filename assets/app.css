@@ -1905,3 +1905,14 @@ label.file-button:has(#restoreBackupInput) #restoreBackupInput{
 .fm11-history-item{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px;padding:10px 12px;background:rgba(127,140,150,.06);border-radius:8px;font-size:.88rem}
 .fm11-history-item time{color:var(--muted,#667085);font-variant-numeric:tabular-nums}
 @media(max-width:760px){.fm11-overview{grid-template-columns:minmax(0,1fr)}.fm11-panel{padding:12px;margin-bottom:10px}.fm11-low-list{max-height:200px}.fm11-history-item{grid-template-columns:1fr;gap:3px}.fm11-bar-row{grid-template-columns:58px minmax(15px,1fr) 62px;gap:6px}.fm11-bar-value{font-size:.73rem}.fm11-heading h2{font-size:1rem}}
+
+/* v11.0.1: leesbare dashboardtekst op lichte achtergrond. */
+.fm11-panel{color:#111827;background:#fff}
+.fm11-panel .fm11-bar-name,.fm11-panel .fm11-bar-value,
+.fm11-panel .fm11-low-item,.fm11-panel .fm11-low-item strong,
+.fm11-panel .fm11-low-item span,.fm11-panel .fm11-low-right b,
+.fm11-panel .fm11-history-item span{color:#111827!important;opacity:1!important}
+.fm11-panel .fm11-muted,.fm11-panel .fm11-history-item time{color:#4b5563!important;opacity:1!important}
+.fm11-panel .fm11-history-item{background:#f3f4f6}
+.fm11-panel .fm11-history-controls select{max-width:min(100%,520px);width:min(100%,520px);min-width:0;color:#111827;background:#fff}
+@media(max-width:760px){.fm11-history-controls{align-items:stretch}.fm11-history-controls select{width:100%;max-width:100%}}

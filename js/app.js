@@ -5,12 +5,12 @@ const SYNC_DIRTY_KEY='filament_manager_v10_0_dirty_v1';
 const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','Andere'],types:{PLA:['Basic','Matte'],PETG:['Basic'],TPU:['95A'],ABS:['Basic'],ASA:['Basic'],Andere:[]},colors:[],brands:['Bambu Lab'],suppliers:['Bambu Lab']};
 let state=load();
 if(!Array.isArray(state.rollUsage))state.rollUsage=[];
-state.appVersion='11.0';
+state.appVersion='11.0.1';
 let currentView='dashboard',previousView='dashboard',stockMode='spools',stockSortMode='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,activeLibraryKind='colors',editingLibraryValue=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
-function fresh(){return{appVersion:'11.0',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
+function fresh(){return{appVersion:'11.0.1',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
 function load(){
   try{
     const own=localStorage.getItem(KEY);
@@ -21,7 +21,7 @@ function load(){
     for(const sourceKey of SOURCE_KEYS){
       const source=localStorage.getItem(sourceKey);
       if(source){
-        const copied={...fresh(),...JSON.parse(source),appVersion:'11.0'};
+        const copied={...fresh(),...JSON.parse(source),appVersion:'11.0.1'};
         localStorage.setItem(KEY,JSON.stringify(copied));
         return copied;
       }
@@ -267,7 +267,14 @@ function renderFm11Dashboard(){
   }).join(''):'<div class="fm11-ok">Geen spoelen met 25% of minder zonder refill.</div>';
   const selected=histSelect.value;
   const allNumbers=[...new Set([...state.spools.map(s=>s.number),...state.history.flatMap(h=>String(h.message||'').match(/\bS\d{3,}\b/gi)||[]),...state.rollUsage.map(r=>r.spoolNumber).filter(Boolean)])].sort((a,b)=>a.localeCompare(b,'nl',{numeric:true}));
-  histSelect.innerHTML='<option value="">Selecteer een spoelnummer</option>'+allNumbers.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  // Toon bij actieve/bestaande spoelen ook de actuele filamentgegevens.
+  // Een historisch spoelnummer zonder huidige spoel blijft opzoekbaar.
+  histSelect.innerHTML='<option value="">Selecteer een spoelnummer</option>'+allNumbers.map(n=>{
+    const spool=state.spools.find(s=>s.number===n);
+    const f=spool?filament(spool.filamentId):null;
+    const name=f?`${n} - ${f.category} - ${f.type} - ${f.color}`:n;
+    return `<option value="${esc(n)}">${esc(name)}</option>`;
+  }).join('');
   histSelect.value=allNumbers.includes(selected)?selected:'';
   renderFm11History();
 }
@@ -1239,7 +1246,7 @@ createBackupBtn.onclick=()=>{
       backupFormat:'filament-manager',
       backupVersion:1,
       exportedAt:new Date().toISOString(),
-      appVersion:'11.0',
+      appVersion:'11.0.1',
       data:state
     };
     const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
@@ -1378,7 +1385,7 @@ restoreBackupInput.onchange=async event=>{
   const previousState=state;
   try{
     state=restored;
-    state.appVersion='11.0';
+    state.appVersion='11.0.1';
     save();
     add('Opslaan in browser: geslaagd');
     add('Firebase-synchronisatie: ingepland');
