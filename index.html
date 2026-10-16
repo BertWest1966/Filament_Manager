@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Filament">
-  <title>Filament Manager v11.0.1.1</title>
+  <title>Filament Manager v11.1</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=11.0.1.1">
+  <link rel="stylesheet" href="assets/app.css?v=11.1">
 </head>
 <body>
 <div class="app-shell">
@@ -18,7 +18,7 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 11.0.1</span>
+      <span>Versie 11.1</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M9.5 20v-6h5v6"/></svg></span><span>Dashboard</span></button>
@@ -39,7 +39,7 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 11.0.1</span>
+        <span>Versie 11.1</span>
       </div>
     </header>
 
@@ -167,8 +167,8 @@
         <div class="panel">
           <h2>Spoelwissel / refill koppelen</h2>
           <div class="toolbar fill-mode-tabs">
-            <button class="active" type="button" id="fillManualModeBtn">Manueel</button>
-            <button type="button" id="fillScanModeBtn">Scan</button>
+            <button type="button" id="fillManualModeBtn">Manueel</button>
+            <button class="active" type="button" id="fillScanModeBtn">Scan spoel</button>
           </div>
 
           <p id="fillModeStatus" class="note">Vul de spoel en refill manueel in.</p>
@@ -184,8 +184,13 @@
             </label>
           </div>
 
+          <div id="smartRefillPanel" class="smart-refill-panel hidden" aria-live="polite">
+            <h3>Passende refills</h3>
+            <div id="smartRefillList"></div>
+            <button type="button" id="scanRefillAlternativeBtn" class="hidden">Refill scannen (alternatief)</button>
+          </div>
           <div class="dialog-actions">
-            <button type="button" id="fillStartScanBtn" class="hidden">Camera openen</button>
+            <button type="button" id="fillStartScanBtn" class="hidden">Spoel scannen</button>
             <button type="button" id="confirmScannedPairBtn" class="primary hidden">Scan bevestigen</button>
             <button type="button" id="rescanPairBtn" class="hidden">Opnieuw scannen</button>
             <button class="primary" id="quickFillBtn">Koppelen</button>
@@ -634,7 +639,7 @@ window.FMPrint = (() => {
   </form>
 </dialog>
 
-<script src="js/app.js?v=11.0.1.1"></script>
+<script src="js/app.js?v=11.1"></script>
 <script src="js/print-tools.js?v=7.5.5"></script>
 </body>
 </html>

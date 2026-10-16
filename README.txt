@@ -1,4 +1,4 @@
-Filament Manager - versie 11.0.1
+Filament Manager - versie 11.1
 ================================
 
 Status
@@ -141,9 +141,12 @@ Wijziging v10.9.2:
 Bij het wijzigen van het filament van een bestaande spoel verschijnt eerst een bevestiging met het vorige en het nieuwe filament, de oude en nieuwe hoeveelheid en het bestaande spoelnummer. Bij annuleren wordt de wijziging niet opgeslagen. Is de spoel volgens het systeem nog niet leeg, dan vermeldt de melding dit expliciet. De aparte bevestiging als hetzelfde filament al op andere spoelen staat blijft behouden.
 
 
-Versie 11.0.1: grafieken (periode, categorie en type) boven de bijbehorende tabellen. Tabellen van periode en categorie passen zonder horizontaal scrollen op iPhone; detailoverzicht en logboek tonen daar compacte kaarten. Desktop-tabellen blijven behouden. Zelfde Firebase-account, datamodel en localStorage-sleutel.
+Versie 11.1: grafieken (periode, categorie en type) boven de bijbehorende tabellen. Tabellen van periode en categorie passen zonder horizontaal scrollen op iPhone; detailoverzicht en logboek tonen daar compacte kaarten. Desktop-tabellen blijven behouden. Zelfde Firebase-account, datamodel en localStorage-sleutel.
 
 
-Versie 11.0.1: grafisch categorie-overzicht op Dashboard, waarschuwingen voor actieve spoelen op 25% of minder zonder refill, en selecteerbare geschiedenis per spoelnummer. Responsive voor Mac/iPhone. Bestaande gegevensopslag, import/export en Firebase-onboarding ongewijzigd. Oude geschiedenis toont alleen voorheen vastgelegde gebeurtenissen, inclusief verbruiksregistraties.
+Versie 11.1: grafisch categorie-overzicht op Dashboard, waarschuwingen voor actieve spoelen op 25% of minder zonder refill, en selecteerbare geschiedenis per spoelnummer. Responsive voor Mac/iPhone. Bestaande gegevensopslag, import/export en Firebase-onboarding ongewijzigd. Oude geschiedenis toont alleen voorheen vastgelegde gebeurtenissen, inclusief verbruiksregistraties.
 
-Versie 11.0.1: spoelkeuze in historiek toont spoelnummer, categorie, type en kleur; verbeterd contrast van dashboard, waarschuwingen en historiek.
+Versie 11.1: spoelkeuze in historiek toont spoelnummer, categorie, type en kleur; verbeterd contrast van dashboard, waarschuwingen en historiek.
+
+
+Versie 11.1: scan één spoel; toon alle refills met exact hetzelfde filament-ID, kies er één en bevestig vóór koppelen. Refill scannen blijft als alternatief.

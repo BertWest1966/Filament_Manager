@@ -1906,7 +1906,7 @@ label.file-button:has(#restoreBackupInput) #restoreBackupInput{
 .fm11-history-item time{color:var(--muted,#667085);font-variant-numeric:tabular-nums}
 @media(max-width:760px){.fm11-overview{grid-template-columns:minmax(0,1fr)}.fm11-panel{padding:12px;margin-bottom:10px}.fm11-low-list{max-height:200px}.fm11-history-item{grid-template-columns:1fr;gap:3px}.fm11-bar-row{grid-template-columns:58px minmax(15px,1fr) 62px;gap:6px}.fm11-bar-value{font-size:.73rem}.fm11-heading h2{font-size:1rem}}
 
-/* v11.0.1: leesbare dashboardtekst op lichte achtergrond. */
+/* v11.1: leesbare dashboardtekst op lichte achtergrond. */
 .fm11-panel{color:#111827;background:#fff}
 .fm11-panel .fm11-bar-name,.fm11-panel .fm11-bar-value,
 .fm11-panel .fm11-low-item,.fm11-panel .fm11-low-item strong,
@@ -1916,3 +1916,12 @@ label.file-button:has(#restoreBackupInput) #restoreBackupInput{
 .fm11-panel .fm11-history-item{background:#f3f4f6}
 .fm11-panel .fm11-history-controls select{max-width:min(100%,520px);width:min(100%,520px);min-width:0;color:#111827;background:#fff}
 @media(max-width:760px){.fm11-history-controls{align-items:stretch}.fm11-history-controls select{width:100%;max-width:100%}}
+
+/* v11.1: selectie passende refills na het scannen van een spoel */
+.smart-refill-panel{border:1px solid #cbd5e1;border-radius:12px;padding:14px;margin:14px 0;background:#fff;color:#111827}
+.smart-refill-panel h3{margin:0 0 8px;font-size:1.1rem;color:#111827}
+.smart-refill-panel .note{color:#475569}
+.smart-refill-choice{display:flex;align-items:center;gap:12px;border:1px solid #d1d5db;border-radius:10px;padding:12px;margin:8px 0;color:#111827;background:#f8fafc;cursor:pointer;line-height:1.45}
+.smart-refill-choice input{width:20px;height:20px;flex-shrink:0;accent-color:#0f766e}
+.smart-refill-choice:has(input:checked){border-color:#0f766e;background:#ecfdf5}
+.smart-refill-panel button{margin-top:10px}
