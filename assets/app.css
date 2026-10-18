@@ -1925,3 +1925,61 @@ label.file-button:has(#restoreBackupInput) #restoreBackupInput{
 .smart-refill-choice input{width:20px;height:20px;flex-shrink:0;accent-color:#0f766e}
 .smart-refill-choice:has(input:checked){border-color:#0f766e;background:#ecfdf5}
 .smart-refill-panel button{margin-top:10px}
+
+
+/* v11.1.1: alle zoekvelden hebben een eigen, direct bedienbare wis-knop. */
+.fm-search-field{
+  position:relative;
+  display:block;
+  flex:1 1 180px;
+  min-width:0;
+  max-width:100%;
+}
+.fm-search-field>input[data-clearable-search]{
+  display:block;
+  width:100%;
+  min-width:0!important;
+  box-sizing:border-box;
+  padding-right:47px!important;
+}
+.fm-search-field>.fm-clear-search{
+  position:absolute;
+  top:50%;right:4px;
+  transform:translateY(-50%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 38px!important;
+  width:38px!important;
+  height:38px!important;
+  min-width:38px!important;
+  min-height:32px!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:7px!important;
+  background:transparent!important;
+  color:#475569!important;
+  font-size:25px!important;
+  font-weight:400!important;
+  line-height:1!important;
+  cursor:pointer;
+  z-index:1;
+}
+.fm-search-field>.fm-clear-search[hidden]{display:none!important}
+.fm-search-field>.fm-clear-search:hover,
+.fm-search-field>.fm-clear-search:focus-visible{
+  color:#111827!important;
+  background:#e9eef3!important;
+}
+.fm-search-field>.fm-clear-search:focus-visible{outline:2px solid #2563eb;outline-offset:-2px}
+.global-search>.fm-search-field{width:100%;flex:auto}
+#dashboard .panel-head>.fm-search-field{flex:1 1 180px}
+#dashboard .panel-head>.fm-search-field>input{min-height:35px!important;height:35px}
+#spoelen .toolbar>.fm-search-field,
+#refills .toolbar>.fm-search-field{flex:1 1 220px!important;min-width:0!important}
+#spoelen .toolbar>.fm-search-field>input,
+#refills .toolbar>.fm-search-field>input{width:100%!important;min-width:0!important}
+@media(max-width:600px){
+  .panel-head>.fm-search-field,.toolbar>.fm-search-field{flex:1 1 100%;width:100%;min-width:0}
+}

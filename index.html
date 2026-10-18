@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Filament">
-  <title>Filament Manager v11.1</title>
+  <title>Filament Manager v11.1.1</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icon-180.png">
-  <link rel="stylesheet" href="assets/app.css?v=11.1">
+  <link rel="stylesheet" href="assets/app.css?v=11.1.1">
 </head>
 <body>
 <div class="app-shell">
@@ -18,7 +18,7 @@
   <aside class="desktop-sidebar">
     <div class="brand">
       <strong>Filament Manager</strong>
-      <span>Versie 11.1</span>
+      <span>Versie 11.1.1</span>
     </div>
     <nav>
       <button data-view="dashboard" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M9.5 20v-6h5v6"/></svg></span><span>Dashboard</span></button>
@@ -39,12 +39,15 @@
     <header class="mobile-header">
       <div>
         <strong>Filament Manager</strong>
-        <span>Versie 11.1</span>
+        <span>Versie 11.1.1</span>
       </div>
     </header>
 
     <div class="global-search">
-      <input id="globalSearch" placeholder="Zoek filament, spoel of refill">
+      <div class="fm-search-field">
+        <input id="globalSearch" data-clearable-search="true" placeholder="Zoek filament, spoel of refill">
+        <button type="button" class="fm-clear-search" aria-label="Wis zoek filament, spoel of refill" title="Zoekveld leegmaken" hidden>×</button>
+      </div>
       <div id="globalResults" class="search-results hidden"></div>
     </div>
 
@@ -82,7 +85,10 @@
           <div class="panel-head">
             <h2>Voorraad</h2>
             <button type="button" id="dashboardScanSpoolBtn">Spoel scannen</button>
-            <input id="dashboardSearch" placeholder="Zoek type of kleur">
+            <div class="fm-search-field">
+              <input id="dashboardSearch" data-clearable-search="true" placeholder="Zoek type of kleur">
+              <button type="button" class="fm-clear-search" aria-label="Wis zoek type of kleur" title="Zoekveld leegmaken" hidden>×</button>
+            </div>
           </div>
           <div id="dashboardList"></div>
         </div>
@@ -91,7 +97,10 @@
       <section id="catalogus" class="view">
         <div class="toolbar">
           <button class="primary" id="newFilamentBtn">Nieuw filament</button>
-          <input id="catalogSearch" placeholder="Zoek categorie, type of kleur">
+          <div class="fm-search-field">
+            <input id="catalogSearch" data-clearable-search="true" placeholder="Zoek categorie, type of kleur">
+            <button type="button" class="fm-clear-search" aria-label="Wis zoek categorie, type of kleur" title="Zoekveld leegmaken" hidden>×</button>
+          </div>
         </div>
         <div class="panel"><div id="catalogList"></div></div>
       </section>
@@ -101,7 +110,10 @@
           <button class="primary" id="newSpoolBtn">Nieuwe spoel</button>
           <button id="newRefillBtn">Nieuwe refill</button>
           <button id="printSelectedLabelsBtn">Print geselecteerde stickers</button>
-          <input id="stockSearch" placeholder="Zoek nummer, type of kleur">
+          <div class="fm-search-field">
+            <input id="stockSearch" data-clearable-search="true" placeholder="Zoek nummer, type of kleur">
+            <button type="button" class="fm-clear-search" aria-label="Wis zoek nummer, type of kleur" title="Zoekveld leegmaken" hidden>×</button>
+          </div>
           <select id="stockSort">
             <option value="filament">Categorie → type → kleur</option>
             <option value="number-asc">Nummer oplopend</option>
@@ -119,7 +131,10 @@
         <div class="toolbar">
           <button class="primary" type="button" onclick="openSpool()">Nieuwe spoel</button>
           <button type="button" id="printSelectedSpoolLabelsBtn">Print geselecteerde stickers</button>
-          <input id="spoolScreenSearch" placeholder="Zoek nummer, type of kleur">
+          <div class="fm-search-field">
+            <input id="spoolScreenSearch" data-clearable-search="true" placeholder="Zoek nummer, type of kleur">
+            <button type="button" class="fm-clear-search" aria-label="Wis zoek nummer, type of kleur" title="Zoekveld leegmaken" hidden>×</button>
+          </div>
           <select id="spoolScreenSort">
             <option value="filament">Categorie → type → kleur</option>
             <option value="number-asc">Nummer oplopend</option>
@@ -133,7 +148,10 @@
         <div class="toolbar">
           <button class="primary" type="button" onclick="openRefill()">Nieuwe refill</button>
           <button type="button" id="printSelectedRefillLabelsBtn">Print geselecteerde stickers</button>
-          <input id="refillScreenSearch" placeholder="Zoek nummer, type of kleur">
+          <div class="fm-search-field">
+            <input id="refillScreenSearch" data-clearable-search="true" placeholder="Zoek nummer, type of kleur">
+            <button type="button" class="fm-clear-search" aria-label="Wis zoek nummer, type of kleur" title="Zoekveld leegmaken" hidden>×</button>
+          </div>
           <select id="refillScreenSort">
             <option value="filament">Categorie → type → kleur</option>
             <option value="number-asc">Nummer oplopend</option>
@@ -148,7 +166,10 @@
         <div class="panel">
           <div class="panel-head">
             <h2>Automatische bestellijst</h2>
-            <input id="orderListSearch" placeholder="Zoek type of kleur">
+            <div class="fm-search-field">
+              <input id="orderListSearch" data-clearable-search="true" placeholder="Zoek type of kleur">
+              <button type="button" class="fm-clear-search" aria-label="Wis zoek type of kleur" title="Zoekveld leegmaken" hidden>×</button>
+            </div>
             <button type="button" id="manualOrderAddBtn">Handmatig toevoegen</button>
           </div>
           <div id="orderList"></div>
@@ -158,7 +179,10 @@
       <section id="bestellingen" class="view">
         <div class="toolbar">
           <button class="primary" id="newOrderBtn">Nieuwe bestelling</button>
-          <input id="ordersSearch" placeholder="Zoek leverancier">
+          <div class="fm-search-field">
+            <input id="ordersSearch" data-clearable-search="true" placeholder="Zoek leverancier">
+            <button type="button" class="fm-clear-search" aria-label="Wis zoek leverancier" title="Zoekveld leegmaken" hidden>×</button>
+          </div>
         </div>
         <div class="panel"><div id="ordersList"></div></div>
       </section>
@@ -209,7 +233,10 @@
           </div>
           <div class="toolbar">
             <button class="primary" id="addLibraryValueBtn">Nieuwe waarde</button>
-            <input id="librarySearch" placeholder="Zoeken">
+            <div class="fm-search-field">
+              <input id="librarySearch" data-clearable-search="true" placeholder="Zoeken">
+              <button type="button" class="fm-clear-search" aria-label="Wis zoeken" title="Zoekveld leegmaken" hidden>×</button>
+            </div>
           </div>
           <div id="libraryManagerList"></div>
         </div>
@@ -276,7 +303,10 @@
         <div class="panel">
           <div class="panel-head">
             <h2>Logboek</h2>
-            <input id="logSearch" placeholder="Zoek actie">
+            <div class="fm-search-field">
+              <input id="logSearch" data-clearable-search="true" placeholder="Zoek actie">
+              <button type="button" class="fm-clear-search" aria-label="Wis zoek actie" title="Zoekveld leegmaken" hidden>×</button>
+            </div>
           </div>
           <div id="logList"></div>
         </div>
@@ -639,7 +669,7 @@ window.FMPrint = (() => {
   </form>
 </dialog>
 
-<script src="js/app.js?v=11.1"></script>
+<script src="js/app.js?v=11.1.1"></script>
 <script src="js/print-tools.js?v=7.5.5"></script>
 </body>
 </html>

@@ -5,12 +5,12 @@ const SYNC_DIRTY_KEY='filament_manager_v10_0_dirty_v1';
 const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','Andere'],types:{PLA:['Basic','Matte'],PETG:['Basic'],TPU:['95A'],ABS:['Basic'],ASA:['Basic'],Andere:[]},colors:[],brands:['Bambu Lab'],suppliers:['Bambu Lab']};
 let state=load();
 if(!Array.isArray(state.rollUsage))state.rollUsage=[];
-state.appVersion='11.1';
+state.appVersion='11.1.1';
 let currentView='dashboard',previousView='dashboard',stockMode='spools',stockSortMode='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,activeLibraryKind='colors',editingLibraryValue=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
-function fresh(){return{appVersion:'11.1',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
+function fresh(){return{appVersion:'11.1.1',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
 function load(){
   try{
     const own=localStorage.getItem(KEY);
@@ -21,7 +21,7 @@ function load(){
     for(const sourceKey of SOURCE_KEYS){
       const source=localStorage.getItem(sourceKey);
       if(source){
-        const copied={...fresh(),...JSON.parse(source),appVersion:'11.1'};
+        const copied={...fresh(),...JSON.parse(source),appVersion:'11.1.1'};
         localStorage.setItem(KEY,JSON.stringify(copied));
         return copied;
       }
@@ -1227,7 +1227,7 @@ function setRefillLinkMode(mode){
 }
 fillManualModeBtn.onclick=()=>setRefillLinkMode('manual');
 fillScanModeBtn.onclick=()=>setRefillLinkMode('scan');
-// v11.1: slimme spoelscan is de standaard; manueel blijft beschikbaar.
+// v11.1.1: slimme spoelscan is de standaard; manueel blijft beschikbaar.
 setRefillLinkMode('scan');
 fillStartScanBtn.onclick=async()=>{
   quickFillSpool.value='';
@@ -1301,7 +1301,7 @@ createBackupBtn.onclick=()=>{
       backupFormat:'filament-manager',
       backupVersion:1,
       exportedAt:new Date().toISOString(),
-      appVersion:'11.1',
+      appVersion:'11.1.1',
       data:state
     };
     const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
@@ -1440,7 +1440,7 @@ restoreBackupInput.onchange=async event=>{
   const previousState=state;
   try{
     state=restored;
-    state.appVersion='11.1';
+    state.appVersion='11.1.1';
     save();
     add('Opslaan in browser: geslaagd');
     add('Firebase-synchronisatie: ingepland');
@@ -2118,6 +2118,29 @@ async function initFirebaseSync(){
     setFirebaseStatus('Firebase kon niet starten — lokale kopie blijft bruikbaar','error');
   }
 }
+
+
+// v11.1.1: in elk zoekveld een wis-knop, zonder bestaande zoeklogica te wijzigen.
+// Een normaal input-event werkt met alle bestaande filters, ook op iPhone.
+function initClearableSearchFields(){
+  document.querySelectorAll('.fm-search-field').forEach(field=>{
+    const input=field.querySelector('input[data-clearable-search]');
+    const clearButton=field.querySelector('.fm-clear-search');
+    if(!input||!clearButton)return;
+    const refresh=()=>{clearButton.hidden=input.value.length===0};
+    input.addEventListener('input',refresh);
+    input.addEventListener('change',refresh);
+    clearButton.addEventListener('click',()=>{
+      if(!input.value)return;
+      input.value='';
+      input.dispatchEvent(new Event('input',{bubbles:true}));
+      input.focus();
+      refresh();
+    });
+    refresh();
+  });
+}
+initClearableSearchFields();
 
 renderAll();
 persistLocalState();
