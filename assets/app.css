@@ -1983,3 +1983,7 @@ label.file-button:has(#restoreBackupInput) #restoreBackupInput{
 @media(max-width:600px){
   .panel-head>.fm-search-field,.toolbar>.fm-search-field{flex:1 1 100%;width:100%;min-width:0}
 }
+
+/* v11.1.2: native spoelkeuze in de manuele refillmodus, bruikbaar op Mac en iPhone. */
+#quickFillSpoolSelect{width:100%;max-width:100%;min-width:0;background:#fff;color:#111827}
+#quickFillSpoolSelect:focus-visible{outline:2px solid #2563eb;outline-offset:2px}

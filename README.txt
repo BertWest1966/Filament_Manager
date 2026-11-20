@@ -1,4 +1,4 @@
-Filament Manager - versie 11.1.1
+Filament Manager - versie 11.1.2
 ================================
 
 Status
@@ -152,3 +152,5 @@ Versie 11.1: spoelkeuze in historiek toont spoelnummer, categorie, type en kleur
 Versie 11.1: scan één spoel; toon alle refills met exact hetzelfde filament-ID, kies er één en bevestig vóór koppelen. Refill scannen blijft als alternatief.
 
 Versie 11.1.1: wis-knop (×) in alle tien zoekvelden: algemeen, Dashboard, catalogus, voorraad, Spoelen, Refills, automatische bestellijst, bestellingen, bibliotheken en logboek. Eén klik/tik wist de zoektekst en herstelt direct de ongefilterde resultaten via dezelfde bestaande zoekfunctie. De onderliggende voorraad-, QR- en Firebase-data blijven ongewijzigd.
+
+Versie 11.1.2: bij Manueel een numeriek gesorteerde keuzelijst van actieve spoelnummers, met filament en resterend niveau. Na selectie verschijnt automatisch dezelfde lijst van exact overeenkomende refills als bij spoelscan. Na refillkeuze blijft de definitieve bevestiging gelden. Scanmodus, Firebase en gegevensopslag blijven behouden.

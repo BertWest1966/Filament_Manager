@@ -5,12 +5,12 @@ const SYNC_DIRTY_KEY='filament_manager_v10_0_dirty_v1';
 const DEFAULTS={categories:['PLA','PETG','TPU','ABS','ASA','Andere'],types:{PLA:['Basic','Matte'],PETG:['Basic'],TPU:['95A'],ABS:['Basic'],ASA:['Basic'],Andere:[]},colors:[],brands:['Bambu Lab'],suppliers:['Bambu Lab']};
 let state=load();
 if(!Array.isArray(state.rollUsage))state.rollUsage=[];
-state.appVersion='11.1.1';
+state.appVersion='11.1.2';
 let currentView='dashboard',previousView='dashboard',stockMode='spools',stockSortMode='filament',editFilamentId=null,editSpoolId=null,editRefillId=null,activeLibraryKind='colors',editingLibraryValue=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function uid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'_'+Math.random()}
-function fresh(){return{appVersion:'11.1.1',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
+function fresh(){return{appVersion:'11.1.2',catalog:[],spools:[],refills:[],orders:[],history:[],rollUsage:[],libraries:structuredClone(DEFAULTS)}}
 function load(){
   try{
     const own=localStorage.getItem(KEY);
@@ -21,7 +21,7 @@ function load(){
     for(const sourceKey of SOURCE_KEYS){
       const source=localStorage.getItem(sourceKey);
       if(source){
-        const copied={...fresh(),...JSON.parse(source),appVersion:'11.1.1'};
+        const copied={...fresh(),...JSON.parse(source),appVersion:'11.1.2'};
         localStorage.setItem(KEY,JSON.stringify(copied));
         return copied;
       }
@@ -812,6 +812,7 @@ let refillLinkSpoolNumber='';
 let scanPairConfirmed=false;
 const confirmScannedPairBtn=document.getElementById('confirmScannedPairBtn');
 const rescanPairBtn=document.getElementById('rescanPairBtn');
+const quickFillSpoolSelect=document.getElementById('quickFillSpoolSelect');
 const quickFillSpoolInfo=document.getElementById('quickFillSpoolInfo');
 const quickFillRefillInfo=document.getElementById('quickFillRefillInfo');
 const smartRefillPanel=document.getElementById('smartRefillPanel');
@@ -819,19 +820,53 @@ const smartRefillList=document.getElementById('smartRefillList');
 const scanRefillAlternativeBtn=document.getElementById('scanRefillAlternativeBtn');
 let smartRefillSelected=false;
 
+// v11.1.2: alle actieve spoelen numeriek tonen bij manuele refillkoppeling.
+// De onderliggende QR-invoer blijft ongewijzigd voor de scanmodus.
+function refreshManualSpoolOptions(){
+  if(!quickFillSpoolSelect)return;
+  const previous=quickFillSpoolSelect.value;
+  const options=state.spools
+    .filter(s=>(!s.status||s.status==='active')&&s.number)
+    .sort((a,b)=>String(a.number).localeCompare(String(b.number),'nl',{numeric:true}));
+  quickFillSpoolSelect.innerHTML='<option value="">Kies een spoelnummer…</option>'+
+    options.map(s=>{
+      const f=filament(s.filamentId);
+      const details=f?` · ${label(f)}`:'';
+      return `<option value="${esc(s.number)}">${esc(s.number)}${esc(details)} · ${Number(s.level)||0}%</option>`;
+    }).join('');
+  if(options.some(s=>s.number===previous))quickFillSpoolSelect.value=previous;
+}
+
+function selectManualSpool(){
+  if(refillLinkMode!=='manual')return;
+  const spool=state.spools.find(s=>s.number===quickFillSpoolSelect.value && (!s.status||s.status==='active'));
+  quickFillSpool.value=spool?.number||'';
+  quickFillRefill.value='';
+  scanPairConfirmed=false;
+  if(spool){
+    displayMatchingRefills(spool);
+  }else{
+    clearSmartRefills();
+    quickFillBtn.disabled=true;
+    fillModeStatus.textContent='Kies eerst een spoel uit de numeriek gesorteerde lijst.';
+  }
+  updateQuickFillFilamentInfo();
+}
+quickFillSpoolSelect.addEventListener('change',selectManualSpool);
+
 function displayMatchingRefills(spool){
   smartRefillSelected=false;
   quickFillRefill.value='';
   updateQuickFillFilamentInfo();
   confirmScannedPairBtn.classList.add('hidden');
   quickFillBtn.disabled=true;
-  scanRefillAlternativeBtn.classList.remove('hidden');
+  scanRefillAlternativeBtn.classList.toggle('hidden',refillLinkMode!=='scan');
   smartRefillPanel.classList.remove('hidden');
   const f=filament(spool.filamentId);
   const eligible=state.refills.filter(r=>r.filamentId===spool.filamentId).sort((a,b)=>a.number.localeCompare(b.number,'nl',{numeric:true}));
   const description=f?label(f):'Filament niet gevonden';
   if(!eligible.length){
-    smartRefillList.innerHTML='<p class="note">Geen passende refills in voorraad voor dit exacte filament. Je kunt eventueel een refill scannen als alternatief.</p>';
+    smartRefillList.innerHTML='<p class="note">Geen beschikbare refill van exact hetzelfde filament gevonden.</p>';
     fillModeStatus.textContent=`Spoel ${spool.number} · ${description}: geen passende refill beschikbaar.`;
     return;
   }
@@ -847,7 +882,7 @@ function displayMatchingRefills(spool){
     quickFillBtn.disabled=false;
     fillModeStatus.textContent=`Spoel ${spool.number} en refill ${current.number} geselecteerd. Tik op Koppelen voor de definitieve bevestiging.`;
   }));
-  fillModeStatus.textContent=`Spoel ${spool.number} herkend. Selecteer één van de ${eligible.length} passende refills.`;
+  fillModeStatus.textContent=`Spoel ${spool.number} ${refillLinkMode==='manual'?'gekozen':'herkend'}. Selecteer één van de ${eligible.length} passende refills.`;
 }
 
 function clearSmartRefills(){
@@ -1176,7 +1211,15 @@ dashboardLevelForm.onsubmit=e=>{
 
 quickFillSpool.addEventListener('input',updateQuickFillFilamentInfo);
 quickFillSpool.addEventListener('change',updateQuickFillFilamentInfo);
-quickFillRefill.addEventListener('input',updateQuickFillFilamentInfo);
+quickFillRefill.addEventListener('input',()=>{
+  updateQuickFillFilamentInfo();
+  // Een handmatig ingevoerd refillnummer overschrijft een eerdere radiokeuze.
+  if(refillLinkMode==='manual'){
+    smartRefillSelected=false;
+    smartRefillList.querySelectorAll('input[name="smartRefillOption"]').forEach(r=>r.checked=false);
+    quickFillBtn.disabled=!quickFillSpool.value.trim()||!quickFillRefill.value.trim();
+  }
+});
 quickFillRefill.addEventListener('change',()=>{
   updateQuickFillFilamentInfo();
   if(refillLinkMode==='scan') showScanPairConfirmation();
@@ -1208,26 +1251,32 @@ function setRefillLinkMode(mode){
   fillManualModeBtn.classList.toggle('active',mode==='manual');
   fillScanModeBtn.classList.toggle('active',mode==='scan');
   fillStartScanBtn.classList.toggle('hidden',mode!=='scan');
+  quickFillSpool.classList.toggle('hidden',mode==='manual');
+  quickFillSpoolSelect.classList.toggle('hidden',mode!=='manual');
   quickFillSpool.readOnly=mode==='scan';
   quickFillRefill.readOnly=mode==='scan';
   clearSmartRefills();
+  scanPairConfirmed=false;
+  confirmScannedPairBtn.classList.add('hidden');
+  rescanPairBtn.classList.add('hidden');
+  quickFillBtn.disabled=true;
   if(mode==='manual'){
-    scanPairConfirmed=false;
-    confirmScannedPairBtn.classList.add('hidden');
-    rescanPairBtn.classList.add('hidden');
-    quickFillBtn.disabled=false;
-    fillModeStatus.textContent='Vul de spoel en refill manueel in.';
+    refreshManualSpoolOptions();
+    const current=state.spools.find(s=>s.number===quickFillSpool.value && (!s.status||s.status==='active'));
+    quickFillSpoolSelect.value=current?.number||'';
+    selectManualSpool();
   }else{
+    quickFillSpoolSelect.value='';
     quickFillSpool.value='';
     quickFillRefill.value='';
-    resetScanPairConfirmation(false);
+    refillLinkSpoolNumber='';
     updateQuickFillFilamentInfo();
     fillModeStatus.textContent='Open de camera, scan de spoel en selecteer een passende refill uit de lijst.';
   }
 }
 fillManualModeBtn.onclick=()=>setRefillLinkMode('manual');
 fillScanModeBtn.onclick=()=>setRefillLinkMode('scan');
-// v11.1.1: slimme spoelscan is de standaard; manueel blijft beschikbaar.
+// v11.1.2: slimme spoelscan blijft standaard; manueel biedt een gesorteerde spoelkeuze.
 setRefillLinkMode('scan');
 fillStartScanBtn.onclick=async()=>{
   quickFillSpool.value='';
@@ -1268,17 +1317,18 @@ quickFillBtn.onclick=()=>{
   log(`Refill ${r.number} gekoppeld aan ${s.number}`,s.filamentId);
   quickFillSpool.value='';
   quickFillRefill.value='';
+  quickFillSpoolSelect.value='';
   updateQuickFillFilamentInfo();
   refillScanPhase=null;
   scanPairConfirmed=false;
   clearSmartRefills();
   confirmScannedPairBtn.classList.add('hidden');
   rescanPairBtn.classList.add('hidden');
-  if(refillLinkMode==='scan') quickFillBtn.disabled=true;
+  quickFillBtn.disabled=true;
   save();
   fillModeStatus.textContent=refillLinkMode==='scan'
     ? 'Koppeling voltooid. Scan een volgende spoel om passende refills te kiezen.'
-    : 'Koppeling voltooid. Vul de volgende spoel en refill manueel in.';
+    : 'Koppeling voltooid. Kies een volgende spoel uit de lijst.';
   showAppToast(`✓ Spoel ${s.number} is succesvol aangevuld met refill ${r.number}.`);
 }
 
@@ -1301,7 +1351,7 @@ createBackupBtn.onclick=()=>{
       backupFormat:'filament-manager',
       backupVersion:1,
       exportedAt:new Date().toISOString(),
-      appVersion:'11.1.1',
+      appVersion:'11.1.2',
       data:state
     };
     const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
@@ -1440,7 +1490,7 @@ restoreBackupInput.onchange=async event=>{
   const previousState=state;
   try{
     state=restored;
-    state.appVersion='11.1.1';
+    state.appVersion='11.1.2';
     save();
     add('Opslaan in browser: geslaagd');
     add('Firebase-synchronisatie: ingepland');
@@ -1890,7 +1940,7 @@ document.querySelectorAll('[data-stats-mode]').forEach(b=>b.onclick=()=>{
 statsPrevBtn.onclick=()=>moveStatsPeriod(-1);
 statsNextBtn.onclick=()=>{if(!sameCurrentStatsPeriod())moveStatsPeriod(1)};
 
-function renderAll(){refreshDatalists();renderDashboard();renderFm11Dashboard();renderCatalog();renderStock();renderSpoolScreen();renderRefillScreen();renderOrderList();renderOrders();renderLibraries();renderLog();renderStatistics()}
+function renderAll(){refreshDatalists();renderDashboard();renderFm11Dashboard();renderCatalog();renderStock();renderSpoolScreen();renderRefillScreen();renderOrderList();renderOrders();renderLibraries();renderLog();renderStatistics();refreshManualSpoolOptions()}
 
 const spoolScreenSearchEl=document.getElementById('spoolScreenSearch');
 const refillScreenSearchEl=document.getElementById('refillScreenSearch');
